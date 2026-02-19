@@ -16,7 +16,7 @@ class SentApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: 'Sent',
-      theme: AppTheme.light,
+      theme: AppTheme.dark,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
