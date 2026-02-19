@@ -17,13 +17,16 @@ GoRouter appRouter(Ref ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
 
   return GoRouter(
-    initialLocation: '/todo',
+    initialLocation: '/auth/login',
     redirect: (context, state) async {
-      final hasToken = await tokenStorage.hasToken();
       final isAuthRoute = state.matchedLocation.startsWith('/auth');
-
-      if (!hasToken && !isAuthRoute) return '/auth/login';
-      if (hasToken && isAuthRoute) return '/todo';
+      try {
+        final hasToken = await tokenStorage.hasToken();
+        if (!hasToken && !isAuthRoute) return '/auth/login';
+        if (hasToken && isAuthRoute) return '/todo';
+      } catch (_) {
+        if (!isAuthRoute) return '/auth/login';
+      }
       return null;
     },
     routes: [
