@@ -42,6 +42,17 @@ dev_dependencies:
   freezed: ^3.0.0
   json_serializable: ^6.9.3
 
+  # 앱 아이콘 생성
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  ios: true
+  android: false
+  image_path: "assets/images/app_icon.png"
+  ios_content_mode: scaleAspectFit
+  background_color: "#000000"
+  remove_alpha_ios: true
+
 flutter:
   uses-material-design: true
 
