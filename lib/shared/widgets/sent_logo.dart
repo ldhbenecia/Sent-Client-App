@@ -16,13 +16,6 @@ class SentLogo extends StatelessWidget {
         color: AppColors.card,
         borderRadius: BorderRadius.circular(size * 0.24),
         border: Border.all(color: AppColors.border, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withValues(alpha: 0.04),
-            blurRadius: 12,
-            spreadRadius: 0,
-          ),
-        ],
       ),
       child: CustomPaint(
         painter: _SentIconPainter(),
@@ -36,60 +29,119 @@ class _SentIconPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final scale = size.width / 72;
 
-    // Paper plane (send icon)
-    final bodyPaint = Paint()
-      ..color = AppColors.primary300
-      ..style = PaintingStyle.fill;
+    // 배경 미묘한 그라디언트
+    final bgPaint = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(-0.3, -0.3),
+        radius: 0.9,
+        colors: [
+          const Color(0xFF242424),
+          AppColors.card,
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    final rrect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Radius.circular(size.width * 0.24),
+    );
+    canvas.drawRRect(rrect, bgPaint);
 
-    final shadowPaint = Paint()
-      ..color = AppColors.primary600
-      ..style = PaintingStyle.fill;
-
-    // 종이비행기 몸체 - 오른쪽 위를 향해 날아가는 방향
-    final angle = -math.pi / 6; // 30도 기울기
+    final s = size.width / 100; // 100 기준 스케일
 
     canvas.save();
     canvas.translate(cx, cy);
-    canvas.rotate(angle);
+    canvas.rotate(-math.pi / 5.5); // 약 32도
 
-    // 날개 왼쪽 (아래)
+    // ── Trail dots ──────────────────────────────────────────
+    final trailPaint = Paint()..style = PaintingStyle.fill;
+
+    final trailPositions = [
+      (x: -28.0 * s, y: 24.0 * s, r: 2.2 * s, a: 0.15),
+      (x: -20.0 * s, y: 32.0 * s, r: 3.0 * s, a: 0.20),
+      (x: -10.0 * s, y: 36.0 * s, r: 4.0 * s, a: 0.25),
+    ];
+    for (final t in trailPositions) {
+      trailPaint.color = Color.fromRGBO(255, 255, 255, t.a);
+      canvas.drawCircle(Offset(t.x, t.y), t.r, trailPaint);
+    }
+
+    // ── 종이비행기 몸체 ─────────────────────────────────────
+    // 코 (앞)
+    final nose    = Offset(0, -32 * s);
+    // 왼쪽 날개 끝
+    final leftTip = Offset(-26 * s, 20 * s);
+    // 오른쪽 날개 끝
+    final rightTip = Offset(26 * s, 14 * s);
+    // 몸통 중심
+    final center  = Offset(0, 9 * s);
+    // 꼬리
+    final tail    = Offset(-8 * s, 32 * s);
+
+    // 왼쪽 날개 (밝은 면)
     final leftWing = Path()
-      ..moveTo(0, -14 * scale)       // 코 (앞쪽 끝)
-      ..lineTo(-12 * scale, 8 * scale) // 왼쪽 날개 끝
-      ..lineTo(0, 4 * scale)          // 몸통 중심 아래
+      ..moveTo(nose.dx, nose.dy)
+      ..lineTo(leftTip.dx, leftTip.dy)
+      ..lineTo(center.dx, center.dy)
       ..close();
-    canvas.drawPath(leftWing, bodyPaint);
-
-    // 날개 오른쪽 (위)
-    final rightWing = Path()
-      ..moveTo(0, -14 * scale)
-      ..lineTo(12 * scale, 6 * scale)
-      ..lineTo(0, 4 * scale)
-      ..close();
-    canvas.drawPath(rightWing, Paint()
-      ..color = AppColors.primary400
-      ..style = PaintingStyle.fill);
-
-    // 꼬리 접힌 부분 (하단 삼각)
-    final tail = Path()
-      ..moveTo(-12 * scale, 8 * scale)
-      ..lineTo(0, 4 * scale)
-      ..lineTo(-4 * scale, 14 * scale)
-      ..close();
-    canvas.drawPath(tail, shadowPaint);
-
-    // 중앙 접힌 선 강조
-    final foldLine = Path()
-      ..moveTo(0, -14 * scale)
-      ..lineTo(-4 * scale, 14 * scale);
     canvas.drawPath(
-      foldLine,
+      leftWing,
+      Paint()
+        ..color = AppColors.primary200
+        ..style = PaintingStyle.fill,
+    );
+
+    // 오른쪽 날개 (중간 명도)
+    final rightWing = Path()
+      ..moveTo(nose.dx, nose.dy)
+      ..lineTo(rightTip.dx, rightTip.dy)
+      ..lineTo(center.dx, center.dy)
+      ..close();
+    canvas.drawPath(
+      rightWing,
+      Paint()
+        ..color = AppColors.primary400
+        ..style = PaintingStyle.fill,
+    );
+
+    // 꼬리 삼각 (그림자)
+    final tailPath = Path()
+      ..moveTo(leftTip.dx, leftTip.dy)
+      ..lineTo(center.dx, center.dy)
+      ..lineTo(tail.dx, tail.dy)
+      ..close();
+    canvas.drawPath(
+      tailPath,
       Paint()
         ..color = AppColors.primary700
+        ..style = PaintingStyle.fill,
+    );
+
+    // 중앙 접힘선
+    canvas.drawLine(
+      nose,
+      tail,
+      Paint()
+        ..color = AppColors.primary800
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 0.8 * scale,
+        ..strokeWidth = 1.2 * s
+        ..strokeCap = StrokeCap.round,
+    );
+
+    // 날개 외곽선 (미세 테두리)
+    final outlinePath = Path()
+      ..moveTo(nose.dx, nose.dy)
+      ..lineTo(leftTip.dx, leftTip.dy)
+      ..lineTo(tail.dx, tail.dy)
+      ..lineTo(center.dx, center.dy)
+      ..lineTo(rightTip.dx, rightTip.dy)
+      ..close();
+    canvas.drawPath(
+      outlinePath,
+      Paint()
+        ..color = AppColors.primary600
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.6 * s
+        ..strokeJoin = StrokeJoin.round,
     );
 
     canvas.restore();
