@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/theme/app_colors.dart';
 
-class TodoPage extends StatelessWidget {
-  const TodoPage({super.key});
+class MemoPage extends StatelessWidget {
+  const MemoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class TodoPage extends StatelessWidget {
       ),
       body: const Center(
         child: Text(
-          'Todo 기능 구현 예정',
+          'Memo 기능 구현 예정',
           style: TextStyle(color: AppColors.textSecondary),
         ),
       ),
