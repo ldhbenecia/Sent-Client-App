@@ -27,6 +27,9 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   shared_preferences: ^2.3.5
 
+  # OAuth 로그인 (ASWebAuthenticationSession)
+  flutter_web_auth_2: ^3.0.0
+
   # 유틸
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
