@@ -49,11 +49,14 @@ lib/
 # 시뮬레이터 켜기 (flutter run 전에 필수)
 open -a Simulator
 
-# 앱 실행
+# 앱 실행 (.env 기반, 권장)
+./run.sh
+
+# 앱 실행 (직접)
 flutter run
 
 # 한 번에 실행
-xcrun simctl boot "iPhone 17 Pro" && open -a Simulator && flutter run
+xcrun simctl boot "iPhone 17 Pro" && open -a Simulator && ./run.sh
 
 # 백엔드 URL 바꿔서 실행
 flutter run --dart-define=API_BASE_URL=https://sent-dev.sentlabs.site
