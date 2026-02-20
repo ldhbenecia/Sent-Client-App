@@ -1,7 +1,6 @@
 # Sent Client App — CLAUDE.md
 
-Flutter 기반 All-in-One 생산성 앱 (iOS 우선).
-백엔드: Kotlin/Spring Boot (`sent-server`), JWT 인증, REST API + WebSocket.
+Flutter iOS 앱. 백엔드: `sent-server` (Kotlin/Spring Boot, localhost:8080).
 
 ---
 
@@ -12,8 +11,8 @@ Flutter 기반 All-in-One 생산성 앱 (iOS 우선).
 | 상태 관리 | `flutter_riverpod` + `riverpod_annotation` |
 | 네트워크 | `dio` + `pretty_dio_logger` |
 | 라우팅 | `go_router` |
+| OAuth 로그인 | `flutter_web_auth_2` |
 | 토큰 저장 | `flutter_secure_storage` |
-| 로컬 저장 | `shared_preferences` |
 | 모델 직렬화 | `freezed` + `json_serializable` |
 | 코드 생성 | `build_runner` |
 
@@ -23,54 +22,83 @@ Flutter 기반 All-in-One 생산성 앱 (iOS 우선).
 
 ```
 lib/
-├── main.dart                  # 앱 진입점 (ProviderScope + MaterialApp.router)
+├── main.dart
 ├── core/
-│   ├── network/               # Dio 클라이언트, 인터셉터
-│   ├── storage/               # 토큰 저장소
-│   ├── router/                # go_router 라우트 정의
-│   └── error/                 # AppException sealed class
+│   ├── config/        # AppConfig (API URL, OAuth 콜백 스킴)
+│   ├── network/       # Dio + JWT 인터셉터
+│   ├── storage/       # TokenStorage
+│   ├── router/        # go_router
+│   └── error/         # AppException
 ├── features/
-│   ├── auth/                  # 로그인, 회원가입
-│   │   ├── data/              # Repository 구현체, API 호출
-│   │   ├── domain/            # Model, Repository 인터페이스
-│   │   └── presentation/      # Page, Widget, Provider
-│   ├── todo/                  # Todo 기능
-│   └── chat/                  # Chat + WebSocket
+│   ├── auth/
+│   │   ├── data/services/      # OAuthService
+│   │   └── presentation/pages/ # LoginPage
+│   ├── todo/
+│   ├── memo/
+│   └── social/
 └── shared/
-    ├── theme/                 # AppTheme (색상, 폰트, 컴포넌트 스타일)
-    └── widgets/               # 공통 위젯 (MainShell 등)
+    ├── theme/         # AppColors, AppTheme
+    └── widgets/       # SentLogo, MainShell, GlassContainer
 ```
-
-각 feature는 `data / domain / presentation` 3계층으로 구성한다.
 
 ---
 
-## 아키텍처 규칙
+## 명령어
 
-### 레이어 의존성 방향
-```
-presentation → domain ← data
-```
-- `presentation`은 `domain`의 인터페이스만 참조한다
-- `data`는 `domain`의 인터페이스를 구현한다
-- 레이어를 건너뛰는 직접 참조는 금지한다
+```bash
+# 시뮬레이터 켜기 (flutter run 전에 필수)
+open -a Simulator
 
-### Provider 작성 규칙
-- `@riverpod` 어노테이션을 사용한다 (riverpod_generator)
-- Provider 파일마다 `part '파일명.g.dart';` 선언 필요
-- 코드 생성은 `dart run build_runner build --delete-conflicting-outputs`
+# 앱 실행
+flutter run
+
+# 한 번에 실행
+xcrun simctl boot "iPhone 17 Pro" && open -a Simulator && flutter run
+
+# 백엔드 URL 바꿔서 실행
+flutter run --dart-define=API_BASE_URL=https://sent-dev.sentlabs.site
+
+# 실행 중: r = hot reload / R = restart / q = 종료
+
+# 코드 생성 (.g.dart 재생성)
+dart run build_runner build --delete-conflicting-outputs
+
+# 빌드 에러 확인
+flutter build ios --no-codesign
+```
+
+---
+
+## 라우팅
+
+```
+/auth/login  → LoginPage
+/todo        → TodoPage   (ShellRoute 탭 1)
+/memo        → MemoPage   (ShellRoute 탭 2)
+/social      → SocialPage (ShellRoute 탭 3)
+```
+
+토큰 없으면 `/auth/login`, 토큰 있으면 `/todo` 자동 리다이렉트.
+
+---
+
+## Provider 패턴
 
 ```dart
-// 올바른 예시
+// @riverpod 어노테이션 사용, 파일마다 part 선언 필요
+part 'todo_list.g.dart';
+
 @riverpod
 Future<List<Todo>> todoList(Ref ref) async {
-  final repo = ref.watch(todoRepositoryProvider);
-  return repo.fetchAll();
+  return ref.watch(todoRepositoryProvider).fetchAll();
 }
 ```
 
-### 모델 작성 규칙
-- 모든 모델은 `freezed` + `json_serializable`을 사용한다
+코드 생성 후 `.g.dart` 파일도 커밋한다.
+
+---
+
+## 모델 패턴
 
 ```dart
 @freezed
@@ -85,81 +113,29 @@ class Todo with _$Todo {
 }
 ```
 
-### 에러 처리 규칙
-- API 에러는 `AppException` sealed class로 변환한다 (`core/error/app_exception.dart`)
-- DioException → `mapDioException()` 함수로 변환
-- Provider에서 예외를 직접 throw하지 않고 `AsyncValue`의 error state로 처리한다
-
 ---
 
-## 네트워크
+## 디자인 시스템
 
-- Base URL: `core/network/api_client.dart`의 `_baseUrl` 상수
-- 모든 요청에 `Authorization: Bearer {accessToken}` 자동 첨부
-- 401 응답 시 Refresh Token으로 자동 재발급 후 원래 요청 재시도
-- 재발급 실패 시 토큰 삭제 → 로그인 화면으로 리다이렉트
-
----
-
-## 라우팅
-
-- 토큰 없으면 `/auth/login`으로 자동 리다이렉트
-- 토큰 있으면 `/auth/*` 접근 시 `/todo`로 리다이렉트
-- 메인 화면은 `ShellRoute` 안에서 바텀 네비게이션 공유
-
-```
-/auth/login     → LoginPage
-/auth/sign-up   → SignUpPage
-/todo           → TodoPage        (ShellRoute)
-/chat           → ChatListPage    (ShellRoute)
-```
+- 다크 테마 전용, 폰트: Pretendard
+- 색상: `lib/shared/theme/app_colors.dart`
+  - background `#000000` / card `#0F0F0F` / border `#262626`
+- 글래스모피즘: `GlassContainer` 위젯 사용
 
 ---
 
 ## 커밋 컨벤션
 
 ```
-feat:     새로운 기능
-fix:      버그 수정
-refactor: 동작 변경 없는 코드 개선
-chore:    빌드, 설정, 패키지 관련
-test:     테스트 코드
-docs:     문서
+feat / fix / refactor / chore / docs
 ```
 
-- 관련 파일은 하나의 커밋으로 묶는다
-- 역할이 다른 파일은 커밋을 분리한다
-- 커밋 메시지는 한국어로 작성한다
-
----
-
-## 주요 명령어
-
-```bash
-# 앱 실행 (iOS 시뮬레이터)
-flutter run
-
-# 코드 생성 (freezed, riverpod .g.dart)
-dart run build_runner build --delete-conflicting-outputs
-
-# 코드 생성 감지 모드 (개발 중)
-dart run build_runner watch --delete-conflicting-outputs
-
-# 정적 분석
-flutter analyze
-
-# 테스트
-flutter test
-
-# 패키지 설치
-flutter pub get
-```
+관련 파일은 묶어서, 역할 다른 파일은 분리해서 커밋.
 
 ---
 
 ## 주의사항
 
-- `.g.dart`, `.freezed.dart` 파일은 **커밋 대상**이다 (빌드 필수)
-- `flutter_secure_storage`는 iOS Keychain을 사용하므로 시뮬레이터에서도 동작한다
-- WebSocket(Chat)은 `web_socket_channel` 패키지를 사용한다 (추후 추가 예정)
-- 환경별 Base URL은 `.env` 파일로 관리한다 (`.gitignore` 처리됨)
+- `flutter run` 전에 시뮬레이터 **Booted 상태** 확인 (`open -a Simulator`)
+- `.g.dart`, `.freezed.dart` 파일 커밋 대상
+- API URL 기본값: `http://localhost:8080` (`AppConfig.apiBaseUrl`)
