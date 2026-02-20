@@ -8,7 +8,13 @@ part 'token_storage.g.dart';
 TokenStorage tokenStorage(Ref ref) => TokenStorage();
 
 class TokenStorage {
-  static const _storage = FlutterSecureStorage();
+  // iOS: first_unlock_this_device → 재부팅 후 첫 잠금 해제 시 접근 가능
+  // 이 옵션 없으면 앱 첫 실행 시 키체인 미초기화로 크래시 발생 가능
+  static const _storage = FlutterSecureStorage(
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock_this_device,
+    ),
+  );
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
 
