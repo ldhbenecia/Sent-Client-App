@@ -30,6 +30,9 @@ dependencies:
   # OAuth 로그인 (ASWebAuthenticationSession)
   flutter_web_auth_2: ^3.0.0
 
+  # SVG 렌더링
+  flutter_svg: ^2.0.0
+
   # 유틸
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
@@ -61,6 +64,7 @@ flutter:
 
   assets:
     - assets/fonts/
+    - assets/icons/
 
   fonts:
     - family: Pretendard

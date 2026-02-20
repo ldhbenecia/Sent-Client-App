@@ -33,9 +33,9 @@ class AppTheme {
       titleTextStyle: TextStyle(
         fontFamily: _fontFamily,
         color: AppColors.textPrimary,
-        fontSize: 17,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 1.5,
+        fontSize: 20,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -1,
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(

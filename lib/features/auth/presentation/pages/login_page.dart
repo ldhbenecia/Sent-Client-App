@@ -1,12 +1,15 @@
-import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/widgets/sent_logo.dart';
 import '../../data/services/oauth_service.dart';
+
+// --dart-define=DEV_MODE=true 로 실행 시에만 DEV 버튼 표시
+const _kDevMode = bool.fromEnvironment('DEV_MODE', defaultValue: false);
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -76,15 +79,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget _buildLogo() {
     return const Column(
       children: [
-        SentLogo(size: 72),
+        SentLogo(size: 84),
         SizedBox(height: 20),
         Text(
           'SENT',
           style: TextStyle(
             color: AppColors.textPrimary,
-            fontSize: 34,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 6,
+            fontSize: 62,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -1,
+            height: 1.0,
           ),
         ),
         SizedBox(height: 8),
@@ -109,7 +113,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         border: Border.all(color: AppColors.border, width: 0.5),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
             '소셜 계정으로 간편하게 시작하세요',
@@ -124,7 +128,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             label: 'Google로 계속하기',
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,
-            icon: const _GoogleIcon(),
+            icon: SvgPicture.asset('assets/icons/ic_google.svg', width: 26, height: 26),
             isLoading: _loadingProvider == 'google',
             onTap: () => _handleLogin('google'),
           ),
@@ -133,14 +137,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             label: '네이버로 계속하기',
             backgroundColor: const Color(0xFF03C75A),
             foregroundColor: Colors.white,
-            icon: const Text(
-              'N',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+            icon: SvgPicture.asset('assets/icons/ic_naver.svg', width: 26, height: 26),
             isLoading: _loadingProvider == 'naver',
             onTap: () => _handleLogin('naver'),
           ),
@@ -149,10 +146,34 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             label: '카카오로 계속하기',
             backgroundColor: const Color(0xFFFEE500),
             foregroundColor: const Color(0xFF191919),
-            icon: const _KakaoIcon(),
+            icon: SvgPicture.asset('assets/icons/ic_kakao.svg', width: 26, height: 26),
             isLoading: _loadingProvider == 'kakao',
             onTap: () => _handleLogin('kakao'),
           ),
+          if (_kDevMode) ...[
+            const SizedBox(height: 14),
+            const Divider(color: AppColors.border, height: 0.5),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () async {
+                await ref.read(tokenStorageProvider).saveTokens(
+                  accessToken: 'dev_access_token',
+                  refreshToken: 'dev_refresh_token',
+                );
+                if (mounted) context.go('/todo');
+              },
+              child: const Center(
+                child: Text(
+                  'DEV — 로그인 건너뛰기',
+                  style: TextStyle(
+                    color: AppColors.textDisabled,
+                    fontSize: 12,
+                    letterSpacing: -0.1,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -239,7 +260,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Widget _buildCopyright() {
     return const Text(
-      '© 2025 Life Tracker. All rights reserved.',
+      '© 2025 Sent. All rights reserved.',
       style: TextStyle(
         color: AppColors.textPlaceholder,
         fontSize: 11,
@@ -393,12 +414,12 @@ class _SocialLoginButton extends StatelessWidget {
             children: [
               const SizedBox(width: 16),
               SizedBox(
-                width: 28,
+                width: 30,
                 child: Center(
                   child: isLoading
                       ? SizedBox(
-                          width: 18,
-                          height: 18,
+                          width: 20,
+                          height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: foregroundColor.withValues(alpha: 0.7),
@@ -428,109 +449,6 @@ class _SocialLoginButton extends StatelessWidget {
       ),
     );
   }
-}
-
-// ── Google 4색 G 아이콘 ────────────────────────────────────────
-class _GoogleIcon extends StatelessWidget {
-  const _GoogleIcon();
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 22,
-      height: 22,
-      child: CustomPaint(painter: _GoogleGPainter()),
-    );
-  }
-}
-
-class _GoogleGPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.save();
-    canvas.translate(size.width / 2, size.height / 2);
-
-    final r = size.width * 0.43;
-    final sw = size.width * 0.17;
-
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = sw
-      ..strokeCap = StrokeCap.butt;
-
-    // 0°(3시)에서 시계방향으로 300° = 4등분(75°씩)
-    const step = math.pi * 5 / 12; // 75°
-    final colors = [
-      const Color(0xFF4285F4), // blue  (3→6시 방향)
-      const Color(0xFFEA4335), // red   (6→9시)
-      const Color(0xFFFBBC04), // yellow(9→12시)
-      const Color(0xFF34A853), // green (12→3시 방향 위쪽)
-    ];
-    for (int i = 0; i < 4; i++) {
-      paint.color = colors[i];
-      canvas.drawArc(
-        Rect.fromCircle(center: Offset.zero, radius: r),
-        i * step,
-        step,
-        false,
-        paint,
-      );
-    }
-
-    // 가로 바 (파란색, 중심→오른쪽)
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, -sw / 2, r, sw),
-        Radius.circular(sw / 2),
-      ),
-      Paint()..color = const Color(0xFF4285F4),
-    );
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ── 네이버 N 아이콘 ───────────────────────────────────────────
-// (버튼 배경이 #03C75A 초록, 흰 N은 이미 잘 보임)
-
-// ── 카카오 말풍선 아이콘 ──────────────────────────────────────
-class _KakaoIcon extends StatelessWidget {
-  const _KakaoIcon();
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 22,
-      height: 22,
-      child: CustomPaint(painter: _KakaoBubblePainter()),
-    );
-  }
-}
-
-class _KakaoBubblePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final paint = Paint()
-      ..color = const Color(0xFF191919)
-      ..style = PaintingStyle.fill;
-
-    // 메인 말풍선 (타원형)
-    canvas.drawOval(Rect.fromLTWH(0, 0, w, h * 0.76), paint);
-
-    // 꼬리 (아래쪽 삼각형)
-    final tail = Path()
-      ..moveTo(w * 0.28, h * 0.70)
-      ..lineTo(w * 0.20, h * 0.96)
-      ..lineTo(w * 0.52, h * 0.70)
-      ..close();
-    canvas.drawPath(tail, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ── Policy Texts ───────────────────────────────────────────────
