@@ -43,25 +43,30 @@ lib/
 
 ---
 
-## 명령어
+## 실행 명령어
 
+### DEV (개발 환경)
 ```bash
-# 시뮬레이터 켜기 (flutter run 전에 필수)
-open -a Simulator
+# .env: API_BASE_URL=http://localhost:8080, DEV_MODE=true
+./run.dev.sh   # DEV_MODE=true → 앱 내 "DEV — 로그인 건너뛰기" 버튼 표시
+               # 로그인 스킵: 로그인 카드 하단 DEV 버튼
+               # 로그인 화면 복귀: 메인에서 우상단 프로필 아이콘 탭
+```
 
-# 앱 실행 (.env 기반, 권장)
-./run.sh
+### PROD (프로덕션 환경)
+```bash
+# 1. .env.prod 파일 준비 (.env.prod.example 참고)
+cp .env.prod.example .env.prod
+# API_BASE_URL=https://api.sent.com, DEV_MODE=false 로 수정
 
-# 앱 실행 (직접)
-flutter run
+# 2. 실행
+./run.prod.sh  # DEV_MODE=false → DEV 버튼 숨김
+               # 실제 기기 배포: flutter build ipa
+```
 
-# 한 번에 실행
-xcrun simctl boot "iPhone 17 Pro" && open -a Simulator && ./run.sh
-
-# 백엔드 URL 바꿔서 실행
-flutter run --dart-define=API_BASE_URL=https://sent-dev.sentlabs.site
-
-# 실행 중: r = hot reload / R = restart / q = 종료
+### 기타
+```bash
+# 실행 중 단축키: r = hot reload / R = restart / q = 종료
 
 # 코드 생성 (.g.dart 재생성)
 dart run build_runner build --delete-conflicting-outputs

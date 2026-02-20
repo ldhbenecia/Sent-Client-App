@@ -43,6 +43,7 @@ ios/.symlinks/
 .env
 .env.*
 !.env.example
+!.env.prod.example
 
 # Symbolication related
 app.*.symbols

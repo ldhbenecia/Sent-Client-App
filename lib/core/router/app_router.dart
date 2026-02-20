@@ -12,6 +12,9 @@ import '../storage/token_storage.dart';
 
 part 'app_router.g.dart';
 
+// DEV_MODE=true 일 때만 dev bypass 허용
+const _kDevMode = bool.fromEnvironment('DEV_MODE', defaultValue: false);
+
 @riverpod
 GoRouter appRouter(Ref ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
@@ -21,6 +24,14 @@ GoRouter appRouter(Ref ref) {
     redirect: (context, state) async {
       final isAuthRoute = state.matchedLocation.startsWith('/auth');
       try {
+        // prod 모드에서 dev 토큰이 남아있으면 자동 클리어
+        if (!_kDevMode) {
+          final token = await tokenStorage.getAccessToken();
+          if (token == 'dev_access_token') {
+            await tokenStorage.clearTokens();
+            return '/auth/login';
+          }
+        }
         final hasToken = await tokenStorage.hasToken();
         if (!hasToken && !isAuthRoute) return '/auth/login';
         if (hasToken && isAuthRoute) return '/todo';
