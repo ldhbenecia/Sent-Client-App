@@ -6,7 +6,10 @@ import '../storage/token_storage.dart';
 
 part 'api_client.g.dart';
 
-const _baseUrl = 'https://api.sent.com'; // TODO: 실제 서버 URL로 교체
+const _baseUrl = String.fromEnvironment(
+  'API_BASE_URL',
+  defaultValue: 'http://localhost:8080',
+);
 
 @riverpod
 Dio dio(Ref ref) {
@@ -71,7 +74,15 @@ Future<bool> _refreshToken(Dio dio, TokenStorage tokenStorage) async {
     final refreshToken = await tokenStorage.getRefreshToken();
     if (refreshToken == null) return false;
 
-    final response = await dio.post(
+    // 인터셉터 없는 별도 Dio로 호출 → 401 시 재귀 루프 방지
+    final cleanDio = Dio(BaseOptions(
+      baseUrl: dio.options.baseUrl,
+      connectTimeout: dio.options.connectTimeout,
+      receiveTimeout: dio.options.receiveTimeout,
+      headers: {'Content-Type': 'application/json'},
+    ));
+
+    final response = await cleanDio.post(
       '/api/v1/auth/refresh',
       data: {'refreshToken': refreshToken},
     );

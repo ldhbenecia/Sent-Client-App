@@ -3,6 +3,9 @@ import 'package:dio/dio.dart';
 sealed class AppException implements Exception {
   const AppException(this.message);
   final String message;
+
+  @override
+  String toString() => message;
 }
 
 class NetworkException extends AppException {
@@ -40,6 +43,7 @@ AppException mapDioException(DioException e) {
             e.response?.data?['message'] ?? '서버 오류가 발생했습니다.',
           ),
       },
+    DioExceptionType.connectionError => const NetworkException('서버에 연결할 수 없습니다.'),
     _ => const UnknownException(),
   };
 }
