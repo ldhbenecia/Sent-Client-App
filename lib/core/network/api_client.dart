@@ -75,27 +75,31 @@ Future<bool> _refreshToken(Dio dio, TokenStorage tokenStorage) async {
     if (refreshToken == null) return false;
 
     // 인터셉터 없는 별도 Dio로 호출 → 401 시 재귀 루프 방지
+    // refresh_token은 쿠키로 전송 (서버가 @CookieValue로 읽음)
     final cleanDio = Dio(BaseOptions(
       baseUrl: dio.options.baseUrl,
       connectTimeout: dio.options.connectTimeout,
       receiveTimeout: dio.options.receiveTimeout,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': 'refresh_token=$refreshToken',
+      },
     ));
 
-    final response = await cleanDio.post(
-      '/api/v1/auth/refresh',
-      data: {'refreshToken': refreshToken},
-    );
+    final response = await cleanDio.post('/api/auth/reissue');
 
-    final newAccessToken = response.data['accessToken'] as String;
-    final newRefreshToken = response.data['refreshToken'] as String;
+    // ApiResponse<String> → 새 access token은 data 필드에
+    final newAccessToken = response.data['data'] as String;
     await tokenStorage.saveTokens(
       accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
+      refreshToken: refreshToken,
     );
     return true;
-  } catch (_) {
-    await tokenStorage.clearTokens();
+  } catch (e) {
+    // 네트워크 오류는 토큰 유지, 인증 오류(4xx)만 토큰 삭제
+    if (e is DioException && e.response != null) {
+      await tokenStorage.clearTokens();
+    }
     return false;
   }
 }
