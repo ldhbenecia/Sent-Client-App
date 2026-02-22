@@ -183,7 +183,7 @@ class TodoListSection extends ConsumerWidget {
             );
           }),
 
-        const SliverPadding(padding: EdgeInsets.only(bottom: 110)),
+        const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
       ],
     );
   }

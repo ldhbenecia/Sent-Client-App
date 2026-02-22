@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +6,7 @@ import '../../../../shared/theme/app_colors.dart';
 import '../providers/todo_provider.dart';
 import '../widgets/todo_calendar.dart';
 import '../widgets/todo_list_section.dart';
-import '../widgets/todo_menu_card.dart';
+import '../../../../shared/widgets/app_nav_menu.dart';
 
 const _kDevMode = bool.fromEnvironment('DEV_MODE', defaultValue: false);
 
@@ -232,51 +231,10 @@ class _TodoPageState extends ConsumerState<TodoPage> {
   }
 
   void _showMenu(BuildContext context) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      barrierColor: Colors.transparent,
-      transitionDuration: const Duration(milliseconds: 220),
-      pageBuilder: (_, __, ___) => const SizedBox.shrink(),
-      transitionBuilder: (ctx, anim, _, __) {
-        return FadeTransition(
-          opacity: anim,
-          child: Stack(
-            children: [
-              BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: anim.value * 10,
-                  sigmaY: anim.value * 10,
-                ),
-                child: Container(
-                  color: Colors.black.withOpacity(0.35 * anim.value),
-                ),
-              ),
-              Center(
-                child: ScaleTransition(
-                  scale: Tween(begin: 0.92, end: 1.0).animate(
-                    CurvedAnimation(
-                        parent: anim, curve: Curves.easeOutCubic),
-                  ),
-                  child: TodoMenuCard(
-                    onCategoryTap: () {
-                      Navigator.of(ctx).pop();
-                      context.push('/todo/categories');
-                    },
-                    onDevLogout: _kDevMode
-                        ? () {
-                            Navigator.of(ctx).pop();
-                            context.go('/auth/login');
-                          }
-                        : null,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    showAppNavMenu(
+      context,
+      onCategoryTap: () => context.push('/todo/categories'),
+      onDevLogout: _kDevMode ? () => context.go('/auth/login') : null,
     );
   }
 }
