@@ -4,43 +4,29 @@ import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 
 class MainShell extends StatelessWidget {
-  const MainShell({super.key, required this.child});
+  const MainShell({super.key, required this.navigationShell});
 
-  final Widget child;
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-    final selectedIndex = _selectedIndex(location);
-
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBody: true,
-      body: child,
-      bottomNavigationBar: _PillNavigationBar(
-        selectedIndex: selectedIndex,
-        onTap: (index) => _onTap(context, index),
+      body: navigationShell,
+      bottomNavigationBar: _LiquidGlassNavBar(
+        selectedIndex: navigationShell.currentIndex,
+        onTap: (index) => navigationShell.goBranch(
+          index,
+          initialLocation: index == navigationShell.currentIndex,
+        ),
       ),
     );
   }
-
-  int _selectedIndex(String location) {
-    if (location.startsWith('/memo')) return 1;
-    if (location.startsWith('/social')) return 2;
-    return 0;
-  }
-
-  void _onTap(BuildContext context, int index) {
-    switch (index) {
-      case 0: context.go('/todo');
-      case 1: context.go('/memo');
-      case 2: context.go('/social');
-    }
-  }
 }
 
-class _PillNavigationBar extends StatelessWidget {
-  const _PillNavigationBar({
+class _LiquidGlassNavBar extends StatelessWidget {
+  const _LiquidGlassNavBar({
     required this.selectedIndex,
     required this.onTap,
   });
@@ -48,30 +34,42 @@ class _PillNavigationBar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
 
-  static const _tabs = [
-    (label: 'Todo',   icon: Icons.check_circle_outline, activeIcon: Icons.check_circle),
-    (label: 'Memo',   icon: Icons.edit_note_outlined,   activeIcon: Icons.edit_note),
-    (label: 'Social', icon: Icons.people_outline,       activeIcon: Icons.people),
-  ];
+  static const _tabs = ['Todo', 'Memo', 'Social'];
 
   @override
   Widget build(BuildContext context) {
+    final bottomPad = MediaQuery.of(context).padding.bottom;
+
     return Padding(
-      padding: const EdgeInsets.only(left: 40, right: 40, bottom: 32),
+      padding: EdgeInsets.only(
+        left: 40,
+        right: 40,
+        bottom: bottomPad > 0 ? bottomPad : 20,
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(40),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
           child: Container(
-            height: 60,
+            height: 56,
             decoration: BoxDecoration(
-              color: const Color(0xCC1C1C1E),
+              // 리퀴드 글래스: 흰색 레이어 + 어두운 베이스 혼합
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.white.withOpacity(0.10),
+                  Colors.white.withOpacity(0.04),
+                ],
+              ),
               borderRadius: BorderRadius.circular(40),
-              border: Border.all(color: AppColors.glassBorder, width: 0.5),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.15),
+                width: 0.5,
+              ),
             ),
             child: Row(
               children: List.generate(_tabs.length, (index) {
-                final tab = _tabs[index];
                 final isSelected = selectedIndex == index;
                 return Expanded(
                   child: GestureDetector(
@@ -79,21 +77,26 @@ class _PillNavigationBar extends StatelessWidget {
                     onTap: () => onTap(index),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.all(6),
+                      curve: Curves.easeOutCubic,
+                      margin: const EdgeInsets.all(5),
                       decoration: isSelected
                           ? BoxDecoration(
-                              color: AppColors.muted,
+                              color: Colors.white.withOpacity(0.14),
                               borderRadius: BorderRadius.circular(34),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.2),
+                                width: 0.5,
+                              ),
                             )
                           : null,
                       child: Center(
                         child: Text(
-                          tab.label,
+                          _tabs[index],
                           style: TextStyle(
                             color: isSelected
                                 ? AppColors.textPrimary
-                                : AppColors.textSecondary,
-                            fontSize: 14,
+                                : AppColors.textMuted,
+                            fontSize: 13,
                             fontWeight: isSelected
                                 ? FontWeight.w600
                                 : FontWeight.w400,
