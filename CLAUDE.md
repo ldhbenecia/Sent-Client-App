@@ -4,146 +4,76 @@ Flutter iOS 앱. 백엔드: `sent-server` (Kotlin/Spring Boot, localhost:8080).
 
 ---
 
-## Tech Stack
+## 실행
 
-| 역할 | 패키지 |
-|------|--------|
-| 상태 관리 | `flutter_riverpod` + `riverpod_annotation` |
-| 네트워크 | `dio` + `pretty_dio_logger` |
-| 라우팅 | `go_router` |
-| OAuth 로그인 | `flutter_web_auth_2` |
-| 토큰 저장 | `flutter_secure_storage` |
-| 모델 직렬화 | `freezed` + `json_serializable` |
-| 코드 생성 | `build_runner` |
-
----
-
-## 폴더 구조
-
-```
-lib/
-├── main.dart
-├── core/
-│   ├── config/        # AppConfig (API URL, OAuth 콜백 스킴)
-│   ├── network/       # Dio + JWT 인터셉터
-│   ├── storage/       # TokenStorage
-│   ├── router/        # go_router
-│   └── error/         # AppException
-├── features/
-│   ├── auth/
-│   │   ├── data/services/      # OAuthService
-│   │   └── presentation/pages/ # LoginPage
-│   ├── todo/
-│   ├── memo/
-│   └── social/
-└── shared/
-    ├── theme/         # AppColors, AppTheme
-    └── widgets/       # SentLogo, MainShell, GlassContainer
-```
-
----
-
-## 실행 명령어
-
-### DEV (개발 환경)
 ```bash
-# .env: API_BASE_URL=http://localhost:8080, DEV_MODE=true
-./run.dev.sh   # DEV_MODE=true → 앱 내 "DEV — 로그인 건너뛰기" 버튼 표시
-               # 로그인 스킵: 로그인 카드 하단 DEV 버튼
-               # 로그인 화면 복귀: 메인에서 우상단 프로필 아이콘 탭
+./run.dev.sh    # DEV_MODE=true, localhost:8080
+./run.prod.sh   # DEV_MODE=false, 프로덕션 URL
+
+dart run build_runner build --delete-conflicting-outputs  # 코드 생성
+flutter build ios --no-codesign                           # 빌드 에러 확인
 ```
-
-### PROD (프로덕션 환경)
-```bash
-# 1. .env.prod 파일 준비 (.env.prod.example 참고)
-cp .env.prod.example .env.prod
-# API_BASE_URL=https://api.sent.com, DEV_MODE=false 로 수정
-
-# 2. 실행
-./run.prod.sh  # DEV_MODE=false → DEV 버튼 숨김
-               # 실제 기기 배포: flutter build ipa
-```
-
-### 기타
-```bash
-# 실행 중 단축키: r = hot reload / R = restart / q = 종료
-
-# 코드 생성 (.g.dart 재생성)
-dart run build_runner build --delete-conflicting-outputs
-
-# 빌드 에러 확인
-flutter build ios --no-codesign
-```
-
----
-
-## 라우팅
-
-```
-/auth/login  → LoginPage
-/todo        → TodoPage   (ShellRoute 탭 1)
-/memo        → MemoPage   (ShellRoute 탭 2)
-/social      → SocialPage (ShellRoute 탭 3)
-```
-
-토큰 없으면 `/auth/login`, 토큰 있으면 `/todo` 자동 리다이렉트.
-
----
-
-## Provider 패턴
-
-```dart
-// @riverpod 어노테이션 사용, 파일마다 part 선언 필요
-part 'todo_list.g.dart';
-
-@riverpod
-Future<List<Todo>> todoList(Ref ref) async {
-  return ref.watch(todoRepositoryProvider).fetchAll();
-}
-```
-
-코드 생성 후 `.g.dart` 파일도 커밋한다.
-
----
-
-## 모델 패턴
-
-```dart
-@freezed
-class Todo with _$Todo {
-  const factory Todo({
-    required String id,
-    required String title,
-    required bool isDone,
-  }) = _Todo;
-
-  factory Todo.fromJson(Map<String, dynamic> json) => _$TodoFromJson(json);
-}
-```
-
----
-
-## 디자인 시스템
-
-- 다크 테마 전용, 폰트: Pretendard
-- 색상: `lib/shared/theme/app_colors.dart`
-  - background `#000000` / card `#0F0F0F` / border `#262626`
-- 글래스모피즘: `GlassContainer` 위젯 사용
 
 ---
 
 ## 커밋 컨벤션
 
 ```
-feat / fix / refactor / chore / docs
+type(scope): 설명
 ```
 
-관련 파일은 묶어서, 역할 다른 파일은 분리해서 커밋.
+**type**: `feat` / `fix` / `refactor` / `chore` / `docs`
+
+**scope**:
+
+| scope | 대상 |
+|-------|------|
+| `deps` | pubspec.yaml, pubspec.lock |
+| `core` | lib/core/ |
+| `router` | lib/core/router/ |
+| `auth` | lib/features/auth/ |
+| `todo` | lib/features/todo/ |
+| `memo` | lib/features/memo/ |
+| `social` | lib/features/social/ |
+| `ui` | lib/shared/ |
+| `env` | 환경설정, run.sh |
+
+```
+feat(todo): 카테고리 편집 페이지 추가
+fix(core): 토큰 갱신 무한 루프 수정
+chore(deps): table_calendar 패키지 추가
+refactor(router): StatefulShellRoute 전환
+```
+
+역할이 다른 파일은 커밋을 분리한다.
+
+---
+
+## 코드 스타일
+
+**파일 분리**: 한 파일에 너무 많은 클래스/위젯을 넣지 않는다.
+- 페이지 파일(`_page.dart`)에는 해당 페이지의 주요 위젯만
+- 재사용 가능한 위젯은 `shared/widgets/` 또는 feature 내 `widgets/` 폴더로 분리
+- Provider는 `presentation/providers/` 에 모아서 관리
+
+**위젯 구성**:
+- 작은 private 위젯(`_XxxWidget`)은 같은 파일 하단에 위치
+- 200줄 이상 넘어가면 분리를 검토한다
+
+**상태관리**:
+- `@riverpod` 어노테이션 사용, 파일마다 `part '*.g.dart'` 선언
+- UI에서 직접 비동기 로직 쓰지 않고 Provider/Notifier로 위임
+- AsyncValue는 `.when()` 또는 `.valueOrNull ?? []` 패턴 사용
+
+**네이밍**:
+- 파일명: `snake_case`
+- 클래스: `PascalCase`
+- private 위젯/함수: `_camelCase`
 
 ---
 
 ## 주의사항
 
-- `flutter run` 전에 시뮬레이터 **Booted 상태** 확인 (`open -a Simulator`)
-- `.g.dart`, `.freezed.dart` 파일 커밋 대상
-- API URL 기본값: `http://localhost:8080` (`AppConfig.apiBaseUrl`)
+- `flutter run` 전에 시뮬레이터 **Booted 상태** 확인
+- `.g.dart`, `.freezed.dart` 파일도 커밋한다
+- DEV 모드: `dart-define=DEV_MODE=true` 없이 빌드하면 dev 버튼 안 뜸 → `flutter clean` 후 재빌드
