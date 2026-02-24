@@ -134,6 +134,15 @@ class SocialPage extends ConsumerWidget {
     );
   }
 
+  /// 32자(대시 없음) or 36자(표준) UUID 모두 36자 표준 형식으로 정규화
+  String _normalizeUuid(String input) {
+    final raw = input.replaceAll('-', '').toLowerCase();
+    if (raw.length != 32) return input; // 형식 불명 → 그대로 전달
+    return '${raw.substring(0, 8)}-${raw.substring(8, 12)}-'
+        '${raw.substring(12, 16)}-${raw.substring(16, 20)}-'
+        '${raw.substring(20)}';
+  }
+
   Future<void> _showAddFriendDialog(
       BuildContext context, WidgetRef ref) async {
     final receiverId = await showDialog<String>(
@@ -141,8 +150,10 @@ class SocialPage extends ConsumerWidget {
       builder: (_) => const _AddFriendDialog(),
     );
     if (receiverId == null || receiverId.isEmpty) return;
+    // 32자 대시 없는 UUID → 표준 36자 형식으로 자동 변환
+    final formattedId = _normalizeUuid(receiverId);
     try {
-      await ref.read(friendRepositoryProvider).addFriend(receiverId);
+      await ref.read(friendRepositoryProvider).addFriend(formattedId);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('친구 요청을 보냈습니다.')),
