@@ -12,53 +12,51 @@ void showAppNavMenu(
 }) {
   showGeneralDialog(
     context: pageContext,
-    barrierDismissible: true,
-    barrierLabel: 'dismiss',
+    barrierDismissible: false,
+    barrierLabel: '',
     barrierColor: Colors.transparent,
-    transitionDuration: const Duration(milliseconds: 420),
+    transitionDuration: const Duration(milliseconds: 220),
     pageBuilder: (_, __, ___) => const SizedBox.shrink(),
     transitionBuilder: (ctx, anim, _, __) {
-      // 등장: 탄성 스프링, 퇴장: 빠른 easeIn
-      final scaleCurve = CurvedAnimation(
+      final curved = CurvedAnimation(
         parent: anim,
-        curve: const ElasticOutCurve(0.62),
+        curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeInCubic,
       );
-      final fadeCurve = CurvedAnimation(
-        parent: anim,
-        curve: const Interval(0.0, 0.35, curve: Curves.easeOut),
-        reverseCurve: Curves.easeInCubic,
-      );
+      final scaleCurve = Tween<double>(begin: 0.96, end: 1.0).animate(curved);
 
       return Material(
         color: Colors.transparent,
         child: Stack(
           children: [
             // 배경: 바깥 탭 → 닫기
-            GestureDetector(
-              onTap: () => Navigator.of(ctx).pop(),
-              behavior: HitTestBehavior.opaque,
-              child: FadeTransition(
-                opacity: fadeCurve,
-                child: Container(
-                  color: Colors.black.withOpacity(0.05),
+            // Builder로 위젯 트리 내부 context를 확보해야 go_router와 충돌 없이 pop 가능
+            Builder(
+              builder: (bCtx) => GestureDetector(
+                onTap: () => Navigator.of(bCtx).pop(),
+                behavior: HitTestBehavior.opaque,
+                child: FadeTransition(
+                  opacity: curved,
+                  child: Container(
+                    color: Colors.black.withOpacity(0.05),
+                  ),
                 ),
               ),
             ),
 
-            // 카드: 상단 배치 + 스프링 스케일
+            // 카드: 상단 배치 + 미세 스케일 + 페이드
             SafeArea(
               child: Align(
                 alignment: Alignment.topCenter,
                 child: GestureDetector(
-                  // 카드 영역 탭은 배경 dismiss 차단
+                  // 카드 탭이 배경 dismiss로 전파되지 않도록 흡수
                   onTap: () {},
                   behavior: HitTestBehavior.opaque,
                   child: ScaleTransition(
                     scale: scaleCurve,
                     alignment: Alignment.topCenter,
                     child: FadeTransition(
-                      opacity: fadeCurve,
+                      opacity: curved,
                       child: _AppNavMenuCard(
                         onTodoTap: () {
                           Navigator.of(ctx).pop();
