@@ -65,4 +65,13 @@ class FriendRepository {
       throw mapDioException(e);
     }
   }
+
+  // DELETE /api/v1/friends/{friendId}
+  Future<void> deleteFriend(int friendId) async {
+    try {
+      await _dio.delete('/api/v1/friends/$friendId');
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
 }
