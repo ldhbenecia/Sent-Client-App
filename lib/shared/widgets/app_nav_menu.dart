@@ -56,6 +56,10 @@ void showAppNavMenu(
                         Navigator.of(ctx).pop();
                         pageContext.go('/social');
                       },
+                      onPreferencesTap: () {
+                        Navigator.of(ctx).pop();
+                        pageContext.push('/preferences');
+                      },
                       onCategoryTap: onCategoryTap != null
                           ? () {
                               Navigator.of(ctx).pop();
@@ -88,6 +92,7 @@ class _AppNavMenuCard extends StatelessWidget {
     required this.onTodoTap,
     required this.onMemoTap,
     required this.onSocialTap,
+    required this.onPreferencesTap,
     this.onCategoryTap,
     this.onDevLogout,
   });
@@ -95,6 +100,7 @@ class _AppNavMenuCard extends StatelessWidget {
   final VoidCallback onTodoTap;
   final VoidCallback onMemoTap;
   final VoidCallback onSocialTap;
+  final VoidCallback onPreferencesTap;
   final VoidCallback? onCategoryTap;
   final VoidCallback? onDevLogout;
 
@@ -105,11 +111,9 @@ class _AppNavMenuCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: BackdropFilter(
-          // 적당한 blur — 뒤 콘텐츠 형태가 보이면서 frosted glass 느낌
           filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
           child: Container(
             decoration: BoxDecoration(
-              // 탑→바텀 그라디언트: 상단 빛 반사 (specular) + 하단 더 투명
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -182,7 +186,7 @@ class _AppNavMenuCard extends StatelessWidget {
                   ),
                 _NavRow(
                   label: 'Preferences',
-                  onTap: () => Navigator.of(context).pop(),
+                  onTap: onPreferencesTap,
                   secondary: true,
                 ),
 
