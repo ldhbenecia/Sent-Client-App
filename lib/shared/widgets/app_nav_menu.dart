@@ -13,58 +13,76 @@ void showAppNavMenu(
   showGeneralDialog(
     context: pageContext,
     barrierDismissible: true,
-    barrierLabel: '',
+    barrierLabel: 'dismiss',
     barrierColor: Colors.transparent,
-    transitionDuration: const Duration(milliseconds: 280),
+    transitionDuration: const Duration(milliseconds: 420),
     pageBuilder: (_, __, ___) => const SizedBox.shrink(),
     transitionBuilder: (ctx, anim, _, __) {
-      final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+      // 등장: 탄성 스프링, 퇴장: 빠른 easeIn
+      final scaleCurve = CurvedAnimation(
+        parent: anim,
+        curve: const ElasticOutCurve(0.62),
+        reverseCurve: Curves.easeInCubic,
+      );
+      final fadeCurve = CurvedAnimation(
+        parent: anim,
+        curve: const Interval(0.0, 0.35, curve: Curves.easeOut),
+        reverseCurve: Curves.easeInCubic,
+      );
+
       return Material(
         color: Colors.transparent,
         child: Stack(
           children: [
-            // 배경: 카드 밖은 살짝만 어둡게 — 뒤 콘텐츠 최대한 살리기
-            FadeTransition(
-              opacity: anim,
-              child: Container(
-                color: Colors.black.withOpacity(0.05),
+            // 배경: 바깥 탭 → 닫기
+            GestureDetector(
+              onTap: () => Navigator.of(ctx).pop(),
+              behavior: HitTestBehavior.opaque,
+              child: FadeTransition(
+                opacity: fadeCurve,
+                child: Container(
+                  color: Colors.black.withOpacity(0.05),
+                ),
               ),
             ),
 
-            // 카드: 상단 배치
+            // 카드: 상단 배치 + 스프링 스케일
             SafeArea(
               child: Align(
                 alignment: Alignment.topCenter,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, -0.05),
-                    end: Offset.zero,
-                  ).animate(curved),
-                  child: FadeTransition(
-                    opacity: curved,
-                    child: _AppNavMenuCard(
-                      onTodoTap: () {
-                        Navigator.of(ctx).pop();
-                        pageContext.go('/todo');
-                      },
-                      onMemoTap: () {
-                        Navigator.of(ctx).pop();
-                        pageContext.go('/memo');
-                      },
-                      onSocialTap: () {
-                        Navigator.of(ctx).pop();
-                        pageContext.go('/social');
-                      },
-                      onPreferencesTap: () {
-                        Navigator.of(ctx).pop();
-                        pageContext.push('/preferences');
-                      },
-                      onCategoryTap: onCategoryTap != null
-                          ? () {
-                              Navigator.of(ctx).pop();
-                              onCategoryTap();
-                            }
-                          : null,
+                child: GestureDetector(
+                  // 카드 영역 탭은 배경 dismiss 차단
+                  onTap: () {},
+                  behavior: HitTestBehavior.opaque,
+                  child: ScaleTransition(
+                    scale: scaleCurve,
+                    alignment: Alignment.topCenter,
+                    child: FadeTransition(
+                      opacity: fadeCurve,
+                      child: _AppNavMenuCard(
+                        onTodoTap: () {
+                          Navigator.of(ctx).pop();
+                          pageContext.go('/todo');
+                        },
+                        onMemoTap: () {
+                          Navigator.of(ctx).pop();
+                          pageContext.go('/memo');
+                        },
+                        onSocialTap: () {
+                          Navigator.of(ctx).pop();
+                          pageContext.go('/social');
+                        },
+                        onPreferencesTap: () {
+                          Navigator.of(ctx).pop();
+                          pageContext.push('/preferences');
+                        },
+                        onCategoryTap: onCategoryTap != null
+                            ? () {
+                                Navigator.of(ctx).pop();
+                                onCategoryTap();
+                              }
+                            : null,
+                      ),
                     ),
                   ),
                 ),
