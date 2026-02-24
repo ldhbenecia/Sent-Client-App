@@ -198,11 +198,20 @@ class _AddFriendDialogState extends State<_AddFriendDialog> {
             fontSize: 17,
             fontWeight: FontWeight.w600),
       ),
-      content: TextField(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '친구의 Preferences에서 ID를 확인해 입력해주세요.',
+            style: TextStyle(color: AppColors.textMuted, fontSize: 13, height: 1.5),
+          ),
+          const SizedBox(height: 12),
+          TextField(
         controller: _controller,
         style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
         decoration: InputDecoration(
-          hintText: '친구 ID를 입력해주세요',
+          hintText: '친구 ID',
           hintStyle:
               const TextStyle(color: AppColors.textDisabled, fontSize: 14),
           filled: true,
@@ -225,6 +234,8 @@ class _AddFriendDialogState extends State<_AddFriendDialog> {
         ),
         autofocus: true,
         onSubmitted: (v) => Navigator.of(context).pop(v.trim()),
+          ),
+        ],
       ),
       actions: [
         TextButton(
