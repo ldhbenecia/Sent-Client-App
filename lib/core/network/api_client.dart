@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../auth/auth_state.dart';
 import '../storage/token_storage.dart';
 
 part 'api_client.g.dart';
@@ -23,6 +24,7 @@ Dio dio(Ref ref) {
   );
 
   final tokenStorage = ref.read(tokenStorageProvider);
+  final authNotifier = ref.read(authStateNotifierProvider);
 
   // 요청 인터셉터: Access Token 자동 첨부
   dio.interceptors.add(
@@ -49,6 +51,8 @@ Dio dio(Ref ref) {
               return handler.reject(error);
             }
           }
+          // refresh 실패 → 로그인 화면으로 이동
+          authNotifier.logout();
         }
         handler.next(error);
       },
