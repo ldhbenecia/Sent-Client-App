@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../auth/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/settings/presentation/pages/preferences_page.dart';
 import '../../features/todo/presentation/pages/todo_page.dart';
 import '../../features/todo/presentation/pages/todo_edit_page.dart';
 import '../../features/todo/presentation/pages/category_page.dart';
@@ -22,9 +24,12 @@ const _kDevMode = bool.fromEnvironment('DEV_MODE', defaultValue: false);
 @riverpod
 GoRouter appRouter(Ref ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
+  final authNotifier = ref.watch(authStateNotifierProvider);
 
   return GoRouter(
     initialLocation: '/auth/login',
+    // authNotifier가 logout()을 호출하면 redirect 재실행 → 토큰 없으면 로그인으로
+    refreshListenable: authNotifier,
     redirect: (context, state) async {
       final isAuthRoute = state.matchedLocation.startsWith('/auth');
       try {
@@ -48,6 +53,21 @@ GoRouter appRouter(Ref ref) {
         path: '/auth/login',
         name: 'login',
         builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/preferences',
+        name: 'preferences',
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const PreferencesPage(),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              SlideTransition(
+            position: animation.drive(
+              Tween(begin: const Offset(1, 0), end: Offset.zero)
+                  .chain(CurveTween(curve: Curves.easeOutCubic)),
+            ),
+            child: child,
+          ),
+        ),
       ),
       StatefulShellRoute(
         builder: (context, state, shell) => MainShell(navigationShell: shell),
