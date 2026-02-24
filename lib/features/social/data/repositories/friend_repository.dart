@@ -35,14 +35,13 @@ class FriendRepository {
     }
   }
 
-  // POST /api/v1/friends — body: { receiverId: UUID }
-  Future<int> addFriend(String receiverId) async {
+  // POST /api/v1/friends — body: { receiverEmail: String }
+  Future<void> addFriend(String receiverEmail) async {
     try {
-      final res = await _dio.post(
+      await _dio.post(
         '/api/v1/friends',
-        data: {'receiverId': receiverId},
+        data: {'receiverEmail': receiverEmail},
       );
-      return res.data['data'] as int; // 생성된 friendRequestId
     } on DioException catch (e) {
       throw mapDioException(e);
     }

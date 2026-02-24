@@ -18,7 +18,6 @@ class UserRepository {
         );
         final data = res.data['data'] as Map<String, dynamic>;
         return UserSearchResult(
-          id: data['id'] as int,
           email: data['email'] as String,
           displayName: data['displayName'] as String,
           profileImageUrl: data['profileImageUrl'] as String?,
