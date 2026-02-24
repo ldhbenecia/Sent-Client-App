@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../../../../shared/theme/app_colors.dart';
+import '../../../auth/data/repositories/auth_repository.dart';
 
 class PreferencesPage extends ConsumerWidget {
   const PreferencesPage({super.key});
@@ -36,7 +38,20 @@ class PreferencesPage extends ConsumerWidget {
 
     if (confirmed != true) return;
 
-    await ref.read(tokenStorageProvider).clearTokens();
+    final tokenStorage = ref.read(tokenStorageProvider);
+    final refreshToken = await tokenStorage.getRefreshToken();
+
+    // 서버에 로그아웃 요청 (access token 블랙리스트 + refresh token 삭제)
+    if (refreshToken != null) {
+      try {
+        await AuthRepository(ref.read(dioProvider))
+            .logout(refreshToken: refreshToken);
+      } catch (_) {
+        // 서버 실패해도 로컬 토큰은 삭제
+      }
+    }
+
+    await tokenStorage.clearTokens();
     ref.read(authStateNotifierProvider).logout();
   }
 
@@ -108,22 +123,28 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-        decoration: BoxDecoration(
-          color: AppColors.card,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Material(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border, width: 0.5),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: color ?? AppColors.textPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.border, width: 0.5),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: color ?? AppColors.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
         ),
       ),
