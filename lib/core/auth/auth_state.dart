@@ -10,6 +10,15 @@ part 'auth_state.g.dart';
 AuthStateNotifier authStateNotifier(Ref ref) => AuthStateNotifier();
 
 class AuthStateNotifier extends ChangeNotifier {
-  /// 토큰 만료/로그아웃 → GoRouter redirect 트리거
-  void logout() => notifyListeners();
+  VoidCallback? _cleanupCallback;
+
+  /// 로그아웃 시 실행할 cleanup (프로바이더 invalidate 등) 등록.
+  /// app_router.dart에서 한 번만 세팅.
+  void setCleanupCallback(VoidCallback cb) => _cleanupCallback = cb;
+
+  /// 토큰 만료/로그아웃 → 상태 초기화 → GoRouter redirect 트리거
+  void logout() {
+    _cleanupCallback?.call();
+    notifyListeners();
+  }
 }

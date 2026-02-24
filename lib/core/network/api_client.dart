@@ -39,6 +39,11 @@ Dio dio(Ref ref) {
       onError: (error, handler) async {
         // 401: 토큰 만료 → Refresh Token으로 재발급
         if (error.response?.statusCode == 401) {
+          // 이미 로그아웃 상태(refresh token 없음)면 무한 루프 방지
+          final refreshToken = await tokenStorage.getRefreshToken();
+          if (refreshToken == null) {
+            return handler.next(error);
+          }
           final refreshed = await _refreshToken(dio, tokenStorage);
           if (refreshed) {
             final retryRequest = error.requestOptions;
