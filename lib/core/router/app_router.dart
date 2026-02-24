@@ -16,6 +16,7 @@ import '../../features/social/presentation/pages/social_page.dart';
 import '../../shared/widgets/main_shell.dart';
 import '../../shared/theme/app_colors.dart';
 import '../storage/token_storage.dart';
+import '../../features/todo/presentation/providers/todo_provider.dart';
 
 part 'app_router.g.dart';
 
@@ -25,6 +26,14 @@ const _kDevMode = bool.fromEnvironment('DEV_MODE', defaultValue: false);
 GoRouter appRouter(Ref ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
   final authNotifier = ref.watch(authStateNotifierProvider);
+
+  // 로그아웃 시 UI 상태만 초기화 (날짜 → 오늘로 리셋)
+  // 데이터 프로바이더(todoItems 등)는 로그인 시점에 invalidate — 여기서 하면
+  // StatefulShellBranch가 TodoPage를 살려두기 때문에 토큰 없이 즉시 rebuild → 401 에러 상태 고정됨
+  authNotifier.setCleanupCallback(() {
+    ref.invalidate(selectedDateProvider);
+    ref.invalidate(focusedMonthProvider);
+  });
 
   return GoRouter(
     initialLocation: '/auth/login',

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/storage/token_storage.dart';
+import '../../../../features/social/presentation/providers/friend_provider.dart';
+import '../../../../features/todo/presentation/providers/todo_provider.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/widgets/sent_logo.dart';
 import '../../data/services/oauth_service.dart';
@@ -35,6 +37,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
           );
+      // 이전 계정 데이터 제거 — 새 토큰이 저장된 후 invalidate해야 rebuild 시 올바른 데이터 로드
+      ref.invalidate(todoItemsProvider);
+      ref.invalidate(todoCategoriesProvider);
+      ref.invalidate(friendsProvider);
+      ref.invalidate(pendingRequestsProvider);
       if (mounted) context.go('/todo');
     } on Exception catch (e) {
       final msg = e.toString();
