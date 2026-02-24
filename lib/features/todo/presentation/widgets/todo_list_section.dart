@@ -48,8 +48,13 @@ class TodoListSection extends ConsumerWidget {
     final today = DateTime(now.year, now.month, now.day);
     final isToday = selectedDate == today;
 
-    return CustomScrollView(
-      slivers: [
+    return RefreshIndicator(
+      color: AppColors.textPrimary,
+      backgroundColor: AppColors.card,
+      onRefresh: () => ref.refresh(todoItemsProvider.future),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
         // 날짜 헤더
         SliverToBoxAdapter(
           child: Padding(
@@ -185,6 +190,7 @@ class TodoListSection extends ConsumerWidget {
 
         const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
       ],
+    ),
     );
   }
 }
