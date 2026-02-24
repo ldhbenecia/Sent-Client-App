@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
+import 'info_page.dart';
+import 'notifications_page.dart';
+import 'profile_page.dart';
 
 // ── JWT → UUID 추출 ───────────────────────────────────────────────
 String? _extractUuidFromToken(String token) {
@@ -26,10 +28,6 @@ String? _extractUuidFromToken(String token) {
   }
 }
 
-// ── SharedPreferences 키 ─────────────────────────────────────────
-const _kNotifFriendRequest = 'notif_friend_request';
-const _kNotifTodo = 'notif_todo';
-
 // ════════════════════════════════════════════════════════════════
 class PreferencesPage extends ConsumerStatefulWidget {
   const PreferencesPage({super.key});
@@ -40,8 +38,6 @@ class PreferencesPage extends ConsumerStatefulWidget {
 
 class _PreferencesPageState extends ConsumerState<PreferencesPage> {
   String? _uuid;
-  bool _notifFriendRequest = true;
-  bool _notifTodo = true;
 
   @override
   void initState() {
@@ -50,20 +46,11 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
   }
 
   Future<void> _load() async {
-    final token =
-        await ref.read(tokenStorageProvider).getAccessToken();
-    final prefs = await SharedPreferences.getInstance();
+    final token = await ref.read(tokenStorageProvider).getAccessToken();
     if (!mounted) return;
     setState(() {
       _uuid = token != null ? _extractUuidFromToken(token) : null;
-      _notifFriendRequest = prefs.getBool(_kNotifFriendRequest) ?? true;
-      _notifTodo = prefs.getBool(_kNotifTodo) ?? true;
     });
-  }
-
-  Future<void> _setToggle(String key, bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(key, value);
   }
 
   Future<void> _logout() async {
@@ -110,12 +97,28 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
     ref.read(authStateNotifierProvider).logout();
   }
 
+  void _push(Widget page) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => page,
+        transitionsBuilder: (_, animation, __, child) => SlideTransition(
+          position: animation.drive(
+            Tween(begin: const Offset(1, 0), end: Offset.zero)
+                .chain(CurveTween(curve: Curves.easeOutCubic)),
+          ),
+          child: child,
+        ),
+        transitionDuration: const Duration(milliseconds: 280),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Preferences'),
+        title: const Text('설정'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
           onPressed: () => Navigator.of(context).pop(),
@@ -131,82 +134,24 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
 
           const SizedBox(height: 28),
 
-          // ── 프로필 ─────────────────────────────────────────────
-          const _SectionHeader(label: '프로필'),
+          // ── 설정 ───────────────────────────────────────────────
+          const _SectionHeader(label: '설정'),
           _NavTile(
-            label: '이름 변경',
-            badge: '준비 중',
-            onTap: () => _showComingSoon(),
+            label: '프로필',
+            onTap: () => _push(const ProfilePage()),
           ),
           _NavTile(
-            label: '프로필 사진',
-            badge: '준비 중',
-            onTap: () => _showComingSoon(),
+            label: '알림',
+            onTap: () => _push(const NotificationsPage()),
           ),
 
           const SizedBox(height: 28),
 
-          // ── 개인정보 보호 ─────────────────────────────────────
-          const _SectionHeader(label: '개인정보 보호'),
+          // ── 정보 ───────────────────────────────────────────────
+          const _SectionHeader(label: '정보'),
           _NavTile(
-            label: '비공개 계정',
-            badge: '준비 중',
-            onTap: () => _showComingSoon(),
-          ),
-          _NavTile(
-            label: '차단 목록',
-            badge: '준비 중',
-            onTap: () => _showComingSoon(),
-          ),
-
-          const SizedBox(height: 28),
-
-          // ── 알림 ───────────────────────────────────────────────
-          const _SectionHeader(label: '알림'),
-          _ToggleTile(
-            label: '친구 요청 알림',
-            value: _notifFriendRequest,
-            onChanged: (v) {
-              setState(() => _notifFriendRequest = v);
-              _setToggle(_kNotifFriendRequest, v);
-            },
-          ),
-          _ToggleTile(
-            label: '할 일 알림',
-            value: _notifTodo,
-            onChanged: (v) {
-              setState(() => _notifTodo = v);
-              _setToggle(_kNotifTodo, v);
-            },
-          ),
-
-          const SizedBox(height: 28),
-
-          // ── 앱 권한 ────────────────────────────────────────────
-          const _SectionHeader(label: '앱 권한'),
-          _InfoRow(
-            label: '앱 권한 관리',
-            detail: 'iOS 설정 > SENT',
-          ),
-
-          const SizedBox(height: 28),
-
-          // ── 공지 / 약관 ────────────────────────────────────────
-          const _SectionHeader(label: '공지'),
-          _NavTile(
-            label: '공지사항',
-            badge: '준비 중',
-            onTap: () => _showComingSoon(),
-          ),
-          _NavTile(
-            label: '서비스 이용약관',
-            badge: '준비 중',
-            onTap: () => _showComingSoon(),
-          ),
-          _NavTile(
-            label: '개인정보 처리방침',
-            badge: '준비 중',
-            onTap: () => _showComingSoon(),
+            label: '정보',
+            onTap: () => _push(const InfoPage()),
           ),
 
           const SizedBox(height: 28),
@@ -219,21 +164,9 @@ class _PreferencesPageState extends ConsumerState<PreferencesPage> {
             onTap: _logout,
           ),
 
-          const SizedBox(height: 28),
-
-          // ── 앱 정보 ────────────────────────────────────────────
-          const _SectionHeader(label: '앱 정보'),
-          const _InfoRow(label: '버전', detail: '1.0.0'),
-
           const SizedBox(height: 40),
         ],
       ),
-    );
-  }
-
-  void _showComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('준비 중인 기능이에요.')),
     );
   }
 }
@@ -263,7 +196,6 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// 내 ID 타일
 class _MyIdTile extends StatelessWidget {
   const _MyIdTile({required this.uuid});
   final String? uuid;
@@ -323,16 +255,10 @@ class _MyIdTile extends StatelessWidget {
   }
 }
 
-// 이동 타일 (ChevronRight + 선택적 뱃지)
 class _NavTile extends StatelessWidget {
-  const _NavTile({
-    required this.label,
-    required this.onTap,
-    this.badge,
-  });
+  const _NavTile({required this.label, required this.onTap});
   final String label;
   final VoidCallback onTap;
-  final String? badge;
 
   @override
   Widget build(BuildContext context) {
@@ -360,21 +286,6 @@ class _NavTile extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w400)),
                 ),
-                if (badge != null)
-                  Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(badge!,
-                        style: const TextStyle(
-                            color: AppColors.textMuted,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500)),
-                  ),
                 const Icon(Icons.chevron_right_rounded,
                     color: AppColors.textDisabled, size: 20),
               ],
@@ -386,48 +297,6 @@ class _NavTile extends StatelessWidget {
   }
 }
 
-// 토글 타일
-class _ToggleTile extends StatelessWidget {
-  const _ToggleTile({
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-  final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border, width: 0.5),
-      ),
-      padding: const EdgeInsets.fromLTRB(18, 4, 12, 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(label,
-                style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w400)),
-          ),
-          Switch.adaptive(
-            value: value,
-            onChanged: onChanged,
-            activeColor: AppColors.textPrimary,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// 액션 타일 (로그아웃 등 — 컬러 강조)
 class _ActionTile extends StatelessWidget {
   const _ActionTile({
     required this.label,
@@ -462,39 +331,6 @@ class _ActionTile extends StatelessWidget {
                     fontWeight: FontWeight.w400)),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// 정보 표시 타일 (탭 없음)
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.detail});
-  final String label;
-  final String detail;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border, width: 0.5),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label,
-              style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400)),
-          Text(detail,
-              style: const TextStyle(
-                  color: AppColors.textMuted, fontSize: 14)),
-        ],
       ),
     );
   }
