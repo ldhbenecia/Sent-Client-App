@@ -58,23 +58,31 @@ class AppColors {
   static const glassDark       = Color(0xCC0F0F0F); // card 80%
 
   // ── Category Preset Colors ─────────────────────────────────
-  static const categoryRed    = Color(0xFFFF6467);
-  static const categoryOrange = Color(0xFFFF9F0A);
-  static const categoryYellow = Color(0xFFFFD60A);
-  static const categoryGreen  = Color(0xFF32D74B);
-  static const categoryBlue   = Color(0xFF0A84FF);
-  static const categoryPurple = Color(0xFFBF5AF2);
-  static const categoryPink   = Color(0xFFFF375F);
-  static const categoryCyan   = Color(0xFF64D2FF);
+  static const categoryRed     = Color(0xFFFF6467); // 긴급 / 중요
+  static const categoryOrange  = Color(0xFFFF9F0A); // 생활 / 쇼핑
+  static const categoryYellow  = Color(0xFFFFD60A); // 메모 / 아이디어
+  static const categoryGreen   = Color(0xFF32D74B); // 건강 / 자연
+  static const categoryMint    = Color(0xFF00C7BE); // 여행 / 휴식
+  static const categoryCyan    = Color(0xFF64D2FF); // 공부 / 집중
+  static const categoryBlue    = Color(0xFF0A84FF); // 업무 / 코드
+  static const categoryIndigo  = Color(0xFF5856D6); // 창작 / 예술
+  static const categoryPurple  = Color(0xFFBF5AF2); // 취미 / 게임
+  static const categoryPink    = Color(0xFFFF375F); // 감정 / 관계
+  static const categoryBrown   = Color(0xFFAC8E68); // 커피 / 음식
+  static const categoryGray    = Color(0xFF8E8E93); // 기타 / 일반
 
   static const List<Color> categoryPresets = [
     categoryRed,
     categoryOrange,
     categoryYellow,
     categoryGreen,
+    categoryMint,
+    categoryCyan,
     categoryBlue,
+    categoryIndigo,
     categoryPurple,
     categoryPink,
-    categoryCyan,
+    categoryBrown,
+    categoryGray,
   ];
 }

@@ -32,7 +32,7 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
     final cat = widget.category;
     _nameCtrl = TextEditingController(text: cat?.name ?? '');
     _selectedIcon = cat?.icon ?? kCategoryIcons.first;
-    _selectedColor = cat?.color ?? AppColors.categoryRed;
+    _selectedColor = cat?.color ?? AppColors.categoryBlue;
   }
 
   @override

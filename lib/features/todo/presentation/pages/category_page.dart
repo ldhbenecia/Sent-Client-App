@@ -33,21 +33,31 @@ class CategoryPage extends ConsumerWidget {
         ),
         centerTitle: false,
       ),
-      body: categoriesAsync.when(
+      body: RefreshIndicator(
+        color: AppColors.textPrimary,
+        backgroundColor: AppColors.card,
+        onRefresh: () async => ref.invalidate(todoCategoriesProvider),
+        child: categoriesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(e.toString().replaceAll('Exception: ', ''),
-                  style: const TextStyle(color: AppColors.textMuted, fontSize: 14)),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => ref.invalidate(todoCategoriesProvider),
-                child: const Text('다시 시도',
-                    style: TextStyle(color: AppColors.textPrimary)),
+        error: (e, _) => SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: 300,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(e.toString().replaceAll('Exception: ', ''),
+                      style: const TextStyle(color: AppColors.textMuted, fontSize: 14)),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () => ref.invalidate(todoCategoriesProvider),
+                    child: const Text('다시 시도',
+                        style: TextStyle(color: AppColors.textPrimary)),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         data: (categories) => ListView(
@@ -111,6 +121,7 @@ class CategoryPage extends ConsumerWidget {
             const SizedBox(height: 80),
           ],
         ),
+      ),
       ),
     );
   }
