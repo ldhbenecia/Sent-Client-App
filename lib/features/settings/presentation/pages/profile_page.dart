@@ -1,8 +1,59 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/storage/token_storage.dart';
 import '../../../../shared/theme/app_colors.dart';
 
-class ProfilePage extends StatelessWidget {
+// ── JWT 페이로드에서 사용자 정보 추출 ────────────────────────────────
+class _UserInfo {
+  final String? displayName;
+  final String? email;
+  final String? profileImageUrl;
+  const _UserInfo({this.displayName, this.email, this.profileImageUrl});
+}
+
+_UserInfo _parseToken(String token) {
+  try {
+    final parts = token.split('.');
+    if (parts.length != 3) return const _UserInfo();
+    var payload = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    while (payload.length % 4 != 0) {
+      payload += '=';
+    }
+    final decoded = utf8.decode(base64.decode(payload));
+    final json = jsonDecode(decoded) as Map<String, dynamic>;
+    return _UserInfo(
+      displayName: json['displayName'] as String?,
+      email: json['email'] as String?,
+      profileImageUrl: json['profileImageUrl'] as String?,
+    );
+  } catch (_) {
+    return const _UserInfo();
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends ConsumerState<ProfilePage> {
+  _UserInfo _info = const _UserInfo();
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final token = await ref.read(tokenStorageProvider).getAccessToken();
+    if (!mounted || token == null) return;
+    setState(() => _info = _parseToken(token));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,79 +68,77 @@ class ProfilePage extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 32),
+          const SizedBox(height: 36),
 
           // ── 프로필 이미지 ───────────────────────────────────────
           Center(
-            child: Stack(
-              children: [
-                Container(
-                  width: 88,
-                  height: 88,
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.border, width: 0.5),
-                  ),
-                  child: const Icon(
-                    Icons.person_rounded,
-                    size: 44,
-                    color: AppColors.textDisabled,
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: GestureDetector(
-                    onTap: () => _showComingSoon(context),
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.card,
-                        shape: BoxShape.circle,
-                        border:
-                            Border.all(color: AppColors.border, width: 0.5),
+            child: Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: AppColors.secondary,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.border, width: 0.5),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: _info.profileImageUrl != null
+                  ? Image.network(
+                      _info.profileImageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.person_rounded,
+                        size: 44,
+                        color: AppColors.textDisabled,
                       ),
-                      child: const Icon(
-                        Icons.camera_alt_rounded,
-                        size: 14,
-                        color: AppColors.textMuted,
-                      ),
+                    )
+                  : const Icon(
+                      Icons.person_rounded,
+                      size: 44,
+                      color: AppColors.textDisabled,
                     ),
-                  ),
-                ),
-              ],
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
-          // ── 프로필 설정 항목 ────────────────────────────────────
-          const _SectionHeader(label: '프로필 정보'),
-          _NavTile(
-            label: '이름 변경',
-            detail: '준비 중',
-            onTap: () => _showComingSoon(context),
-          ),
-          _NavTile(
-            label: '프로필 사진 변경',
-            detail: '준비 중',
-            onTap: () => _showComingSoon(context),
-          ),
+          // ── 이름 ────────────────────────────────────────────────
+          if (_info.displayName != null)
+            Center(
+              child: Text(
+                _info.displayName!,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.4,
+                ),
+              ),
+            ),
 
-          const SizedBox(height: 28),
+          // ── 이메일 ──────────────────────────────────────────────
+          if (_info.email != null) ...[
+            const SizedBox(height: 5),
+            Center(
+              child: Text(
+                _info.email!,
+                style: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 36),
 
           // ── 개인정보 보호 ───────────────────────────────────────
           const _SectionHeader(label: '개인정보 보호'),
           _NavTile(
             label: '비공개 계정',
-            detail: '준비 중',
             onTap: () => _showComingSoon(context),
           ),
           _NavTile(
             label: '차단 목록',
-            detail: '준비 중',
             onTap: () => _showComingSoon(context),
           ),
 
@@ -130,14 +179,9 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _NavTile extends StatelessWidget {
-  const _NavTile({
-    required this.label,
-    required this.onTap,
-    this.detail,
-  });
+  const _NavTile({required this.label, required this.onTap});
   final String label;
   final VoidCallback onTap;
-  final String? detail;
 
   @override
   Widget build(BuildContext context) {
@@ -154,8 +198,7 @@ class _NavTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.border, width: 0.5),
             ),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
             child: Row(
               children: [
                 Expanded(
@@ -165,13 +208,6 @@ class _NavTile extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w400)),
                 ),
-                if (detail != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: Text(detail!,
-                        style: const TextStyle(
-                            color: AppColors.textDisabled, fontSize: 13)),
-                  ),
                 const Icon(Icons.chevron_right_rounded,
                     color: AppColors.textDisabled, size: 20),
               ],
