@@ -9,7 +9,6 @@ import '../theme/app_colors.dart';
 void showAppNavMenu(
   BuildContext pageContext, {
   VoidCallback? onCategoryTap,
-  VoidCallback? onDevLogout,
 }) {
   showGeneralDialog(
     context: pageContext,
@@ -66,12 +65,6 @@ void showAppNavMenu(
                               onCategoryTap();
                             }
                           : null,
-                      onDevLogout: onDevLogout != null
-                          ? () {
-                              Navigator.of(ctx).pop();
-                              onDevLogout();
-                            }
-                          : null,
                     ),
                   ),
                 ),
@@ -94,7 +87,6 @@ class _AppNavMenuCard extends StatelessWidget {
     required this.onSocialTap,
     required this.onPreferencesTap,
     this.onCategoryTap,
-    this.onDevLogout,
   });
 
   final VoidCallback onTodoTap;
@@ -102,7 +94,6 @@ class _AppNavMenuCard extends StatelessWidget {
   final VoidCallback onSocialTap;
   final VoidCallback onPreferencesTap;
   final VoidCallback? onCategoryTap;
-  final VoidCallback? onDevLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -189,16 +180,6 @@ class _AppNavMenuCard extends StatelessWidget {
                   onTap: onPreferencesTap,
                   secondary: true,
                 ),
-
-                if (onDevLogout != null) ...[
-                  Divider(height: 0.5, color: Colors.white.withOpacity(0.10)),
-                  _NavRow(
-                    label: 'DEV Logout',
-                    onTap: onDevLogout!,
-                    color: AppColors.destructiveRed.withOpacity(0.80),
-                    secondary: true,
-                  ),
-                ],
 
                 const SizedBox(height: 14),
               ],

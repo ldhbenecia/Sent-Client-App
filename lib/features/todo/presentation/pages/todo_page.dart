@@ -8,8 +8,6 @@ import '../widgets/todo_calendar.dart';
 import '../widgets/todo_list_section.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
 
-const _kDevMode = bool.fromEnvironment('DEV_MODE', defaultValue: false);
-
 // ══════════════════════════════════════════════════════════════════
 // TodoPage
 // ══════════════════════════════════════════════════════════════════
@@ -234,7 +232,6 @@ class _TodoPageState extends ConsumerState<TodoPage> {
     showAppNavMenu(
       context,
       onCategoryTap: () => context.push('/todo/categories'),
-      onDevLogout: _kDevMode ? () => context.go('/auth/login') : null,
     );
   }
 }

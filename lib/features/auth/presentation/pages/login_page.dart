@@ -10,9 +10,6 @@ import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/widgets/sent_logo.dart';
 import '../../data/services/oauth_service.dart';
 
-// --dart-define=DEV_MODE=true 로 실행 시에만 DEV 버튼 표시
-const _kDevMode = bool.fromEnvironment('DEV_MODE', defaultValue: false);
-
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -157,30 +154,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             isLoading: _loadingProvider == 'kakao',
             onTap: () => _handleLogin('kakao'),
           ),
-          if (_kDevMode) ...[
-            const SizedBox(height: 14),
-            const Divider(color: AppColors.border, height: 0.5),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: () async {
-                await ref.read(tokenStorageProvider).saveTokens(
-                  accessToken: 'dev_access_token',
-                  refreshToken: 'dev_refresh_token',
-                );
-                if (mounted) context.go('/todo');
-              },
-              child: const Center(
-                child: Text(
-                  'DEV — 로그인 건너뛰기',
-                  style: TextStyle(
-                    color: AppColors.textDisabled,
-                    fontSize: 12,
-                    letterSpacing: -0.1,
-                  ),
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );

@@ -20,8 +20,6 @@ import '../../features/todo/presentation/providers/todo_provider.dart';
 
 part 'app_router.g.dart';
 
-const _kDevMode = bool.fromEnvironment('DEV_MODE', defaultValue: false);
-
 @riverpod
 GoRouter appRouter(Ref ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
@@ -42,13 +40,6 @@ GoRouter appRouter(Ref ref) {
     redirect: (context, state) async {
       final isAuthRoute = state.matchedLocation.startsWith('/auth');
       try {
-        if (!_kDevMode) {
-          final token = await tokenStorage.getAccessToken();
-          if (token == 'dev_access_token') {
-            await tokenStorage.clearTokens();
-            return '/auth/login';
-          }
-        }
         final hasToken = await tokenStorage.hasToken();
         if (!hasToken && !isAuthRoute) return '/auth/login';
         if (hasToken && isAuthRoute) return '/todo';
