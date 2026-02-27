@@ -43,42 +43,58 @@ class SocialSection extends StatelessWidget {
 
 // ── 친구 타일 ─────────────────────────────────────────────────────
 class FriendTile extends StatelessWidget {
-  const FriendTile({super.key, required this.friend, required this.onDelete});
+  const FriendTile({
+    super.key,
+    required this.friend,
+    required this.onDelete,
+    this.onTap,
+  });
   final Friend friend;
   final VoidCallback onDelete;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        children: [
-          SocialAvatar(
-            imageUrl: friend.friendProfileImageUrl,
-            name: friend.friendDisplayName,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              friend.friendDisplayName,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        splashColor: Colors.white.withOpacity(0.04),
+        highlightColor: Colors.white.withOpacity(0.02),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              SocialAvatar(
+                imageUrl: friend.friendProfileImageUrl,
+                name: friend.friendDisplayName,
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  friend.friendDisplayName,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: onDelete,
+                icon: const Icon(
+                  Icons.person_remove_rounded,
+                  size: 18,
+                  color: AppColors.textDisabled,
+                ),
+                padding: EdgeInsets.zero,
+                constraints:
+                    const BoxConstraints(minWidth: 32, minHeight: 32),
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: onDelete,
-            icon: const Icon(
-              Icons.person_remove_rounded,
-              size: 18,
-              color: AppColors.textDisabled,
-            ),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          ),
-        ],
+        ),
       ),
     );
   }

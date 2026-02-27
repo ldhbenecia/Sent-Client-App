@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
 import '../providers/friend_provider.dart';
@@ -92,6 +93,13 @@ class SocialPage extends ConsumerWidget {
                       children: friends
                           .map((f) => FriendTile(
                                 friend: f,
+                                onTap: () => context.push(
+                                  '/social/chat',
+                                  extra: {
+                                    'opponentId': f.friendId,
+                                    'friendName': f.friendDisplayName,
+                                  },
+                                ),
                                 onDelete: () =>
                                     _confirmDelete(context, ref, f),
                               ))

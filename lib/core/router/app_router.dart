@@ -13,6 +13,7 @@ import '../../features/todo/domain/models/todo_category.dart';
 import '../../features/todo/domain/models/todo_item.dart';
 import '../../features/memo/presentation/pages/memo_page.dart';
 import '../../features/social/presentation/pages/social_page.dart';
+import '../../features/social/presentation/pages/chat_page.dart';
 import '../../shared/widgets/main_shell.dart';
 import '../../shared/theme/app_colors.dart';
 import '../storage/token_storage.dart';
@@ -161,6 +162,20 @@ GoRouter appRouter(Ref ref) {
                 path: '/social',
                 name: 'social',
                 builder: (context, state) => const SocialPage(),
+                routes: [
+                  GoRoute(
+                    path: 'chat',
+                    name: 'social-chat',
+                    builder: (context, state) {
+                      final extra =
+                          state.extra as Map<String, dynamic>;
+                      return ChatPage(
+                        opponentId: extra['opponentId'] as String,
+                        friendName: extra['friendName'] as String,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
