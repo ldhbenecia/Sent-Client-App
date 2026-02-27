@@ -36,6 +36,9 @@ dependencies:
   # 캘린더
   table_calendar: ^3.1.2
 
+  # WebSocket (STOMP/SockJS)
+  stomp_dart_client: ^3.0.1
+
   # 유틸
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
