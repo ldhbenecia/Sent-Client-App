@@ -195,9 +195,9 @@ class _AppNavMenuCard extends StatelessWidget {
 
                 // 섹션 이동
                 _NavRow(label: 'Todo', onTap: onTodoTap),
-                _NavRow(label: 'Memo', onTap: onMemoTap),
-                _NavRow(label: 'Social', onTap: onSocialTap),
                 _NavRow(label: 'Ledger', onTap: onLedgerTap),
+                _NavRow(label: 'Social', onTap: onSocialTap),
+                _NavRow(label: 'Memo', onTap: onMemoTap),
 
                 Divider(height: 0.5, color: Colors.white.withOpacity(0.10)),
 

@@ -151,41 +151,7 @@ GoRouter appRouter(Ref ref) {
               ),
             ],
           ),
-          // ── Tab 1: Memo ──────────────────────────────────────────
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/memo',
-                name: 'memo',
-                builder: (context, state) => const MemoPage(),
-              ),
-            ],
-          ),
-          // ── Tab 2: Social ────────────────────────────────────────
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/social',
-                name: 'social',
-                builder: (context, state) => const SocialPage(),
-                routes: [
-                  GoRoute(
-                    path: 'chat',
-                    name: 'social-chat',
-                    builder: (context, state) {
-                      final extra =
-                          state.extra as Map<String, dynamic>;
-                      return ChatPage(
-                        opponentId: extra['opponentId'] as String,
-                        friendName: extra['friendName'] as String,
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // ── Tab 3: Ledger ─────────────────────────────────────────
+          // ── Tab 1: Ledger ─────────────────────────────────────────
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -252,6 +218,40 @@ GoRouter appRouter(Ref ref) {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+          // ── Tab 2: Social ────────────────────────────────────────
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/social',
+                name: 'social',
+                builder: (context, state) => const SocialPage(),
+                routes: [
+                  GoRoute(
+                    path: 'chat',
+                    name: 'social-chat',
+                    builder: (context, state) {
+                      final extra =
+                          state.extra as Map<String, dynamic>;
+                      return ChatPage(
+                        opponentId: extra['opponentId'] as String,
+                        friendName: extra['friendName'] as String,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // ── Tab 3: Memo ──────────────────────────────────────────
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/memo',
+                name: 'memo',
+                builder: (context, state) => const MemoPage(),
               ),
             ],
           ),
