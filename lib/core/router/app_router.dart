@@ -14,6 +14,12 @@ import '../../features/todo/domain/models/todo_item.dart';
 import '../../features/memo/presentation/pages/memo_page.dart';
 import '../../features/social/presentation/pages/social_page.dart';
 import '../../features/social/presentation/pages/chat_page.dart';
+import '../../features/ledger/presentation/pages/ledger_page.dart';
+import '../../features/ledger/presentation/pages/ledger_entry_edit_page.dart';
+import '../../features/ledger/presentation/pages/ledger_category_page.dart';
+import '../../features/ledger/presentation/pages/ledger_category_edit_page.dart';
+import '../../features/ledger/domain/models/ledger_entry.dart';
+import '../../features/ledger/domain/models/ledger_category.dart';
 import '../../shared/widgets/main_shell.dart';
 import '../../shared/theme/app_colors.dart';
 import '../storage/token_storage.dart';
@@ -174,6 +180,76 @@ GoRouter appRouter(Ref ref) {
                         friendName: extra['friendName'] as String,
                       );
                     },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // ── Tab 3: Ledger ─────────────────────────────────────────
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/ledger',
+                name: 'ledger',
+                builder: (context, state) => const LedgerPage(),
+                routes: [
+                  GoRoute(
+                    path: 'categories',
+                    name: 'ledger-categories',
+                    builder: (context, state) =>
+                        const LedgerCategoryPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        name: 'ledger-category-create',
+                        builder: (context, state) =>
+                            const LedgerCategoryEditPage(category: null),
+                      ),
+                      GoRoute(
+                        path: ':id/edit',
+                        name: 'ledger-category-edit',
+                        builder: (context, state) => LedgerCategoryEditPage(
+                          category: state.extra as LedgerCategory?,
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'new',
+                    name: 'ledger-create',
+                    pageBuilder: (context, state) => CustomTransitionPage(
+                      child: const LedgerEntryEditPage(),
+                      transitionsBuilder:
+                          (context, animation, secondary, child) =>
+                              SlideTransition(
+                        position: animation.drive(
+                          Tween(
+                            begin: const Offset(0, 1),
+                            end: Offset.zero,
+                          ).chain(CurveTween(curve: Curves.easeOutCubic)),
+                        ),
+                        child: child,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':id/edit',
+                    name: 'ledger-edit',
+                    pageBuilder: (context, state) => CustomTransitionPage(
+                      child: LedgerEntryEditPage(
+                          entry: state.extra as LedgerEntry?),
+                      transitionsBuilder:
+                          (context, animation, secondary, child) =>
+                              SlideTransition(
+                        position: animation.drive(
+                          Tween(
+                            begin: const Offset(0, 1),
+                            end: Offset.zero,
+                          ).chain(CurveTween(curve: Curves.easeOutCubic)),
+                        ),
+                        child: child,
+                      ),
+                    ),
                   ),
                 ],
               ),

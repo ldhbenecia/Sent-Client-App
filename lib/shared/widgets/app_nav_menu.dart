@@ -9,6 +9,7 @@ import '../theme/app_colors.dart';
 void showAppNavMenu(
   BuildContext pageContext, {
   VoidCallback? onCategoryTap,
+  VoidCallback? onLedgerCategoryTap,
 }) {
   showGeneralDialog(
     context: pageContext,
@@ -70,6 +71,10 @@ void showAppNavMenu(
                           Navigator.of(ctx).pop();
                           pageContext.go('/social');
                         },
+                        onLedgerTap: () {
+                          Navigator.of(ctx).pop();
+                          pageContext.go('/ledger');
+                        },
                         onPreferencesTap: () {
                           Navigator.of(ctx).pop();
                           pageContext.push('/preferences');
@@ -78,6 +83,12 @@ void showAppNavMenu(
                             ? () {
                                 Navigator.of(ctx).pop();
                                 onCategoryTap();
+                              }
+                            : null,
+                        onLedgerCategoryTap: onLedgerCategoryTap != null
+                            ? () {
+                                Navigator.of(ctx).pop();
+                                onLedgerCategoryTap();
                               }
                             : null,
                       ),
@@ -101,15 +112,19 @@ class _AppNavMenuCard extends StatelessWidget {
     required this.onTodoTap,
     required this.onMemoTap,
     required this.onSocialTap,
+    required this.onLedgerTap,
     required this.onPreferencesTap,
     this.onCategoryTap,
+    this.onLedgerCategoryTap,
   });
 
   final VoidCallback onTodoTap;
   final VoidCallback onMemoTap;
   final VoidCallback onSocialTap;
+  final VoidCallback onLedgerTap;
   final VoidCallback onPreferencesTap;
   final VoidCallback? onCategoryTap;
+  final VoidCallback? onLedgerCategoryTap;
 
   @override
   Widget build(BuildContext context) {
@@ -182,6 +197,7 @@ class _AppNavMenuCard extends StatelessWidget {
                 _NavRow(label: 'Todo', onTap: onTodoTap),
                 _NavRow(label: 'Memo', onTap: onMemoTap),
                 _NavRow(label: 'Social', onTap: onSocialTap),
+                _NavRow(label: 'Ledger', onTap: onLedgerTap),
 
                 Divider(height: 0.5, color: Colors.white.withOpacity(0.10)),
 
@@ -189,6 +205,12 @@ class _AppNavMenuCard extends StatelessWidget {
                   _NavRow(
                     label: 'Category',
                     onTap: onCategoryTap!,
+                    secondary: true,
+                  ),
+                if (onLedgerCategoryTap != null)
+                  _NavRow(
+                    label: 'Ledger Category',
+                    onTap: onLedgerCategoryTap!,
                     secondary: true,
                   ),
                 _NavRow(
