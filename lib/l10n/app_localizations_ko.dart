@@ -249,6 +249,27 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get sentRequestsSection => '보낸 친구 요청';
+
+  @override
+  String get statusPending => '대기 중';
+
+  @override
+  String get statusAccepted => '수락됨';
+
+  @override
+  String get statusRejected => '거절됨';
+
+  @override
+  String get chatListTitle => '채팅';
+
+  @override
+  String get chatListEmpty => '진행 중인 대화가 없습니다';
+
+  @override
+  String get chatListEmptySubtitle => '친구를 탭해\n대화를 시작해보세요';
+
+  @override
   String get request => '요청';
 
   @override

@@ -101,6 +101,13 @@
       "name": { "type": "String" }
     }
   },
+  "sentRequestsSection": "보낸 친구 요청",
+  "statusPending": "대기 중",
+  "statusAccepted": "수락됨",
+  "statusRejected": "거절됨",
+  "chatListTitle": "채팅",
+  "chatListEmpty": "진행 중인 대화가 없습니다",
+  "chatListEmptySubtitle": "친구를 탭해\n대화를 시작해보세요",
   "request": "요청",
   "connectingToServer": "서버에 연결 중...",
   "chatEmpty": "아직 메시지가 없어요\n먼저 인사해보세요",

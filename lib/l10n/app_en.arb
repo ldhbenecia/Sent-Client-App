@@ -101,6 +101,13 @@
       "name": { "type": "String" }
     }
   },
+  "sentRequestsSection": "Sent Requests",
+  "statusPending": "Pending",
+  "statusAccepted": "Accepted",
+  "statusRejected": "Declined",
+  "chatListTitle": "Chats",
+  "chatListEmpty": "No conversations yet",
+  "chatListEmptySubtitle": "Tap a friend to\nstart a conversation",
   "request": "Request",
   "connectingToServer": "Connecting to server...",
   "chatEmpty": "No messages yet\nSay hello first!",

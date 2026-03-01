@@ -568,6 +568,48 @@ abstract class AppLocalizations {
   /// **'{name}님께 친구 요청을 보냈습니다.'**
   String friendRequestSent(String name);
 
+  /// No description provided for @sentRequestsSection.
+  ///
+  /// In ko, this message translates to:
+  /// **'보낸 친구 요청'**
+  String get sentRequestsSection;
+
+  /// No description provided for @statusPending.
+  ///
+  /// In ko, this message translates to:
+  /// **'대기 중'**
+  String get statusPending;
+
+  /// No description provided for @statusAccepted.
+  ///
+  /// In ko, this message translates to:
+  /// **'수락됨'**
+  String get statusAccepted;
+
+  /// No description provided for @statusRejected.
+  ///
+  /// In ko, this message translates to:
+  /// **'거절됨'**
+  String get statusRejected;
+
+  /// No description provided for @chatListTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'채팅'**
+  String get chatListTitle;
+
+  /// No description provided for @chatListEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'진행 중인 대화가 없습니다'**
+  String get chatListEmpty;
+
+  /// No description provided for @chatListEmptySubtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'친구를 탭해\n대화를 시작해보세요'**
+  String get chatListEmptySubtitle;
+
   /// No description provided for @request.
   ///
   /// In ko, this message translates to:

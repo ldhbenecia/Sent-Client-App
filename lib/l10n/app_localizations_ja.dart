@@ -249,6 +249,27 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get sentRequestsSection => '送ったリクエスト';
+
+  @override
+  String get statusPending => '保留中';
+
+  @override
+  String get statusAccepted => '承認済み';
+
+  @override
+  String get statusRejected => '拒否済み';
+
+  @override
+  String get chatListTitle => 'チャット';
+
+  @override
+  String get chatListEmpty => '進行中の会話はありません';
+
+  @override
+  String get chatListEmptySubtitle => '友達をタップして\n会話を始めましょう';
+
+  @override
   String get request => 'リクエスト';
 
   @override

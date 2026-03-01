@@ -101,6 +101,13 @@
       "name": { "type": "String" }
     }
   },
+  "sentRequestsSection": "送ったリクエスト",
+  "statusPending": "保留中",
+  "statusAccepted": "承認済み",
+  "statusRejected": "拒否済み",
+  "chatListTitle": "チャット",
+  "chatListEmpty": "進行中の会話はありません",
+  "chatListEmptySubtitle": "友達をタップして\n会話を始めましょう",
   "request": "リクエスト",
   "connectingToServer": "サーバーに接続中...",
   "chatEmpty": "まだメッセージがありません\n最初に挨拶してみましょう",

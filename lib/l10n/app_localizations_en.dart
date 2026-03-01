@@ -253,6 +253,27 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sentRequestsSection => 'Sent Requests';
+
+  @override
+  String get statusPending => 'Pending';
+
+  @override
+  String get statusAccepted => 'Accepted';
+
+  @override
+  String get statusRejected => 'Declined';
+
+  @override
+  String get chatListTitle => 'Chats';
+
+  @override
+  String get chatListEmpty => 'No conversations yet';
+
+  @override
+  String get chatListEmptySubtitle => 'Tap a friend to\nstart a conversation';
+
+  @override
   String get request => 'Request';
 
   @override
