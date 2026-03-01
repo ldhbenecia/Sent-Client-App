@@ -96,22 +96,21 @@ class SocialPage extends ConsumerWidget {
             // ── 보낸 요청 섹션 ────────────────────────────────────
             sentAsync.when(
               data: (sentList) {
-                final pending = sentList
-                    .where((r) => r.status == SentRequestStatus.pending)
-                    .toList();
-                if (pending.isEmpty) {
+                if (sentList.isEmpty) {
                   return const SliverToBoxAdapter(child: SizedBox.shrink());
                 }
                 return SliverToBoxAdapter(
                   child: SocialSection(
-                    label: '${AppLocalizations.of(context)!.sentRequestsSection} ${pending.length}',
+                    label: '${AppLocalizations.of(context)!.sentRequestsSection} ${sentList.length}',
                     child: Column(
-                      children: pending
+                      children: sentList
                           .map((r) => SentFriendRequestTile(
                                 request: r,
-                                onCancel: () => ref
-                                    .read(sentRequestsProvider.notifier)
-                                    .cancel(r.id),
+                                onCancel: r.status == SentRequestStatus.pending
+                                    ? () => ref
+                                        .read(sentRequestsProvider.notifier)
+                                        .cancel(r.id)
+                                    : null,
                               ))
                           .toList(),
                     ),
