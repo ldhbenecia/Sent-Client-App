@@ -68,9 +68,18 @@ refactor(router): StatefulShellRoute 전환
 - `StateProvider`는 단순 UI 상태(선택 월, 선택 날짜 등)에만 사용
 
 **UI/UX 규칙**:
-- 다크 테마 전용; 색상은 항상 `AppColors.*` 참조
+- 색상은 항상 `context.colors.*` 참조 (`AppColors.*` 직접 참조 금지; 카테고리 프리셋·로고 primary 스케일은 예외)
 - `withOpacity()` 대신 `withValues(alpha:)` 사용
 - 삭제 등 비가역적 동작은 반드시 확인 바텀시트 표시
+
+**다국어(i18n) 규칙**:
+- 사용자에게 노출되는 모든 문자열은 `AppLocalizations.of(context)!.<key>` 로 참조
+- 새 기능 구현 시 반드시 `lib/l10n/app_ko.arb`, `app_en.arb`, `app_ja.arb` 3개 파일 모두 업데이트
+- ARB key는 `camelCase`, 화면/기능 단위 prefix 권장 (예: `ledgerNewEntry`, `todoDeleteConfirm`)
+- ARB 수정 후 반드시 `flutter gen-l10n` 실행 (build_runner 아님)
+- 날짜·요일 포맷: `intl` 패키지 `DateFormat` 사용 — `DateFormat.yMMMM(locale)`, `DateFormat.MMMd(locale)`, `DateFormat.E(locale)` 등
+  - locale은 `Localizations.localeOf(context).toString()` 으로 획득
+- 통화 기호: `l10n.currencySymbol` 참조 (한국어 "원", 영어/일본어 "₩")
 
 **네이밍**:
 - 파일명: `snake_case`
