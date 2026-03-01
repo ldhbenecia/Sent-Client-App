@@ -189,7 +189,15 @@ class _MessageList extends StatelessWidget {
         final message = messages[index];
         final isMe = chatState.myUserId != null &&
             message.senderId == chatState.myUserId;
-        return _MessageBubble(message: message, isMe: isMe);
+        // 바로 아래(더 최신) 메시지와 발신자가 다르면 → 그룹 간 큰 여백
+        final newerMessage = index > 0 ? messages[index - 1] : null;
+        final senderChangedBelow = newerMessage != null &&
+            newerMessage.senderId != message.senderId;
+        return _MessageBubble(
+          message: message,
+          isMe: isMe,
+          bottomSpacing: senderChangedBelow ? 14.0 : 2.0,
+        );
       },
     );
   }
@@ -199,10 +207,15 @@ class _MessageList extends StatelessWidget {
 // 메시지 버블
 // ══════════════════════════════════════════════════════════════════
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.message, required this.isMe});
+  const _MessageBubble({
+    required this.message,
+    required this.isMe,
+    this.bottomSpacing = 2.0,
+  });
 
   final ChatMessage message;
   final bool isMe;
+  final double bottomSpacing;
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +226,7 @@ class _MessageBubble extends StatelessWidget {
         '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: EdgeInsets.only(bottom: bottomSpacing),
       child: Row(
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
