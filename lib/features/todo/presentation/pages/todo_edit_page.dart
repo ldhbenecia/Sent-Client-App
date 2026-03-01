@@ -14,8 +14,8 @@ import '../../domain/models/todo_category.dart';
 class TodoEditPage extends ConsumerStatefulWidget {
   const TodoEditPage({super.key, this.todo, this.initialDate});
 
-  final TodoItem? todo;          // null = 생성 모드
-  final DateTime? initialDate;  // 생성 모드에서 기본 날짜
+  final TodoItem? todo;
+  final DateTime? initialDate;
 
   @override
   ConsumerState<TodoEditPage> createState() => _TodoEditPageState();
@@ -26,6 +26,10 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
   late DateTime _date;
   String? _categoryId;
   TimeOfDay? _time;
+  int? _alarmMinutes; // null = 없음
+
+  bool _showTimePicker = false;
+  bool _showAlarmPicker = false;
   bool _isSaving = false;
 
   bool get _isEdit => widget.todo != null;
@@ -46,7 +50,6 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
     super.dispose();
   }
 
-  // ── 날짜 포맷 ─────────────────────────────────────────────────
   String _formatDate(DateTime d) {
     const months = [
       '1월', '2월', '3월', '4월', '5월', '6월',
@@ -59,6 +62,32 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
     final h = t.hour.toString().padLeft(2, '0');
     final m = t.minute.toString().padLeft(2, '0');
     return '$h:$m';
+  }
+
+  String _alarmLabel(int? minutes, AppLocalizations l10n) {
+    return switch (minutes) {
+      null => l10n.none,
+      5    => l10n.alarmBefore5min,
+      10   => l10n.alarmBefore10min,
+      15   => l10n.alarmBefore15min,
+      30   => l10n.alarmBefore30min,
+      60   => l10n.alarmBefore1hour,
+      _    => l10n.none,
+    };
+  }
+
+  void _toggleTimePicker() {
+    setState(() {
+      _showTimePicker = !_showTimePicker;
+      if (_showTimePicker) _showAlarmPicker = false;
+    });
+  }
+
+  void _toggleAlarmPicker() {
+    setState(() {
+      _showAlarmPicker = !_showAlarmPicker;
+      if (_showAlarmPicker) _showTimePicker = false;
+    });
   }
 
   // ── 저장 ──────────────────────────────────────────────────────
@@ -118,31 +147,9 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
       ),
     );
     if (!mounted) return;
-    // result == '' 이면 "없음" 선택
     if (result != null) {
       setState(() => _categoryId = result.isEmpty ? null : result);
     }
-  }
-
-  // ── 시간 선택 ─────────────────────────────────────────────────
-  Future<void> _pickTime() async {
-    final colors = context.colors;
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: _time ?? TimeOfDay.now(),
-      builder: (context, child) => Theme(
-        data: ThemeData.dark().copyWith(
-          colorScheme: ColorScheme.dark(
-            primary: colors.foreground,
-            onPrimary: colors.background,
-            surface: colors.card,
-            onSurface: colors.textPrimary,
-          ),
-        ),
-        child: child!,
-      ),
-    );
-    if (picked != null) setState(() => _time = picked);
   }
 
   @override
@@ -236,8 +243,8 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child:
-                      Divider(height: 0.5, thickness: 0.5, color: colors.border),
+                  child: Divider(
+                      height: 0.5, thickness: 0.5, color: colors.border),
                 ),
 
                 // 카테고리
@@ -275,49 +282,55 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                         ),
                 ),
 
-                // 시간 선택
+                // 시간 선택 (드럼 피커 토글)
                 _FormRow(
                   label: l10n.todoTime,
-                  onTap: _pickTime,
-                  trailing: _time != null
-                      ? Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _formatTime(_time!),
-                              style: TextStyle(
-                                color: colors.textMuted,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            GestureDetector(
-                              onTap: () => setState(() => _time = null),
-                              child: Icon(Icons.close_rounded,
-                                  size: 14, color: colors.textDisabled),
-                            ),
-                          ],
-                        )
-                      : Text(
-                          l10n.none,
-                          style: TextStyle(
-                            color: colors.textDisabled,
-                            fontSize: 14,
-                          ),
-                        ),
-                ),
-
-                // 알림 (stub)
-                _FormRow(
-                  label: l10n.todoNotification,
+                  onTap: _toggleTimePicker,
+                  isExpanded: _showTimePicker,
                   trailing: Text(
-                    l10n.none,
+                    _time != null ? _formatTime(_time!) : l10n.none,
                     style: TextStyle(
-                      color: colors.textDisabled,
+                      color: _time != null
+                          ? colors.textMuted
+                          : colors.textDisabled,
                       fontSize: 14,
                     ),
                   ),
                 ),
+
+                // 인라인 시간 드럼 피커
+                if (_showTimePicker)
+                  _InlineTimePicker(
+                    initialTime: _time ?? const TimeOfDay(hour: 9, minute: 0),
+                    onConfirm: (t) =>
+                        setState(() { _time = t; _showTimePicker = false; }),
+                    onReset: () =>
+                        setState(() { _time = null; _showTimePicker = false; }),
+                  ),
+
+                // 알림 (토글)
+                _FormRow(
+                  label: l10n.todoNotification,
+                  onTap: _toggleAlarmPicker,
+                  isExpanded: _showAlarmPicker,
+                  trailing: Text(
+                    _alarmLabel(_alarmMinutes, l10n),
+                    style: TextStyle(
+                      color: _alarmMinutes != null
+                          ? colors.textMuted
+                          : colors.textDisabled,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+
+                // 인라인 알림 옵션 피커
+                if (_showAlarmPicker)
+                  _InlineAlarmOptions(
+                    selected: _alarmMinutes,
+                    onSelect: (v) =>
+                        setState(() { _alarmMinutes = v; _showAlarmPicker = false; }),
+                  ),
               ],
             ),
           ),
@@ -339,7 +352,8 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                       context.pop();
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: colors.destructiveRed.withValues(alpha: 0.12),
+                      backgroundColor:
+                          colors.destructiveRed.withValues(alpha: 0.12),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -373,11 +387,13 @@ class _FormRow extends StatelessWidget {
     required this.label,
     this.trailing,
     this.onTap,
+    this.isExpanded = false,
   });
 
   final String label;
   final Widget? trailing;
   final VoidCallback? onTap;
+  final bool isExpanded;
 
   @override
   Widget build(BuildContext context) {
@@ -400,10 +416,263 @@ class _FormRow extends StatelessWidget {
             ?trailing,
             if (onTap != null) ...[
               const SizedBox(width: 4),
-              Icon(Icons.chevron_right_rounded,
-                  size: 18, color: colors.textDisabled),
+              AnimatedRotation(
+                turns: isExpanded ? 0.25 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: Icon(Icons.chevron_right_rounded,
+                    size: 18, color: colors.textDisabled),
+              ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 인라인 드럼롤 시간 피커
+// ══════════════════════════════════════════════════════════════════
+class _InlineTimePicker extends StatefulWidget {
+  const _InlineTimePicker({
+    required this.initialTime,
+    required this.onConfirm,
+    required this.onReset,
+  });
+
+  final TimeOfDay initialTime;
+  final void Function(TimeOfDay) onConfirm;
+  final VoidCallback onReset;
+
+  @override
+  State<_InlineTimePicker> createState() => _InlineTimePickerState();
+}
+
+class _InlineTimePickerState extends State<_InlineTimePicker> {
+  late FixedExtentScrollController _hourCtrl;
+  late FixedExtentScrollController _minCtrl;
+  late int _hour;
+  late int _minute;
+
+  @override
+  void initState() {
+    super.initState();
+    _hour = widget.initialTime.hour;
+    _minute = widget.initialTime.minute;
+    _hourCtrl = FixedExtentScrollController(initialItem: _hour);
+    _minCtrl = FixedExtentScrollController(initialItem: _minute);
+  }
+
+  @override
+  void dispose() {
+    _hourCtrl.dispose();
+    _minCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+    const itemExtent = 44.0;
+    const pickerHeight = 220.0;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 2, 20, 4),
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: colors.border, width: 0.5),
+        ),
+        child: Column(
+          children: [
+            SizedBox(
+              height: pickerHeight,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // 선택 하이라이트 밴드
+                  Container(
+                    height: itemExtent,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: colors.secondary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  // 시/분 스크롤
+                  Row(
+                    children: [
+                      // 시
+                      Expanded(
+                        child: ListWheelScrollView.useDelegate(
+                          controller: _hourCtrl,
+                          itemExtent: itemExtent,
+                          physics: const FixedExtentScrollPhysics(),
+                          overAndUnderCenterOpacity: 0.3,
+                          perspective: 0.003,
+                          onSelectedItemChanged: (i) =>
+                              setState(() => _hour = i),
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            childCount: 24,
+                            builder: (_, i) => Center(
+                              child: Text(
+                                i.toString().padLeft(2, '0'),
+                                style: TextStyle(
+                                  color: colors.textPrimary,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // 구분자
+                      Text(
+                        ':',
+                        style: TextStyle(
+                          color: colors.textPrimary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      // 분
+                      Expanded(
+                        child: ListWheelScrollView.useDelegate(
+                          controller: _minCtrl,
+                          itemExtent: itemExtent,
+                          physics: const FixedExtentScrollPhysics(),
+                          overAndUnderCenterOpacity: 0.3,
+                          perspective: 0.003,
+                          onSelectedItemChanged: (i) =>
+                              setState(() => _minute = i),
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            childCount: 60,
+                            builder: (_, i) => Center(
+                              child: Text(
+                                i.toString().padLeft(2, '0'),
+                                style: TextStyle(
+                                  color: colors.textPrimary,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // 버튼 영역
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 14),
+              child: Row(
+                children: [
+                  TextButton(
+                    onPressed: widget.onReset,
+                    style: TextButton.styleFrom(
+                      foregroundColor: colors.textMuted,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                    ),
+                    child: Text(l10n.reset,
+                        style: const TextStyle(fontSize: 14)),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => widget
+                        .onConfirm(TimeOfDay(hour: _hour, minute: _minute)),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF0A84FF),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check_rounded,
+                          color: Colors.white, size: 20),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 인라인 알림 옵션 피커
+// ══════════════════════════════════════════════════════════════════
+class _InlineAlarmOptions extends StatelessWidget {
+  const _InlineAlarmOptions({required this.selected, required this.onSelect});
+
+  final int? selected;
+  final void Function(int?) onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+
+    final options = <(int?, String)>[
+      (null, l10n.none),
+      (5, l10n.alarmBefore5min),
+      (10, l10n.alarmBefore10min),
+      (15, l10n.alarmBefore15min),
+      (30, l10n.alarmBefore30min),
+      (60, l10n.alarmBefore1hour),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 2, 20, 4),
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: colors.border, width: 0.5),
+        ),
+        child: Column(
+          children: options.map((opt) {
+            final (value, label) = opt;
+            final isSelected = selected == value;
+            return InkWell(
+              onTap: () => onSelect(value),
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 13),
+                child: Row(
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: isSelected
+                            ? colors.textPrimary
+                            : colors.textSecondary,
+                        fontSize: 15,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                      ),
+                    ),
+                    const Spacer(),
+                    ?(isSelected
+                        ? Icon(Icons.check_rounded,
+                            size: 16, color: colors.textPrimary)
+                        : null),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
