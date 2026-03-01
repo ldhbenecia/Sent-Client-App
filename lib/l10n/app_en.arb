@@ -1,0 +1,124 @@
+{
+  "@@locale": "en",
+
+  "appName": "SENT",
+
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "save": "Save",
+  "edit": "Edit",
+  "register": "Add",
+  "retry": "Retry",
+  "none": "None",
+  "confirm": "Confirm",
+  "close": "Close",
+  "manage": "Manage",
+  "loadFailed": "Failed to load",
+  "pageNotFound": "Page not found",
+
+  "settings": "Settings",
+  "profile": "Profile",
+  "notifications": "Notifications",
+  "info": "About",
+  "account": "Account",
+  "appearance": "Appearance",
+  "theme": "Theme",
+  "language": "Language",
+  "systemDefault": "System Default",
+  "themeSystem": "System",
+  "themeDark": "Dark",
+  "themeLight": "Light",
+  "logout": "Sign Out",
+  "logoutConfirmTitle": "Sign Out",
+  "logoutConfirmMessage": "Are you sure you want to sign out?",
+  "legalInfo": "Legal",
+  "termsOfService": "Terms of Service",
+  "privacyPolicy": "Privacy Policy",
+  "openSourceLicense": "Open Source Licenses",
+  "version": "Version",
+  "comingSoon": "This feature is coming soon.",
+  "privateAccount": "Private Account",
+  "blockedUsers": "Blocked Users",
+  "privacy": "Privacy",
+
+  "loginTagline": "Organize your daily life",
+  "loginSubtitle": "Sign in with your social account",
+  "continueWithGoogle": "Continue with Google",
+  "continueWithNaver": "Continue with Naver",
+  "continueWithKakao": "Continue with Kakao",
+  "loginError": "Something went wrong during sign in.\nPlease try again later.",
+
+  "today": "Today",
+  "allDone": "All done!",
+  "remainingCount": "{count} tasks remaining",
+  "@remainingCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "todoAddTask": "Add a task",
+
+  "todoEmptyTitle": "No tasks yet",
+  "todoEmptySubtitle": "Tap the + button below\nto add your first task",
+  "todoCategory": "Category",
+  "todoTime": "Set Time",
+  "todoNotification": "Reminder",
+  "todoContentHint": "Enter content",
+  "categoryEdit": "Edit Categories",
+  "categoryNew": "New Category",
+  "categorySelect": "Select Category",
+  "categoryIcon": "Icon",
+  "categoryColor": "Color",
+  "categoryNameHint": "Enter a name",
+
+  "memoEmptyTitle": "No memos yet",
+  "memoEmptySubtitle": "Tap the + button below\nto write your first memo",
+
+  "friendsSection": "Friends",
+  "friendRequestsSection": "Friend Requests",
+  "friendsEmpty": "No friends yet",
+  "friendsEmptySubtitle": "Tap the top-right button\nto add your first friend",
+  "friendDeleteTitle": "Remove Friend",
+  "friendDeleteMessage": "Remove {name} from your friends?",
+  "@friendDeleteMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "accept": "Accept",
+  "reject": "Decline",
+  "addFriend": "Add Friend",
+  "addFriendSubtitle": "Search by email address.",
+  "emailHint": "Email address",
+  "search": "Search",
+  "userNotFound": "No matching user found.",
+  "friendRequestSent": "Friend request sent to {name}.",
+  "@friendRequestSent": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "request": "Request",
+  "connectingToServer": "Connecting to server...",
+  "chatEmpty": "No messages yet\nSay hello first!",
+  "messageHint": "Message",
+  "connectingHint": "Connecting...",
+
+  "currencySymbol": "₩",
+
+  "income": "Income",
+  "expense": "Expense",
+  "netAmount": "Net",
+  "transactionDate": "Date",
+  "paymentMethod": "Payment",
+  "memoOptionalHint": "Memo (optional)",
+  "ledgerEmptyMonth": "No transactions this month",
+  "ledgerEmptyDay": "No transactions on this day",
+  "ledgerDeleteTitle": "Delete transaction?",
+  "ledgerDeleteMessage": "This action cannot be undone.",
+  "addEntry": "Add Transaction",
+  "editEntry": "Edit Transaction",
+  "selectDate": "Select Date",
+  "ledgerCategory": "Ledger Categories",
+  "ledgerCategoryNew": "New Category"
+}

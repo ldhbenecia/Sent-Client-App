@@ -1,0 +1,124 @@
+{
+  "@@locale": "ko",
+
+  "appName": "SENT",
+
+  "cancel": "취소",
+  "delete": "삭제",
+  "save": "저장",
+  "edit": "수정",
+  "register": "등록",
+  "retry": "다시 시도",
+  "none": "없음",
+  "confirm": "확인",
+  "close": "닫기",
+  "manage": "관리",
+  "loadFailed": "불러오기 실패",
+  "pageNotFound": "페이지를 찾을 수 없습니다",
+
+  "settings": "설정",
+  "profile": "프로필",
+  "notifications": "알림",
+  "info": "정보",
+  "account": "계정",
+  "appearance": "화면",
+  "theme": "테마",
+  "language": "언어",
+  "systemDefault": "시스템 기본값",
+  "themeSystem": "시스템",
+  "themeDark": "다크",
+  "themeLight": "라이트",
+  "logout": "로그아웃",
+  "logoutConfirmTitle": "로그아웃",
+  "logoutConfirmMessage": "로그아웃 하시겠어요?",
+  "legalInfo": "법적 정보",
+  "termsOfService": "서비스 이용약관",
+  "privacyPolicy": "개인정보 처리방침",
+  "openSourceLicense": "오픈소스 라이선스",
+  "version": "버전",
+  "comingSoon": "준비 중인 기능이에요.",
+  "privateAccount": "비공개 계정",
+  "blockedUsers": "차단 목록",
+  "privacy": "개인정보 보호",
+
+  "loginTagline": "일상을 체계적으로 관리하세요",
+  "loginSubtitle": "소셜 계정으로 간편하게 시작하세요",
+  "continueWithGoogle": "Google로 계속하기",
+  "continueWithNaver": "네이버로 계속하기",
+  "continueWithKakao": "카카오로 계속하기",
+  "loginError": "로그인 중 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.",
+
+  "today": "오늘",
+  "allDone": "전량 완료했습니다.",
+  "remainingCount": "{count}개의 할 일이 남아있습니다.",
+  "@remainingCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "todoAddTask": "할 일을 추가해보세요",
+
+  "todoEmptyTitle": "할 일이 없습니다",
+  "todoEmptySubtitle": "아래 + 버튼으로\n첫 번째 할 일을 추가해보세요",
+  "todoCategory": "카테고리",
+  "todoTime": "시간 선택",
+  "todoNotification": "알림",
+  "todoContentHint": "내용을 입력하세요",
+  "categoryEdit": "카테고리 편집",
+  "categoryNew": "새로운 카테고리",
+  "categorySelect": "카테고리 선택",
+  "categoryIcon": "아이콘",
+  "categoryColor": "색상",
+  "categoryNameHint": "이름을 입력하세요",
+
+  "memoEmptyTitle": "메모가 없습니다",
+  "memoEmptySubtitle": "아래 + 버튼으로\n첫 번째 메모를 작성해보세요",
+
+  "friendsSection": "친구",
+  "friendRequestsSection": "받은 친구 요청",
+  "friendsEmpty": "친구가 없습니다",
+  "friendsEmptySubtitle": "오른쪽 위 버튼으로\n첫 번째 친구를 추가해보세요",
+  "friendDeleteTitle": "친구 삭제",
+  "friendDeleteMessage": "{name}님을 친구 목록에서 삭제할까요?",
+  "@friendDeleteMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "accept": "수락",
+  "reject": "거절",
+  "addFriend": "친구 추가",
+  "addFriendSubtitle": "친구의 이메일을 입력해 검색하세요.",
+  "emailHint": "이메일 주소",
+  "search": "검색",
+  "userNotFound": "일치하는 사용자를 찾을 수 없습니다.",
+  "friendRequestSent": "{name}님께 친구 요청을 보냈습니다.",
+  "@friendRequestSent": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "request": "요청",
+  "connectingToServer": "서버에 연결 중...",
+  "chatEmpty": "아직 메시지가 없어요\n먼저 인사해보세요",
+  "messageHint": "메시지",
+  "connectingHint": "연결 중...",
+
+  "currencySymbol": "원",
+
+  "income": "수입",
+  "expense": "지출",
+  "netAmount": "순액",
+  "transactionDate": "거래일",
+  "paymentMethod": "결제수단",
+  "memoOptionalHint": "메모 (선택)",
+  "ledgerEmptyMonth": "이번 달 내역이 없습니다",
+  "ledgerEmptyDay": "이 날 내역이 없습니다",
+  "ledgerDeleteTitle": "내역을 삭제할까요?",
+  "ledgerDeleteMessage": "삭제된 내역은 복구할 수 없습니다.",
+  "addEntry": "내역 추가",
+  "editEntry": "내역 수정",
+  "selectDate": "거래일 선택",
+  "ledgerCategory": "가계부 카테고리",
+  "ledgerCategoryNew": "새로운 카테고리"
+}

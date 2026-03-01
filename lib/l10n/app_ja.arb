@@ -1,0 +1,124 @@
+{
+  "@@locale": "ja",
+
+  "appName": "SENT",
+
+  "cancel": "キャンセル",
+  "delete": "削除",
+  "save": "保存",
+  "edit": "編集",
+  "register": "追加",
+  "retry": "再試行",
+  "none": "なし",
+  "confirm": "確認",
+  "close": "閉じる",
+  "manage": "管理",
+  "loadFailed": "読み込みに失敗しました",
+  "pageNotFound": "ページが見つかりません",
+
+  "settings": "設定",
+  "profile": "プロフィール",
+  "notifications": "通知",
+  "info": "情報",
+  "account": "アカウント",
+  "appearance": "外観",
+  "theme": "テーマ",
+  "language": "言語",
+  "systemDefault": "システムのデフォルト",
+  "themeSystem": "システム",
+  "themeDark": "ダーク",
+  "themeLight": "ライト",
+  "logout": "ログアウト",
+  "logoutConfirmTitle": "ログアウト",
+  "logoutConfirmMessage": "ログアウトしますか？",
+  "legalInfo": "法的情報",
+  "termsOfService": "利用規約",
+  "privacyPolicy": "プライバシーポリシー",
+  "openSourceLicense": "オープンソースライセンス",
+  "version": "バージョン",
+  "comingSoon": "この機能は近日公開予定です。",
+  "privateAccount": "非公開アカウント",
+  "blockedUsers": "ブロックリスト",
+  "privacy": "プライバシー",
+
+  "loginTagline": "日常を効率的に管理しましょう",
+  "loginSubtitle": "ソーシャルアカウントで簡単に始める",
+  "continueWithGoogle": "Googleで続ける",
+  "continueWithNaver": "Naverで続ける",
+  "continueWithKakao": "Kakaoで続ける",
+  "loginError": "ログイン中に問題が発生しました。\nしばらくしてからもう一度お試しください。",
+
+  "today": "今日",
+  "allDone": "全て完了しました！",
+  "remainingCount": "残り{count}件のタスクがあります",
+  "@remainingCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "todoAddTask": "タスクを追加しましょう",
+
+  "todoEmptyTitle": "タスクがありません",
+  "todoEmptySubtitle": "下の＋ボタンで\n最初のタスクを追加しましょう",
+  "todoCategory": "カテゴリ",
+  "todoTime": "時間を設定",
+  "todoNotification": "リマインダー",
+  "todoContentHint": "内容を入力してください",
+  "categoryEdit": "カテゴリ編集",
+  "categoryNew": "新しいカテゴリ",
+  "categorySelect": "カテゴリを選択",
+  "categoryIcon": "アイコン",
+  "categoryColor": "カラー",
+  "categoryNameHint": "名前を入力してください",
+
+  "memoEmptyTitle": "メモがありません",
+  "memoEmptySubtitle": "下の＋ボタンで\n最初のメモを作成しましょう",
+
+  "friendsSection": "友達",
+  "friendRequestsSection": "フレンドリクエスト",
+  "friendsEmpty": "友達がいません",
+  "friendsEmptySubtitle": "右上のボタンで\n最初の友達を追加しましょう",
+  "friendDeleteTitle": "友達を削除",
+  "friendDeleteMessage": "{name}さんを友達リストから削除しますか？",
+  "@friendDeleteMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "accept": "承認",
+  "reject": "拒否",
+  "addFriend": "友達を追加",
+  "addFriendSubtitle": "メールアドレスで検索してください。",
+  "emailHint": "メールアドレス",
+  "search": "検索",
+  "userNotFound": "一致するユーザーが見つかりません。",
+  "friendRequestSent": "{name}さんにフレンドリクエストを送りました。",
+  "@friendRequestSent": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "request": "リクエスト",
+  "connectingToServer": "サーバーに接続中...",
+  "chatEmpty": "まだメッセージがありません\n最初に挨拶してみましょう",
+  "messageHint": "メッセージ",
+  "connectingHint": "接続中...",
+
+  "currencySymbol": "₩",
+
+  "income": "収入",
+  "expense": "支出",
+  "netAmount": "収支",
+  "transactionDate": "取引日",
+  "paymentMethod": "支払方法",
+  "memoOptionalHint": "メモ（任意）",
+  "ledgerEmptyMonth": "今月の取引はありません",
+  "ledgerEmptyDay": "この日の取引はありません",
+  "ledgerDeleteTitle": "取引を削除しますか？",
+  "ledgerDeleteMessage": "この操作は元に戻せません。",
+  "addEntry": "取引を追加",
+  "editEntry": "取引を編集",
+  "selectDate": "日付を選択",
+  "ledgerCategory": "家計簿カテゴリ",
+  "ledgerCategoryNew": "新しいカテゴリ"
+}
