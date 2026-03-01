@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../shared/theme/app_color_theme.dart';
+import '../../../../../shared/utils/haptics.dart';
 import '../../domain/models/todo_item.dart';
 
 // ══════════════════════════════════════════════════════════════════
@@ -24,14 +25,14 @@ class TodoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return InkWell(
-      onTap: onEdit,
+      onTap: () { Haptics.light(); onEdit(); },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
-              onTap: onToggle,
+              onTap: () { Haptics.light(); onToggle(); },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 width: 22,

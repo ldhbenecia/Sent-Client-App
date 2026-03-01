@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../utils/haptics.dart';
 
 
 // ══════════════════════════════════════════════════════════════════
@@ -11,6 +12,7 @@ void showAppNavMenu(
   VoidCallback? onCategoryTap,
   VoidCallback? onLedgerCategoryTap,
 }) {
+  Haptics.medium();
   showGeneralDialog(
     context: pageContext,
     barrierDismissible: false,
@@ -178,7 +180,7 @@ class _AppNavMenuCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
+                        onTap: () { Haptics.light(); Navigator.of(context).pop(); },
                         child: Container(
                           width: 26,
                           height: 26,
@@ -254,7 +256,7 @@ class _NavRow extends StatelessWidget {
         ? Colors.white.withValues(alpha: 0.50)
         : Colors.white.withValues(alpha: 0.92);
     return InkWell(
-      onTap: onTap,
+      onTap: () { Haptics.light(); onTap(); },
       splashColor: Colors.white.withValues(alpha: 0.06),
       highlightColor: Colors.white.withValues(alpha: 0.04),
       child: Padding(

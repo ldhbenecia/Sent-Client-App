@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/utils/haptics.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
 import '../providers/ledger_provider.dart';
 import '../widgets/ledger_summary_card.dart';
@@ -336,6 +337,7 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'ledger_fab',
         onPressed: () {
+          Haptics.medium();
           ref.read(ledgerNewEntryInitialDateProvider.notifier).state =
               _selectedDay;
           context.push('/ledger/new');

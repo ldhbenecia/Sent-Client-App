@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/utils/haptics.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
 
 class MemoPage extends StatelessWidget {
@@ -57,7 +58,7 @@ class MemoPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'memo_fab',
-        onPressed: () {},
+        onPressed: () { Haptics.medium(); },
         backgroundColor: colors.foreground,
         foregroundColor: colors.background,
         elevation: 0,

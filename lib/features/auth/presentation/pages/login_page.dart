@@ -9,7 +9,9 @@ import '../../../../features/todo/presentation/providers/todo_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/utils/haptics.dart';
 import '../../../../shared/widgets/sent_logo.dart';
+import '../../../../shared/widgets/tap_scale.dart';
 import '../../data/services/oauth_service.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -385,8 +387,8 @@ class _SocialLoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
+    return TapScale(
+      onTap: isLoading ? null : () { Haptics.light(); onTap(); },
       child: AnimatedOpacity(
         opacity: isLoading ? 0.6 : 1.0,
         duration: const Duration(milliseconds: 150),

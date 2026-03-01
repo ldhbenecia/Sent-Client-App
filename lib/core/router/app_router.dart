@@ -67,13 +67,7 @@ GoRouter appRouter(Ref ref) {
         pageBuilder: (context, state) => CustomTransitionPage(
           child: const PreferencesPage(),
           transitionsBuilder: (context, animation, secondary, child) =>
-              SlideTransition(
-            position: animation.drive(
-              Tween(begin: const Offset(1, 0), end: Offset.zero)
-                  .chain(CurveTween(curve: Curves.easeOutCubic)),
-            ),
-            child: child,
-          ),
+              _slideRightFade(animation, child),
         ),
       ),
       StatefulShellRoute(
@@ -116,17 +110,8 @@ GoRouter appRouter(Ref ref) {
                       child: TodoEditPage(
                         initialDate: state.extra as DateTime?,
                       ),
-                      transitionsBuilder:
-                          (context, animation, secondary, child) =>
-                              SlideTransition(
-                        position: animation.drive(
-                          Tween(
-                            begin: const Offset(0, 1),
-                            end: Offset.zero,
-                          ).chain(CurveTween(curve: Curves.easeOutCubic)),
-                        ),
-                        child: child,
-                      ),
+                      transitionsBuilder: (context, animation, secondary, child) =>
+                          _slideUpFade(animation, child),
                     ),
                   ),
                   GoRoute(
@@ -134,17 +119,8 @@ GoRouter appRouter(Ref ref) {
                     name: 'todo-edit',
                     pageBuilder: (context, state) => CustomTransitionPage(
                       child: TodoEditPage(todo: state.extra as TodoItem?),
-                      transitionsBuilder:
-                          (context, animation, secondary, child) =>
-                              SlideTransition(
-                        position: animation.drive(
-                          Tween(
-                            begin: const Offset(0, 1),
-                            end: Offset.zero,
-                          ).chain(CurveTween(curve: Curves.easeOutCubic)),
-                        ),
-                        child: child,
-                      ),
+                      transitionsBuilder: (context, animation, secondary, child) =>
+                          _slideUpFade(animation, child),
                     ),
                   ),
                 ],
@@ -185,17 +161,8 @@ GoRouter appRouter(Ref ref) {
                     name: 'ledger-create',
                     pageBuilder: (context, state) => CustomTransitionPage(
                       child: const LedgerEntryEditPage(),
-                      transitionsBuilder:
-                          (context, animation, secondary, child) =>
-                              SlideTransition(
-                        position: animation.drive(
-                          Tween(
-                            begin: const Offset(0, 1),
-                            end: Offset.zero,
-                          ).chain(CurveTween(curve: Curves.easeOutCubic)),
-                        ),
-                        child: child,
-                      ),
+                      transitionsBuilder: (context, animation, secondary, child) =>
+                          _slideUpFade(animation, child),
                     ),
                   ),
                   GoRoute(
@@ -204,17 +171,8 @@ GoRouter appRouter(Ref ref) {
                     pageBuilder: (context, state) => CustomTransitionPage(
                       child: LedgerEntryEditPage(
                           entry: state.extra as LedgerEntry?),
-                      transitionsBuilder:
-                          (context, animation, secondary, child) =>
-                              SlideTransition(
-                        position: animation.drive(
-                          Tween(
-                            begin: const Offset(0, 1),
-                            end: Offset.zero,
-                          ).chain(CurveTween(curve: Curves.easeOutCubic)),
-                        ),
-                        child: child,
-                      ),
+                      transitionsBuilder: (context, animation, secondary, child) =>
+                          _slideUpFade(animation, child),
                     ),
                   ),
                 ],
@@ -321,3 +279,37 @@ class _AnimatedBranchContainerState extends State<_AnimatedBranchContainer> {
     );
   }
 }
+
+// ── 페이지 전환 헬퍼 ────────────────────────────────────────────────
+
+/// 아래에서 위로 슬라이드 + 페이드인 (모달 스타일 — create/edit)
+Widget _slideUpFade(Animation<double> animation, Widget child) =>
+    FadeTransition(
+      opacity: CurvedAnimation(
+        parent: animation,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+      ),
+      child: SlideTransition(
+        position: animation.drive(
+          Tween(begin: const Offset(0, 1), end: Offset.zero)
+              .chain(CurveTween(curve: Curves.easeOutCubic)),
+        ),
+        child: child,
+      ),
+    );
+
+/// 오른쪽에서 왼쪽으로 슬라이드 + 페이드인 (push 스타일 — preferences)
+Widget _slideRightFade(Animation<double> animation, Widget child) =>
+    FadeTransition(
+      opacity: CurvedAnimation(
+        parent: animation,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+      ),
+      child: SlideTransition(
+        position: animation.drive(
+          Tween(begin: const Offset(1, 0), end: Offset.zero)
+              .chain(CurveTween(curve: Curves.easeOutCubic)),
+        ),
+        child: child,
+      ),
+    );
