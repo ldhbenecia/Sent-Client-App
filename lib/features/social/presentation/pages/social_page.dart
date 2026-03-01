@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -49,6 +50,11 @@ class SocialPage extends ConsumerWidget {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
+            // ── 내 코드 카드 ──────────────────────────────────────
+            const SliverToBoxAdapter(
+              child: _MyCodeCard(),
+            ),
+
             // ── 받은 요청 섹션 ────────────────────────────────────
             requestsAsync.when(
               data: (requests) {
@@ -209,6 +215,101 @@ class SocialPage extends ConsumerWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => AddFriendSheet(ref: ref),
+    );
+  }
+}
+
+// ── 내 유저코드 카드 ──────────────────────────────────────────────────
+class _MyCodeCard extends ConsumerWidget {
+  const _MyCodeCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+    final profileAsync = ref.watch(myProfileProvider);
+
+    return profileAsync.when(
+      data: (profile) {
+        if (profile == null) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            decoration: BoxDecoration(
+              color: colors.card,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: colors.border, width: 0.5),
+            ),
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.myCode,
+                      style: TextStyle(
+                        color: colors.textMuted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      profile.userCode,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 3.0,
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: profile.userCode));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.codeCopied),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: colors.secondary,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: colors.border, width: 0.5),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.copy_rounded,
+                            size: 13, color: colors.textMuted),
+                        const SizedBox(width: 5),
+                        Text(
+                          l10n.copy,
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }

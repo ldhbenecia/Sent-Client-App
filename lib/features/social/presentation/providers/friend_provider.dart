@@ -1,8 +1,30 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/storage/token_storage.dart';
 import '../../data/repositories/friend_repository.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../domain/models/friend.dart';
+import '../../domain/models/user_profile.dart';
+
+// ── 내 프로필 (JWT sub → GET /api/v1/users/{id}) ──────────────────
+final myProfileProvider = FutureProvider<UserProfile?>((ref) async {
+  final token = await ref.watch(tokenStorageProvider).getAccessToken();
+  if (token == null) return null;
+  try {
+    final parts = token.split('.');
+    var payload = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    while (payload.length % 4 != 0) {
+      payload += '=';
+    }
+    final decoded = utf8.decode(base64.decode(payload));
+    final json = jsonDecode(decoded) as Map<String, dynamic>;
+    final userId = json['sub'] as String;
+    return await ref.read(userRepositoryProvider).fetchProfile(userId);
+  } catch (_) {
+    return null;
+  }
+});
 
 // ── Repository providers ───────────────────────────────────────────
 final friendRepositoryProvider = Provider<FriendRepository>((ref) {

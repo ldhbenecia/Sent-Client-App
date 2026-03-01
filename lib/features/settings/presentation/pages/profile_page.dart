@@ -1,65 +1,20 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/storage/token_storage.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
-
-// ── JWT 페이로드에서 사용자 정보 추출 ────────────────────────────────
-class _UserInfo {
-  final String? displayName;
-  final String? email;
-  final String? profileImageUrl;
-  const _UserInfo({this.displayName, this.email, this.profileImageUrl});
-}
-
-_UserInfo _parseToken(String token) {
-  try {
-    final parts = token.split('.');
-    if (parts.length != 3) return const _UserInfo();
-    var payload = parts[1].replaceAll('-', '+').replaceAll('_', '/');
-    while (payload.length % 4 != 0) {
-      payload += '=';
-    }
-    final decoded = utf8.decode(base64.decode(payload));
-    final json = jsonDecode(decoded) as Map<String, dynamic>;
-    return _UserInfo(
-      displayName: json['displayName'] as String?,
-      email: json['email'] as String?,
-      profileImageUrl: json['profileImageUrl'] as String?,
-    );
-  } catch (_) {
-    return const _UserInfo();
-  }
-}
+import '../../../social/presentation/providers/friend_provider.dart';
 
 // ════════════════════════════════════════════════════════════════
-class ProfilePage extends ConsumerStatefulWidget {
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  ConsumerState<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends ConsumerState<ProfilePage> {
-  _UserInfo _info = const _UserInfo();
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final token = await ref.read(tokenStorageProvider).getAccessToken();
-    if (!mounted || token == null) return;
-    setState(() => _info = _parseToken(token));
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
+    final profileAsync = ref.watch(myProfileProvider);
+
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -69,46 +24,56 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: ListView(
-        children: [
-          const SizedBox(height: 36),
+      body: profileAsync.when(
+        loading: () => Center(
+          child: CircularProgressIndicator(
+            color: colors.textMuted,
+            strokeWidth: 2,
+          ),
+        ),
+        error: (_, _) => const SizedBox.shrink(),
+        data: (profileOrNull) {
+          if (profileOrNull == null) return const SizedBox.shrink();
+          final profile = profileOrNull;
+          return ListView(
+          children: [
+            const SizedBox(height: 36),
 
-          // ── 프로필 이미지 ───────────────────────────────────────
-          Center(
-            child: Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: colors.secondary,
-                shape: BoxShape.circle,
-                border: Border.all(color: colors.border, width: 0.5),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: _info.profileImageUrl != null
-                  ? Image.network(
-                      _info.profileImageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (c, o, e) => Icon(
+            // ── 프로필 이미지 ─────────────────────────────────────
+            Center(
+              child: Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  color: colors.secondary,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: colors.border, width: 0.5),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: profile.profileImageUrl != null
+                    ? Image.network(
+                        profile.profileImageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, o, e) => Icon(
+                          Icons.person_rounded,
+                          size: 44,
+                          color: colors.textDisabled,
+                        ),
+                      )
+                    : Icon(
                         Icons.person_rounded,
                         size: 44,
                         color: colors.textDisabled,
                       ),
-                    )
-                  : Icon(
-                      Icons.person_rounded,
-                      size: 44,
-                      color: colors.textDisabled,
-                    ),
+              ),
             ),
-          ),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // ── 이름 ────────────────────────────────────────────────
-          if (_info.displayName != null)
+            // ── 이름 ──────────────────────────────────────────────
             Center(
               child: Text(
-                _info.displayName!,
+                profile.displayName,
                 style: TextStyle(
                   color: colors.textPrimary,
                   fontSize: 20,
@@ -118,42 +83,99 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
 
-          // ── 이메일 ──────────────────────────────────────────────
-          if (_info.email != null) ...[
+            // ── 이메일 ────────────────────────────────────────────
             const SizedBox(height: 5),
             Center(
               child: Text(
-                _info.email!,
-                style: TextStyle(
-                  color: colors.textMuted,
-                  fontSize: 13,
-                ),
+                profile.email,
+                style: TextStyle(color: colors.textMuted, fontSize: 13),
               ),
             ),
+
+            // ── 유저코드 ──────────────────────────────────────────
+            ...[
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(
+                        ClipboardData(text: profile.userCode));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.codeCopied),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: colors.card,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: colors.border, width: 0.5),
+                    ),
+                    child: Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.myCode,
+                              style: TextStyle(
+                                color: colors.textMuted,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              profile.userCode,
+                              style: TextStyle(
+                                color: colors.textPrimary,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 3.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Icon(Icons.copy_rounded,
+                            size: 16, color: colors.textDisabled),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 36),
+
+            // ── 개인정보 보호 ─────────────────────────────────────
+            _SectionHeader(label: l10n.privacy),
+            _NavTile(
+              label: l10n.privateAccount,
+              onTap: () => _showComingSoon(context, l10n),
+            ),
+            _NavTile(
+              label: l10n.blockedUsers,
+              onTap: () => _showComingSoon(context, l10n),
+            ),
+
+            const SizedBox(height: 40),
           ],
-
-          const SizedBox(height: 36),
-
-          // ── 개인정보 보호 ───────────────────────────────────────
-          _SectionHeader(label: l10n.privacy),
-          _NavTile(
-            label: l10n.privateAccount,
-            onTap: () => _showComingSoon(context),
-          ),
-          _NavTile(
-            label: l10n.blockedUsers,
-            onTap: () => _showComingSoon(context),
-          ),
-
-          const SizedBox(height: 40),
-        ],
+          );
+        },
       ),
     );
   }
 
-  void _showComingSoon(BuildContext context) {
+  void _showComingSoon(BuildContext context, AppLocalizations l10n) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context)!.comingSoon)),
+      SnackBar(content: Text(l10n.comingSoon)),
     );
   }
 }
