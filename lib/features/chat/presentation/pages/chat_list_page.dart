@@ -121,20 +121,14 @@ class _ChatRoomTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    String? timeStr;
+    DateTime? msgDt;
+    bool isToday = false;
     if (room.lastMessageTimestamp != null) {
-      final dt =
-          DateTime.fromMillisecondsSinceEpoch(room.lastMessageTimestamp!);
+      msgDt = DateTime.fromMillisecondsSinceEpoch(room.lastMessageTimestamp!);
       final now = DateTime.now();
-      final isToday = dt.year == now.year &&
-          dt.month == now.month &&
-          dt.day == now.day;
-      if (isToday) {
-        timeStr =
-            '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-      } else {
-        timeStr = '${dt.month}/${dt.day}';
-      }
+      isToday = msgDt.year == now.year &&
+          msgDt.month == now.month &&
+          msgDt.day == now.day;
     }
 
     return Material(
@@ -185,14 +179,28 @@ class _ChatRoomTile extends StatelessWidget {
                   ],
                 ),
               ),
-              if (timeStr != null) ...[
+              if (msgDt != null) ...[
                 const SizedBox(width: 8),
-                Text(
-                  timeStr,
-                  style: TextStyle(
-                    color: colors.textDisabled,
-                    fontSize: 11,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!isToday)
+                      Text(
+                        '${msgDt.month}/${msgDt.day}',
+                        style: TextStyle(
+                          color: colors.textDisabled,
+                          fontSize: 10,
+                        ),
+                      ),
+                    Text(
+                      '${msgDt.hour.toString().padLeft(2, '0')}:${msgDt.minute.toString().padLeft(2, '0')}',
+                      style: TextStyle(
+                        color: colors.textDisabled,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ],
