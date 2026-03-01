@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        title: const Text('정보'),
+        title: Text(l10n.info),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
           onPressed: () => Navigator.of(context).pop(),
@@ -20,30 +23,30 @@ class InfoPage extends StatelessWidget {
           const SizedBox(height: 16),
 
           // ── 앱 버전 ─────────────────────────────────────────────
-          const _InfoRow(label: '버전', detail: '1.0.0'),
+          _InfoRow(label: l10n.version, detail: '1.0.0'),
 
           const SizedBox(height: 28),
 
           // ── 법적 정보 ────────────────────────────────────────────
-          const _SectionHeader(label: '법적 정보'),
+          _SectionHeader(label: l10n.legalInfo),
           _NavTile(
-            label: '서비스 이용약관',
+            label: l10n.termsOfService,
             onTap: () => _showPolicy(
               context,
-              title: '서비스 이용약관',
+              title: l10n.termsOfService,
               content: _termsContent,
             ),
           ),
           _NavTile(
-            label: '개인정보 처리방침',
+            label: l10n.privacyPolicy,
             onTap: () => _showPolicy(
               context,
-              title: '개인정보 처리방침',
+              title: l10n.privacyPolicy,
               content: _privacyContent,
             ),
           ),
           _NavTile(
-            label: '오픈소스 라이선스',
+            label: l10n.openSourceLicense,
             onTap: () => showLicensePage(
               context: context,
               applicationName: 'Sent',
@@ -80,19 +83,20 @@ class _PolicySheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
       minChildSize: 0.5,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.card,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: colors.card,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             border: Border(
-              top: BorderSide(color: AppColors.border, width: 0.5),
-              left: BorderSide(color: AppColors.border, width: 0.5),
-              right: BorderSide(color: AppColors.border, width: 0.5),
+              top: BorderSide(color: colors.border, width: 0.5),
+              left: BorderSide(color: colors.border, width: 0.5),
+              right: BorderSide(color: colors.border, width: 0.5),
             ),
           ),
           child: Column(
@@ -103,7 +107,7 @@ class _PolicySheet extends StatelessWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: colors.border,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -115,8 +119,8 @@ class _PolicySheet extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.3,
@@ -128,26 +132,26 @@ class _PolicySheet extends StatelessWidget {
                       child: Container(
                         width: 28,
                         height: 28,
-                        decoration: const BoxDecoration(
-                          color: AppColors.secondary,
+                        decoration: BoxDecoration(
+                          color: colors.secondary,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.close,
-                            size: 16, color: AppColors.textMuted),
+                        child: Icon(Icons.close,
+                            size: 16, color: colors.textMuted),
                       ),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 0.5, color: AppColors.border),
+              Divider(height: 0.5, color: colors.border),
               Expanded(
                 child: SingleChildScrollView(
                   controller: scrollController,
                   padding: const EdgeInsets.all(24),
                   child: Text(
                     content,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: colors.textMuted,
                       fontSize: 13,
                       height: 1.9,
                       letterSpacing: -0.1,
@@ -171,12 +175,13 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
       child: Text(
         label,
-        style: const TextStyle(
-          color: AppColors.textMuted,
+        style: TextStyle(
+          color: colors.textMuted,
           fontSize: 12,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
@@ -193,10 +198,11 @@ class _NavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Material(
-        color: AppColors.card,
+        color: colors.card,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           onTap: onTap,
@@ -204,7 +210,7 @@ class _NavTile extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border, width: 0.5),
+              border: Border.all(color: colors.border, width: 0.5),
             ),
             padding:
                 const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
@@ -212,13 +218,13 @@ class _NavTile extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(label,
-                      style: const TextStyle(
-                          color: AppColors.textPrimary,
+                      style: TextStyle(
+                          color: colors.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w400)),
                 ),
-                const Icon(Icons.chevron_right_rounded,
-                    color: AppColors.textDisabled, size: 20),
+                Icon(Icons.chevron_right_rounded,
+                    color: colors.textDisabled, size: 20),
               ],
             ),
           ),
@@ -235,25 +241,26 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: colors.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        border: Border.all(color: colors.border, width: 0.5),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: const TextStyle(
-                  color: AppColors.textPrimary,
+              style: TextStyle(
+                  color: colors.textPrimary,
                   fontSize: 15,
                   fontWeight: FontWeight.w400)),
           Text(detail,
-              style: const TextStyle(
-                  color: AppColors.textMuted, fontSize: 14)),
+              style: TextStyle(
+                  color: colors.textMuted, fontSize: 14)),
         ],
       ),
     );

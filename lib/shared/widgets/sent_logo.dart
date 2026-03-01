@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_color_theme.dart';
 
 class SentLogo extends StatelessWidget {
   const SentLogo({super.key, this.size = 72});
@@ -9,22 +10,27 @@ class SentLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: colors.card,
         borderRadius: BorderRadius.circular(size * 0.24),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        border: Border.all(color: colors.border, width: 0.5),
       ),
       child: CustomPaint(
-        painter: _SentIconPainter(),
+        painter: _SentIconPainter(cardColor: colors.card),
       ),
     );
   }
 }
 
 class _SentIconPainter extends CustomPainter {
+  const _SentIconPainter({required this.cardColor});
+
+  final Color cardColor;
+
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
@@ -37,7 +43,7 @@ class _SentIconPainter extends CustomPainter {
         radius: 0.9,
         colors: [
           const Color(0xFF242424),
-          AppColors.card,
+          cardColor,
         ],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
     final rrect = RRect.fromRectAndRadius(
@@ -148,5 +154,6 @@ class _SentIconPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _SentIconPainter oldDelegate) =>
+      oldDelegate.cardColor != cardColor;
 }

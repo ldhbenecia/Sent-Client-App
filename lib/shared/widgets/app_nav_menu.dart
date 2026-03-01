@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../theme/app_colors.dart';
+
 
 // ══════════════════════════════════════════════════════════════════
 // showAppNavMenu — 전역 내비게이션 메뉴 다이얼로그
@@ -17,8 +17,8 @@ void showAppNavMenu(
     barrierLabel: '',
     barrierColor: Colors.transparent,
     transitionDuration: const Duration(milliseconds: 220),
-    pageBuilder: (_, __, ___) => const SizedBox.shrink(),
-    transitionBuilder: (ctx, anim, _, __) {
+    pageBuilder: (c, a1, a2) => const SizedBox.shrink(),
+    transitionBuilder: (ctx, anim, a1, child) {
       final curved = CurvedAnimation(
         parent: anim,
         curve: Curves.easeOutCubic,
@@ -39,7 +39,7 @@ void showAppNavMenu(
                 child: FadeTransition(
                   opacity: curved,
                   child: Container(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                   ),
                 ),
               ),
@@ -128,6 +128,7 @@ class _AppNavMenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
       child: ClipRRect(
@@ -139,14 +140,21 @@ class _AppNavMenuCard extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white.withOpacity(0.18),
-                  Colors.white.withOpacity(0.07),
-                ],
+                colors: isDark
+                    ? [
+                        Colors.white.withValues(alpha: 0.18),
+                        Colors.white.withValues(alpha: 0.07),
+                      ]
+                    : [
+                        const Color(0xF0111111),
+                        const Color(0xF50D0D0D),
+                      ],
               ),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: Colors.white.withOpacity(0.28),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.28)
+                    : Colors.white.withValues(alpha: 0.12),
                 width: 0.8,
               ),
             ),
@@ -162,7 +170,7 @@ class _AppNavMenuCard extends StatelessWidget {
                       Text(
                         'SENT',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.40),
+                          color: Colors.white.withValues(alpha: 0.40),
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 2.2,
@@ -175,23 +183,23 @@ class _AppNavMenuCard extends StatelessWidget {
                           width: 26,
                           height: 26,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.10),
+                            color: Colors.white.withValues(alpha: 0.10),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.20),
+                              color: Colors.white.withValues(alpha: 0.20),
                               width: 0.5,
                             ),
                           ),
                           child: Icon(Icons.close_rounded,
                               size: 13,
-                              color: Colors.white.withOpacity(0.55)),
+                              color: Colors.white.withValues(alpha: 0.55)),
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                Divider(height: 0.5, color: Colors.white.withOpacity(0.10)),
+                Divider(height: 0.5, color: Colors.white.withValues(alpha: 0.10)),
 
                 // 섹션 이동
                 _NavRow(label: 'Todo', onTap: onTodoTap),
@@ -199,7 +207,7 @@ class _AppNavMenuCard extends StatelessWidget {
                 _NavRow(label: 'Social', onTap: onSocialTap),
                 _NavRow(label: 'Memo', onTap: onMemoTap),
 
-                Divider(height: 0.5, color: Colors.white.withOpacity(0.10)),
+                Divider(height: 0.5, color: Colors.white.withValues(alpha: 0.10)),
 
                 if (onCategoryTap != null)
                   _NavRow(
@@ -233,25 +241,22 @@ class _NavRow extends StatelessWidget {
   const _NavRow({
     required this.label,
     required this.onTap,
-    this.color,
     this.secondary = false,
   });
 
   final String label;
   final VoidCallback onTap;
-  final Color? color;
   final bool secondary;
 
   @override
   Widget build(BuildContext context) {
-    final textColor = color ??
-        (secondary
-            ? Colors.white.withOpacity(0.50)
-            : Colors.white.withOpacity(0.92));
+    final textColor = secondary
+        ? Colors.white.withValues(alpha: 0.50)
+        : Colors.white.withValues(alpha: 0.92);
     return InkWell(
       onTap: onTap,
-      splashColor: Colors.white.withOpacity(0.06),
-      highlightColor: Colors.white.withOpacity(0.04),
+      splashColor: Colors.white.withValues(alpha: 0.06),
+      highlightColor: Colors.white.withValues(alpha: 0.04),
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 22,

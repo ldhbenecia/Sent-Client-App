@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/storage/token_storage.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 
 // ── JWT 페이로드에서 사용자 정보 추출 ────────────────────────────────
 class _UserInfo {
@@ -57,10 +58,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        title: const Text('프로필'),
+        title: Text(l10n.profile),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
           onPressed: () => Navigator.of(context).pop(),
@@ -76,25 +79,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               width: 88,
               height: 88,
               decoration: BoxDecoration(
-                color: AppColors.secondary,
+                color: colors.secondary,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border, width: 0.5),
+                border: Border.all(color: colors.border, width: 0.5),
               ),
               clipBehavior: Clip.antiAlias,
               child: _info.profileImageUrl != null
                   ? Image.network(
                       _info.profileImageUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
+                      errorBuilder: (c, o, e) => Icon(
                         Icons.person_rounded,
                         size: 44,
-                        color: AppColors.textDisabled,
+                        color: colors.textDisabled,
                       ),
                     )
-                  : const Icon(
+                  : Icon(
                       Icons.person_rounded,
                       size: 44,
-                      color: AppColors.textDisabled,
+                      color: colors.textDisabled,
                     ),
             ),
           ),
@@ -106,8 +109,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             Center(
               child: Text(
                 _info.displayName!,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
+                style: TextStyle(
+                  color: colors.textPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.4,
@@ -121,8 +124,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             Center(
               child: Text(
                 _info.email!,
-                style: const TextStyle(
-                  color: AppColors.textMuted,
+                style: TextStyle(
+                  color: colors.textMuted,
                   fontSize: 13,
                 ),
               ),
@@ -132,13 +135,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           const SizedBox(height: 36),
 
           // ── 개인정보 보호 ───────────────────────────────────────
-          const _SectionHeader(label: '개인정보 보호'),
+          _SectionHeader(label: l10n.privacy),
           _NavTile(
-            label: '비공개 계정',
+            label: l10n.privateAccount,
             onTap: () => _showComingSoon(context),
           ),
           _NavTile(
-            label: '차단 목록',
+            label: l10n.blockedUsers,
             onTap: () => _showComingSoon(context),
           ),
 
@@ -150,7 +153,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   void _showComingSoon(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('준비 중인 기능이에요.')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.comingSoon)),
     );
   }
 }
@@ -163,12 +166,13 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
       child: Text(
         label,
-        style: const TextStyle(
-          color: AppColors.textMuted,
+        style: TextStyle(
+          color: colors.textMuted,
           fontSize: 12,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
@@ -185,10 +189,11 @@ class _NavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Material(
-        color: AppColors.card,
+        color: colors.card,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           onTap: onTap,
@@ -196,20 +201,20 @@ class _NavTile extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border, width: 0.5),
+              border: Border.all(color: colors.border, width: 0.5),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
             child: Row(
               children: [
                 Expanded(
                   child: Text(label,
-                      style: const TextStyle(
-                          color: AppColors.textPrimary,
+                      style: TextStyle(
+                          color: colors.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w400)),
                 ),
-                const Icon(Icons.chevron_right_rounded,
-                    color: AppColors.textDisabled, size: 20),
+                Icon(Icons.chevron_right_rounded,
+                    color: colors.textDisabled, size: 20),
               ],
             ),
           ),
