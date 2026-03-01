@@ -14,6 +14,7 @@ import '../../features/todo/domain/models/todo_item.dart';
 import '../../features/memo/presentation/pages/memo_page.dart';
 import '../../features/social/presentation/pages/social_page.dart';
 import '../../features/social/presentation/pages/chat_page.dart';
+import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/ledger/presentation/pages/ledger_page.dart';
 import '../../features/ledger/presentation/pages/ledger_entry_edit_page.dart';
 import '../../features/ledger/presentation/pages/ledger_category_page.dart';
@@ -188,14 +189,27 @@ GoRouter appRouter(Ref ref) {
                 builder: (context, state) => const SocialPage(),
                 routes: [
                   GoRoute(
+                    path: 'chats',
+                    name: 'social-chats',
+                    pageBuilder: (context, state) => CustomTransitionPage(
+                      child: const ChatListPage(),
+                      transitionsBuilder: (context, animation, secondary, child) =>
+                          _slideRightFade(animation, child),
+                    ),
+                  ),
+                  GoRoute(
                     path: 'chat',
                     name: 'social-chat',
-                    builder: (context, state) {
+                    pageBuilder: (context, state) {
                       final extra =
                           state.extra as Map<String, dynamic>;
-                      return ChatPage(
-                        opponentId: extra['opponentId'] as String,
-                        friendName: extra['friendName'] as String,
+                      return CustomTransitionPage(
+                        child: ChatPage(
+                          opponentId: extra['opponentId'] as String,
+                          friendName: extra['friendName'] as String,
+                        ),
+                        transitionsBuilder: (context, animation, secondary, child) =>
+                            _slideRightFade(animation, child),
                       );
                     },
                   ),

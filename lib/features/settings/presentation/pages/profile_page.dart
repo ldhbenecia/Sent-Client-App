@@ -97,58 +97,7 @@ class ProfilePage extends ConsumerWidget {
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(
-                        ClipboardData(text: profile.userCode));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.codeCopied),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 18, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: colors.card,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: colors.border, width: 0.5),
-                    ),
-                    child: Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.myCode,
-                              style: TextStyle(
-                                color: colors.textMuted,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              profile.userCode,
-                              style: TextStyle(
-                                color: colors.textPrimary,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 3.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        Icon(Icons.copy_rounded,
-                            size: 16, color: colors.textDisabled),
-                      ],
-                    ),
-                  ),
-                ),
+                child: _UserCodeTile(userCode: profile.userCode),
               ),
             ],
 
@@ -176,6 +125,95 @@ class ProfilePage extends ConsumerWidget {
   void _showComingSoon(BuildContext context, AppLocalizations l10n) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.comingSoon)),
+    );
+  }
+}
+
+// ── 유저코드 타일 (복사 아이콘 토글) ────────────────────────────────
+class _UserCodeTile extends StatefulWidget {
+  const _UserCodeTile({required this.userCode});
+  final String userCode;
+
+  @override
+  State<_UserCodeTile> createState() => _UserCodeTileState();
+}
+
+class _UserCodeTileState extends State<_UserCodeTile> {
+  bool _copied = false;
+
+  Future<void> _onCopy() async {
+    if (_copied) return;
+    await Clipboard.setData(ClipboardData(text: widget.userCode));
+    setState(() => _copied = true);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.codeCopied),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) setState(() => _copied = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+
+    return GestureDetector(
+      onTap: _onCopy,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: colors.border, width: 0.5),
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.myCode,
+                  style: TextStyle(
+                    color: colors.textMuted,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  widget.userCode,
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 3.0,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: animation,
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: Icon(
+                _copied ? Icons.check_rounded : Icons.copy_rounded,
+                key: ValueKey(_copied),
+                size: 16,
+                color: _copied ? colors.textPrimary : colors.textDisabled,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

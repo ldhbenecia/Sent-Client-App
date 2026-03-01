@@ -19,12 +19,18 @@ class SocialPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final friendsAsync = ref.watch(friendsProvider);
     final requestsAsync = ref.watch(pendingRequestsProvider);
+    final sentAsync = ref.watch(sentRequestsProvider);
 
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
         title: const Text('SENT'),
         actions: [
+          IconButton(
+            icon: Icon(Icons.chat_bubble_outline_rounded,
+                color: colors.textMuted, size: 20),
+            onPressed: () => context.push('/social/chats'),
+          ),
           IconButton(
             icon: Icon(Icons.person_add_alt_1_rounded,
                 color: colors.textMuted, size: 22),
@@ -45,6 +51,7 @@ class SocialPage extends ConsumerWidget {
           await Future.wait([
             ref.read(friendsProvider.notifier).refresh(),
             ref.read(pendingRequestsProvider.notifier).refresh(),
+            ref.read(sentRequestsProvider.notifier).refresh(),
           ]);
         },
         child: CustomScrollView(
@@ -83,6 +90,32 @@ class SocialPage extends ConsumerWidget {
               loading: () =>
                   const SliverToBoxAdapter(child: SizedBox.shrink()),
               error: (e, st) =>
+                  const SliverToBoxAdapter(child: SizedBox.shrink()),
+            ),
+
+            // ── 보낸 요청 섹션 ────────────────────────────────────
+            sentAsync.when(
+              data: (sentList) {
+                final pending = sentList
+                    .where((r) => r.status == SentRequestStatus.pending)
+                    .toList();
+                if (pending.isEmpty) {
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                }
+                return SliverToBoxAdapter(
+                  child: SocialSection(
+                    label: '${AppLocalizations.of(context)!.sentRequestsSection} ${pending.length}',
+                    child: Column(
+                      children: pending
+                          .map((r) => SentFriendRequestTile(request: r))
+                          .toList(),
+                    ),
+                  ),
+                );
+              },
+              loading: () =>
+                  const SliverToBoxAdapter(child: SizedBox.shrink()),
+              error: (e, _) =>
                   const SliverToBoxAdapter(child: SizedBox.shrink()),
             ),
 
@@ -220,11 +253,34 @@ class SocialPage extends ConsumerWidget {
 }
 
 // ── 내 유저코드 카드 ──────────────────────────────────────────────────
-class _MyCodeCard extends ConsumerWidget {
+class _MyCodeCard extends ConsumerStatefulWidget {
   const _MyCodeCard();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_MyCodeCard> createState() => _MyCodeCardState();
+}
+
+class _MyCodeCardState extends ConsumerState<_MyCodeCard> {
+  bool _copied = false;
+
+  Future<void> _onCopy(String code, AppLocalizations l10n) async {
+    if (_copied) return;
+    await Clipboard.setData(ClipboardData(text: code));
+    setState(() => _copied = true);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.codeCopied),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) setState(() => _copied = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
     final profileAsync = ref.watch(myProfileProvider);
@@ -234,82 +290,64 @@ class _MyCodeCard extends ConsumerWidget {
         if (profile == null) return const SizedBox.shrink();
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            decoration: BoxDecoration(
-              color: colors.card,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: colors.border, width: 0.5),
-            ),
-            child: Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.myCode,
-                      style: TextStyle(
-                        color: colors.textMuted,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      profile.userCode,
-                      style: TextStyle(
-                        color: colors.textPrimary,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 3.0,
-                      ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: profile.userCode));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.codeCopied),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: colors.secondary,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: colors.border, width: 0.5),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.copy_rounded,
-                            size: 13, color: colors.textMuted),
-                        const SizedBox(width: 5),
-                        Text(
-                          l10n.copy,
-                          style: TextStyle(
-                            color: colors.textMuted,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+          child: GestureDetector(
+            onTap: () => _onCopy(profile.userCode, l10n),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
+              decoration: BoxDecoration(
+                color: colors.card,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colors.border, width: 0.5),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.myCode,
+                        style: TextStyle(
+                          color: colors.textMuted,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.8,
                         ),
-                      ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        profile.userCode,
+                        style: TextStyle(
+                          color: colors.textPrimary,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 4.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    transitionBuilder: (child, animation) => ScaleTransition(
+                      scale: animation,
+                      child: FadeTransition(opacity: animation, child: child),
+                    ),
+                    child: Icon(
+                      _copied ? Icons.check_rounded : Icons.copy_rounded,
+                      key: ValueKey(_copied),
+                      size: 18,
+                      color: _copied ? colors.textPrimary : colors.textDisabled,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, _) => const SizedBox.shrink(),
+      error: (e, _) => const SizedBox.shrink(),
     );
   }
 }
