@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../providers/todo_provider.dart';
 import '../widgets/category_picker_sheet.dart';
 import '../../domain/models/todo_item.dart';
@@ -91,10 +92,11 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
       if (mounted) context.pop();
     } catch (e) {
       if (!mounted) return;
+      final colors = context.colors;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: AppColors.destructiveRed,
+          backgroundColor: colors.destructiveRed,
         ),
       );
     } finally {
@@ -124,16 +126,17 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
 
   // ── 시간 선택 ─────────────────────────────────────────────────
   Future<void> _pickTime() async {
+    final colors = context.colors;
     final picked = await showTimePicker(
       context: context,
       initialTime: _time ?? TimeOfDay.now(),
       builder: (context, child) => Theme(
         data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: AppColors.foreground,
-            onPrimary: AppColors.background,
-            surface: AppColors.card,
-            onSurface: AppColors.textPrimary,
+          colorScheme: ColorScheme.dark(
+            primary: colors.foreground,
+            onPrimary: colors.background,
+            surface: colors.card,
+            onSurface: colors.textPrimary,
           ),
         ),
         child: child!,
@@ -144,6 +147,8 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final categories = ref.watch(todoCategoriesProvider).valueOrNull ?? [];
     final selectedCat = _categoryId != null
         ? categories.firstWhere(
@@ -151,26 +156,26 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
             orElse: () => TodoCategory(
               id: _categoryId!,
               name: '알 수 없음',
-              color: AppColors.textMuted,
+              color: colors.textMuted,
               icon: Icons.circle_outlined,
             ),
           )
         : null;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left_rounded,
-              color: AppColors.textPrimary, size: 28),
+          icon: Icon(Icons.chevron_left_rounded,
+              color: colors.textPrimary, size: 28),
           onPressed: () => context.pop(),
         ),
         title: Text(
           _formatDate(_date),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
             letterSpacing: -0.3,
           ),
         ),
@@ -179,11 +184,11 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
           TextButton(
             onPressed: _titleCtrl.text.trim().isNotEmpty ? _save : null,
             child: Text(
-              '등록',
+              l10n.register,
               style: TextStyle(
                 color: _titleCtrl.text.trim().isNotEmpty
-                    ? AppColors.textPrimary
-                    : AppColors.textDisabled,
+                    ? colors.textPrimary
+                    : colors.textDisabled,
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),
@@ -194,7 +199,7 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
       ),
       body: Column(
         children: [
-          const Divider(height: 0.5, color: AppColors.border),
+          Divider(height: 0.5, color: colors.border),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -206,15 +211,15 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                   child: TextField(
                     controller: _titleCtrl,
                     autofocus: !_isEdit,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
+                    style: TextStyle(
+                      color: colors.textPrimary,
                       fontSize: 17,
                       fontWeight: FontWeight.w500,
                     ),
-                    decoration: const InputDecoration(
-                      hintText: '내용을 입력하세요',
+                    decoration: InputDecoration(
+                      hintText: l10n.todoContentHint,
                       hintStyle: TextStyle(
-                        color: AppColors.textPlaceholder,
+                        color: colors.textPlaceholder,
                         fontSize: 17,
                       ),
                       border: InputBorder.none,
@@ -229,15 +234,15 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                   ),
                 ),
 
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child:
-                      Divider(height: 0.5, thickness: 0.5, color: AppColors.border),
+                      Divider(height: 0.5, thickness: 0.5, color: colors.border),
                 ),
 
                 // 카테고리
                 _FormRow(
-                  label: '카테고리',
+                  label: l10n.todoCategory,
                   onTap: _pickCategory,
                   trailing: selectedCat != null
                       ? Row(
@@ -254,17 +259,17 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                             const SizedBox(width: 6),
                             Text(
                               selectedCat.name,
-                              style: const TextStyle(
-                                color: AppColors.textMuted,
+                              style: TextStyle(
+                                color: colors.textMuted,
                                 fontSize: 14,
                               ),
                             ),
                           ],
                         )
-                      : const Text(
-                          '없음',
+                      : Text(
+                          l10n.none,
                           style: TextStyle(
-                            color: AppColors.textDisabled,
+                            color: colors.textDisabled,
                             fontSize: 14,
                           ),
                         ),
@@ -272,7 +277,7 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
 
                 // 시간 선택
                 _FormRow(
-                  label: '시간 선택',
+                  label: l10n.todoTime,
                   onTap: _pickTime,
                   trailing: _time != null
                       ? Row(
@@ -280,35 +285,35 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                           children: [
                             Text(
                               _formatTime(_time!),
-                              style: const TextStyle(
-                                color: AppColors.textMuted,
+                              style: TextStyle(
+                                color: colors.textMuted,
                                 fontSize: 14,
                               ),
                             ),
                             const SizedBox(width: 4),
                             GestureDetector(
                               onTap: () => setState(() => _time = null),
-                              child: const Icon(Icons.close_rounded,
-                                  size: 14, color: AppColors.textDisabled),
+                              child: Icon(Icons.close_rounded,
+                                  size: 14, color: colors.textDisabled),
                             ),
                           ],
                         )
-                      : const Text(
-                          '없음',
+                      : Text(
+                          l10n.none,
                           style: TextStyle(
-                            color: AppColors.textDisabled,
+                            color: colors.textDisabled,
                             fontSize: 14,
                           ),
                         ),
                 ),
 
                 // 알림 (stub)
-                const _FormRow(
-                  label: '알림',
+                _FormRow(
+                  label: l10n.todoNotification,
                   trailing: Text(
-                    '없음',
+                    l10n.none,
                     style: TextStyle(
-                      color: AppColors.textDisabled,
+                      color: colors.textDisabled,
                       fontSize: 14,
                     ),
                   ),
@@ -319,7 +324,7 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
 
           // 삭제 버튼 (수정 모드만)
           if (_isEdit) ...[
-            const Divider(height: 0.5, color: AppColors.border),
+            Divider(height: 0.5, color: colors.border),
             SafeArea(
               top: false,
               child: Padding(
@@ -334,16 +339,16 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                       context.pop();
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: AppColors.destructiveRed.withOpacity(0.12),
+                      backgroundColor: colors.destructiveRed.withValues(alpha: 0.12),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      '삭제',
+                    child: Text(
+                      l10n.delete,
                       style: TextStyle(
-                        color: AppColors.destructiveRed,
+                        color: colors.destructiveRed,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -376,6 +381,7 @@ class _FormRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -384,18 +390,18 @@ class _FormRow extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: colors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
             ),
             const Spacer(),
-            if (trailing != null) trailing!,
+            ?trailing,
             if (onTap != null) ...[
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right_rounded,
-                  size: 18, color: AppColors.textDisabled),
+              Icon(Icons.chevron_right_rounded,
+                  size: 18, color: colors.textDisabled),
             ],
           ],
         ),
@@ -403,4 +409,3 @@ class _FormRow extends StatelessWidget {
     );
   }
 }
-

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
 import '../providers/friend_provider.dart';
 import '../../domain/models/friend.dart';
@@ -13,30 +14,32 @@ class SocialPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final friendsAsync = ref.watch(friendsProvider);
     final requestsAsync = ref.watch(pendingRequestsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         title: const Text('SENT'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_add_alt_1_rounded,
-                color: AppColors.textMuted, size: 22),
+            icon: Icon(Icons.person_add_alt_1_rounded,
+                color: colors.textMuted, size: 22),
             onPressed: () => _showAddFriendSheet(context, ref),
           ),
           IconButton(
-            icon: const Icon(Icons.menu_rounded,
-                color: AppColors.textMuted, size: 22),
+            icon: Icon(Icons.menu_rounded,
+                color: colors.textMuted, size: 22),
             onPressed: () => showAppNavMenu(context),
           ),
           const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
-        color: AppColors.textPrimary,
-        backgroundColor: AppColors.card,
+        color: colors.textPrimary,
+        backgroundColor: colors.card,
         onRefresh: () async {
           await Future.wait([
             ref.read(friendsProvider.notifier).refresh(),
@@ -54,7 +57,7 @@ class SocialPage extends ConsumerWidget {
                 }
                 return SliverToBoxAdapter(
                   child: SocialSection(
-                    label: '받은 친구 요청 ${requests.length}',
+                    label: '${l10n.friendRequestsSection} ${requests.length}',
                     child: Column(
                       children: requests
                           .map((r) => FriendRequestTile(
@@ -73,7 +76,7 @@ class SocialPage extends ConsumerWidget {
               },
               loading: () =>
                   const SliverToBoxAdapter(child: SizedBox.shrink()),
-              error: (_, __) =>
+              error: (e, st) =>
                   const SliverToBoxAdapter(child: SizedBox.shrink()),
             ),
 
@@ -88,7 +91,7 @@ class SocialPage extends ConsumerWidget {
                 }
                 return SliverToBoxAdapter(
                   child: SocialSection(
-                    label: '친구 ${friends.length}',
+                    label: '${l10n.friendsSection} ${friends.length}',
                     child: Column(
                       children: friends
                           .map((f) => FriendTile(
@@ -108,11 +111,11 @@ class SocialPage extends ConsumerWidget {
                   ),
                 );
               },
-              loading: () => const SliverFillRemaining(
+              loading: () => SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(
                   child: CircularProgressIndicator(
-                    color: AppColors.textMuted,
+                    color: colors.textMuted,
                     strokeWidth: 1.5,
                   ),
                 ),
@@ -123,19 +126,19 @@ class SocialPage extends ConsumerWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline_rounded,
-                          color: AppColors.textDisabled, size: 40),
+                      Icon(Icons.error_outline_rounded,
+                          color: colors.textDisabled, size: 40),
                       const SizedBox(height: 12),
                       Text(
                         e.toString().replaceAll('Exception: ', ''),
-                        style: const TextStyle(
-                            color: AppColors.textMuted, fontSize: 14),
+                        style: TextStyle(
+                            color: colors.textMuted, fontSize: 14),
                       ),
                       const SizedBox(height: 16),
                       TextButton(
                         onPressed: () =>
                             ref.read(friendsProvider.notifier).refresh(),
-                        child: const Text('다시 시도'),
+                        child: Text(l10n.retry),
                       ),
                     ],
                   ),
@@ -152,32 +155,34 @@ class SocialPage extends ConsumerWidget {
 
   Future<void> _confirmDelete(
       BuildContext context, WidgetRef ref, Friend friend) async {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: colors.card,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('친구 삭제',
+        title: Text(l10n.friendDeleteTitle,
             style: TextStyle(
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
                 fontSize: 17,
                 fontWeight: FontWeight.w600)),
         content: Text(
-          '${friend.friendDisplayName}님을 친구 목록에서 삭제할까요?',
+          l10n.friendDeleteMessage(friend.friendDisplayName),
           style:
-              const TextStyle(color: AppColors.textSecondary, fontSize: 15),
+              TextStyle(color: colors.textSecondary, fontSize: 15),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('취소',
-                style: TextStyle(color: AppColors.textMuted)),
+            child: Text(l10n.cancel,
+                style: TextStyle(color: colors.textMuted)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('삭제',
-                style: TextStyle(color: AppColors.destructiveRed)),
+            child: Text(l10n.delete,
+                style: TextStyle(color: colors.destructiveRed)),
           ),
         ],
       ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../providers/todo_provider.dart';
 import '../../domain/models/todo_category.dart';
 
@@ -13,19 +14,21 @@ class CategoryPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final categoriesAsync = ref.watch(todoCategoriesProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left_rounded,
-              color: AppColors.textPrimary, size: 28),
+          icon: Icon(Icons.chevron_left_rounded,
+              color: colors.textPrimary, size: 28),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          '카테고리 편집',
-          style: TextStyle(
+        title: Text(
+          l10n.categoryEdit,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.3,
@@ -34,8 +37,8 @@ class CategoryPage extends ConsumerWidget {
         centerTitle: false,
       ),
       body: RefreshIndicator(
-        color: AppColors.textPrimary,
-        backgroundColor: AppColors.card,
+        color: colors.textPrimary,
+        backgroundColor: colors.card,
         onRefresh: () async => ref.invalidate(todoCategoriesProvider),
         child: categoriesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -48,12 +51,12 @@ class CategoryPage extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(e.toString().replaceAll('Exception: ', ''),
-                      style: const TextStyle(color: AppColors.textMuted, fontSize: 14)),
+                      style: TextStyle(color: colors.textMuted, fontSize: 14)),
                   const SizedBox(height: 12),
                   TextButton(
                     onPressed: () => ref.invalidate(todoCategoriesProvider),
-                    child: const Text('다시 시도',
-                        style: TextStyle(color: AppColors.textPrimary)),
+                    child: Text(l10n.retry,
+                        style: TextStyle(color: colors.textPrimary)),
                   ),
                 ],
               ),
@@ -72,18 +75,18 @@ class CategoryPage extends ConsumerWidget {
                     Container(
                       width: 28,
                       height: 28,
-                      decoration: const BoxDecoration(
-                        color: AppColors.secondary,
+                      decoration: BoxDecoration(
+                        color: colors.secondary,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.circle_outlined,
-                          size: 13, color: AppColors.textDisabled),
+                      child: Icon(Icons.circle_outlined,
+                          size: 13, color: colors.textDisabled),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      '새로운 카테고리',
+                    Text(
+                      l10n.categoryNew,
                       style: TextStyle(
-                        color: AppColors.textMuted,
+                        color: colors.textMuted,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -93,21 +96,21 @@ class CategoryPage extends ConsumerWidget {
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: AppColors.secondary,
+                        color: colors.secondary,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                            color: AppColors.border, width: 0.5),
+                            color: colors.border, width: 0.5),
                       ),
-                      child: const Icon(Icons.add_rounded,
-                          size: 16, color: AppColors.textMuted),
+                      child: Icon(Icons.add_rounded,
+                          size: 16, color: colors.textMuted),
                     ),
                   ],
                 ),
               ),
             ),
 
-            const Divider(
-                height: 0.5, thickness: 0.5, color: AppColors.border),
+            Divider(
+                height: 0.5, thickness: 0.5, color: colors.border),
 
             // 카테고리 목록
             ...categories.map((cat) => _CategoryListTile(
@@ -138,6 +141,7 @@ class _CategoryListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -149,7 +153,7 @@ class _CategoryListTile extends StatelessWidget {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: category.color.withOpacity(0.15),
+                color: category.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(category.icon, size: 17, color: category.color),
@@ -159,8 +163,8 @@ class _CategoryListTile extends StatelessWidget {
             Expanded(
               child: Text(
                 category.name,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
+                style: TextStyle(
+                  color: colors.textPrimary,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -176,8 +180,8 @@ class _CategoryListTile extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-            const Icon(Icons.chevron_right_rounded,
-                size: 18, color: AppColors.textDisabled),
+            Icon(Icons.chevron_right_rounded,
+                size: 18, color: colors.textDisabled),
           ],
         ),
       ),

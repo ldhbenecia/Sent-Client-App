@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../providers/todo_provider.dart';
 import '../widgets/todo_calendar.dart';
 import '../widgets/todo_list_section.dart';
@@ -37,6 +39,8 @@ class _TodoPageState extends ConsumerState<TodoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final selectedDate = ref.watch(selectedDateProvider);
     final datesWithTodos = ref.watch(datesWithTodosProvider);
     final grouped = ref.watch(todosForSelectedDateProvider);
@@ -45,14 +49,14 @@ class _TodoPageState extends ConsumerState<TodoPage> {
         ref.watch(todoCategoriesProvider).valueOrNull ?? [];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         title: const Text('SENT'),
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.menu_rounded,
-              color: AppColors.textMuted,
+              color: colors.textMuted,
               size: 22,
             ),
             onPressed: () => _showMenu(context),
@@ -67,9 +71,9 @@ class _TodoPageState extends ConsumerState<TodoPage> {
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: colors.card,
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppColors.border, width: 0.5),
+                border: Border.all(color: colors.border, width: 0.5),
               ),
               child: Column(
                 children: [
@@ -109,18 +113,17 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                       ),
                       calendarBuilders: CalendarBuilders(
                         dowBuilder: (context, day) {
-                          const labels = [
-                            '일', '월', '화', '수', '목', '금', '토'
-                          ];
+                          final locale = Localizations.localeOf(context).toString();
+                          final label = DateFormat.E(locale).format(day);
                           final isSun = day.weekday == DateTime.sunday;
                           final isSat = day.weekday == DateTime.saturday;
                           return Center(
                             child: Text(
-                              labels[day.weekday % 7],
+                              label,
                               style: TextStyle(
                                 color: isSun || isSat
-                                    ? AppColors.textDisabled
-                                    : AppColors.textMuted,
+                                    ? colors.textDisabled
+                                    : colors.textMuted,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.2,
@@ -131,7 +134,7 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                         defaultBuilder: (context, day, _) {
                           final hasTodo = datesWithTodos.contains(
                               DateTime(day.year, day.month, day.day));
-                          return buildTodoDayCell(day,
+                          return buildTodoDayCell(context, day,
                               isSelected: false,
                               isToday: false,
                               isOutside: false,
@@ -140,7 +143,7 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                         outsideBuilder: (context, day, _) {
                           final hasTodo = datesWithTodos.contains(
                               DateTime(day.year, day.month, day.day));
-                          return buildTodoDayCell(day,
+                          return buildTodoDayCell(context, day,
                               isSelected: false,
                               isToday: false,
                               isOutside: true,
@@ -149,7 +152,7 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                         todayBuilder: (context, day, _) {
                           final hasTodo = datesWithTodos.contains(
                               DateTime(day.year, day.month, day.day));
-                          return buildTodoDayCell(day,
+                          return buildTodoDayCell(context, day,
                               isSelected: false,
                               isToday: true,
                               isOutside: false,
@@ -158,7 +161,7 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                         selectedBuilder: (context, day, _) {
                           final hasTodo = datesWithTodos.contains(
                               DateTime(day.year, day.month, day.day));
-                          return buildTodoDayCell(day,
+                          return buildTodoDayCell(context, day,
                               isSelected: true,
                               isToday: isSameDay(day, DateTime.now()),
                               isOutside: false,
@@ -172,17 +175,17 @@ class _TodoPageState extends ConsumerState<TodoPage> {
             ),
           ),
 
-          const Divider(height: 1, thickness: 0.5, color: AppColors.border),
+          Divider(height: 1, thickness: 0.5, color: colors.border),
 
           // ── 투두 리스트 ─────────────────────────────────────────
           Expanded(
             child: todosAsync.when(
-              loading: () => const Center(
+              loading: () => Center(
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: 80),
+                  padding: const EdgeInsets.only(bottom: 80),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppColors.textMuted,
+                    color: colors.textMuted,
                   ),
                 ),
               ),
@@ -192,13 +195,13 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.wifi_off_rounded,
-                          color: AppColors.textDisabled, size: 40),
+                      Icon(Icons.wifi_off_rounded,
+                          color: colors.textDisabled, size: 40),
                       const SizedBox(height: 12),
                       Text(
                         e.toString().replaceAll('Exception: ', ''),
-                        style: const TextStyle(
-                          color: AppColors.textDisabled,
+                        style: TextStyle(
+                          color: colors.textDisabled,
                           fontSize: 13,
                         ),
                         textAlign: TextAlign.center,
@@ -207,9 +210,9 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                       TextButton(
                         onPressed: () =>
                             ref.invalidate(todoItemsProvider),
-                        child: const Text('다시 시도',
+                        child: Text(l10n.retry,
                             style: TextStyle(
-                                color: AppColors.textMuted,
+                                color: colors.textMuted,
                                 fontSize: 13)),
                       ),
                     ],

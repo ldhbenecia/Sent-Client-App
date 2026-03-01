@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
-import '../../../../../shared/theme/app_colors.dart';
+import 'package:intl/intl.dart';
+import '../../../../../shared/theme/app_color_theme.dart';
 
 // ══════════════════════════════════════════════════════════════════
 // 캘린더 날짜 셀 (숫자 + 점을 하나의 Column으로)
 // ══════════════════════════════════════════════════════════════════
 Widget buildTodoDayCell(
+  BuildContext context,
   DateTime day, {
   required bool isSelected,
   required bool isToday,
   required bool isOutside,
   required bool hasTodo,
 }) {
+  final colors = context.colors;
   final textColor = isSelected
-      ? AppColors.background
+      ? colors.background
       : isOutside
-          ? AppColors.textDisabled
-          : AppColors.textPrimary;
+          ? colors.textDisabled
+          : colors.textPrimary;
 
   return Center(
     child: Column(
@@ -27,8 +29,8 @@ Widget buildTodoDayCell(
           height: 36,
           alignment: Alignment.center,
           decoration: isSelected
-              ? const BoxDecoration(
-                  color: AppColors.foreground,
+              ? BoxDecoration(
+                  color: colors.foreground,
                   shape: BoxShape.circle,
                 )
               : null,
@@ -48,8 +50,8 @@ Widget buildTodoDayCell(
           decoration: BoxDecoration(
             color: hasTodo
                 ? (isSelected
-                    ? AppColors.textDisabled
-                    : AppColors.textMuted)
+                    ? colors.textDisabled
+                    : colors.textMuted)
                 : Colors.transparent,
             shape: BoxShape.circle,
           ),
@@ -78,14 +80,15 @@ class TodoCalendarHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 8, 6),
       child: Row(
         children: [
           Text(
-            '${focusedDay.year}년 ${focusedDay.month}월',
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            DateFormat.yMMMM(Localizations.localeOf(context).toString()).format(focusedDay),
+            style: TextStyle(
+              color: colors.textPrimary,
               fontSize: 15,
               fontWeight: FontWeight.w600,
               letterSpacing: -0.3,
@@ -93,12 +96,12 @@ class TodoCalendarHeader extends StatelessWidget {
           ),
           if (isLoading) ...[
             const SizedBox(width: 8),
-            const SizedBox(
+            SizedBox(
               width: 11,
               height: 11,
               child: CircularProgressIndicator(
                 strokeWidth: 1.5,
-                color: AppColors.textDisabled,
+                color: colors.textDisabled,
               ),
             ),
           ],
@@ -106,19 +109,19 @@ class TodoCalendarHeader extends StatelessWidget {
           GestureDetector(
             onTap: onPrev,
             behavior: HitTestBehavior.opaque,
-            child: const Padding(
-              padding: EdgeInsets.all(8),
+            child: Padding(
+              padding: const EdgeInsets.all(8),
               child: Icon(Icons.chevron_left_rounded,
-                  size: 20, color: AppColors.textMuted),
+                  size: 20, color: colors.textMuted),
             ),
           ),
           GestureDetector(
             onTap: onNext,
             behavior: HitTestBehavior.opaque,
-            child: const Padding(
-              padding: EdgeInsets.all(8),
+            child: Padding(
+              padding: const EdgeInsets.all(8),
               child: Icon(Icons.chevron_right_rounded,
-                  size: 20, color: AppColors.textMuted),
+                  size: 20, color: colors.textMuted),
             ),
           ),
         ],

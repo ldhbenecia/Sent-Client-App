@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../shared/theme/app_colors.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../shared/theme/app_color_theme.dart';
 import '../../domain/models/user_search_result.dart';
 import '../providers/friend_provider.dart';
 import 'social_tiles.dart';
@@ -71,9 +72,11 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
           .read(friendRepositoryProvider)
           .addFriend(_found!.email);
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      final displayName = _found!.displayName;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_found!.displayName}님께 친구 요청을 보냈습니다.')),
+        SnackBar(content: Text(l10n.friendRequestSent(displayName))),
       );
     } catch (e) {
       if (!mounted) return;
@@ -86,16 +89,18 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return Container(
       padding: EdgeInsets.fromLTRB(20, 12, 20, 24 + bottom),
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         border: Border(
-          top: BorderSide(color: AppColors.border, width: 0.5),
-          left: BorderSide(color: AppColors.border, width: 0.5),
-          right: BorderSide(color: AppColors.border, width: 0.5),
+          top: BorderSide(color: colors.border, width: 0.5),
+          left: BorderSide(color: colors.border, width: 0.5),
+          right: BorderSide(color: colors.border, width: 0.5),
         ),
       ),
       child: Column(
@@ -109,26 +114,26 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
 
           // ── 제목 ───────────────────────────────────────────────
-          const Text(
-            '친구 추가',
+          Text(
+            l10n.addFriend,
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.w600,
               letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            '친구의 이메일을 입력해 검색하세요.',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+          Text(
+            l10n.addFriendSubtitle,
+            style: TextStyle(color: colors.textMuted, fontSize: 13),
           ),
           const SizedBox(height: 16),
 
@@ -138,29 +143,29 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
               Expanded(
                 child: TextField(
                   controller: _emailController,
-                  style: const TextStyle(
-                      color: AppColors.textPrimary, fontSize: 15),
+                  style: TextStyle(
+                      color: colors.textPrimary, fontSize: 15),
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    hintText: '이메일 주소',
-                    hintStyle: const TextStyle(
-                        color: AppColors.textDisabled, fontSize: 14),
+                    hintText: l10n.emailHint,
+                    hintStyle: TextStyle(
+                        color: colors.textDisabled, fontSize: 14),
                     filled: true,
-                    fillColor: AppColors.background,
+                    fillColor: colors.background,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide:
-                          const BorderSide(color: AppColors.border),
+                          BorderSide(color: colors.border),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide:
-                          const BorderSide(color: AppColors.border),
+                          BorderSide(color: colors.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                          color: AppColors.textMuted.withOpacity(0.5)),
+                          color: colors.textMuted.withValues(alpha: 0.5)),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 12),
@@ -175,23 +180,23 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
                   onPressed:
                       _searchState == _SearchState.loading ? null : _search,
                   style: TextButton.styleFrom(
-                    backgroundColor: AppColors.secondary,
+                    backgroundColor: colors.secondary,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                   child: _searchState == _SearchState.loading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 1.5,
-                            color: AppColors.textMuted,
+                            color: colors.textMuted,
                           ),
                         )
-                      : const Text('검색',
+                      : Text(l10n.search,
                           style: TextStyle(
-                              color: AppColors.textPrimary,
+                              color: colors.textPrimary,
                               fontWeight: FontWeight.w600)),
                 ),
               ),
@@ -201,10 +206,10 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
           // ── 결과 영역 ───────────────────────────────────────────
           if (_searchState == _SearchState.notFound) ...[
             const SizedBox(height: 14),
-            const Text(
-              '일치하는 사용자를 찾을 수 없습니다.',
+            Text(
+              l10n.userNotFound,
               style:
-                  TextStyle(color: AppColors.textDisabled, fontSize: 13),
+                  TextStyle(color: colors.textDisabled, fontSize: 13),
             ),
           ],
           if (_searchState == _SearchState.error &&
@@ -212,8 +217,8 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
             const SizedBox(height: 14),
             Text(
               _errorMessage!,
-              style: const TextStyle(
-                  color: AppColors.destructiveRed, fontSize: 13),
+              style: TextStyle(
+                  color: colors.destructiveRed, fontSize: 13),
             ),
           ],
           if (_searchState == _SearchState.found && _found != null) ...[
@@ -243,12 +248,14 @@ class _UserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: colors.background,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        border: Border.all(color: colors.border, width: 0.5),
       ),
       child: Row(
         children: [
@@ -260,16 +267,16 @@ class _UserCard extends StatelessWidget {
               children: [
                 Text(
                   user.displayName,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: colors.textPrimary,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
                   user.email,
-                  style: const TextStyle(
-                      color: AppColors.textMuted, fontSize: 12),
+                  style: TextStyle(
+                      color: colors.textMuted, fontSize: 12),
                 ),
               ],
             ),
@@ -280,21 +287,21 @@ class _UserCard extends StatelessWidget {
             child: TextButton(
               onPressed: sending ? null : onAdd,
               style: TextButton.styleFrom(
-                backgroundColor: AppColors.secondary,
+                backgroundColor: colors.secondary,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 padding: const EdgeInsets.symmetric(horizontal: 14),
               ),
               child: sending
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 14,
                       height: 14,
                       child: CircularProgressIndicator(
-                          strokeWidth: 1.5, color: AppColors.textMuted),
+                          strokeWidth: 1.5, color: colors.textMuted),
                     )
-                  : const Text('요청',
+                  : Text(l10n.request,
                       style: TextStyle(
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                           fontSize: 13,
                           fontWeight: FontWeight.w600)),
             ),

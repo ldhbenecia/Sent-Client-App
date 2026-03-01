@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../shared/theme/app_colors.dart';
+import '../../../../../shared/theme/app_color_theme.dart';
 import '../../domain/models/todo_category.dart';
 
 // ══════════════════════════════════════════════════════════════════
@@ -17,12 +18,13 @@ class CategoryIconGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.secondary,
+        color: colors.secondary,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        border: Border.all(color: colors.border, width: 0.5),
       ),
       child: GridView.builder(
         shrinkWrap: true,
@@ -43,12 +45,12 @@ class CategoryIconGrid extends StatelessWidget {
               duration: const Duration(milliseconds: 150),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.foreground.withOpacity(0.15)
+                    ? colors.foreground.withValues(alpha: 0.15)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
                 border: isSelected
                     ? Border.all(
-                        color: AppColors.foreground.withOpacity(0.4),
+                        color: colors.foreground.withValues(alpha: 0.4),
                         width: 1,
                       )
                     : null,
@@ -57,8 +59,8 @@ class CategoryIconGrid extends StatelessWidget {
                 icon,
                 size: 20,
                 color: isSelected
-                    ? AppColors.textPrimary
-                    : AppColors.textMuted,
+                    ? colors.textPrimary
+                    : colors.textMuted,
               ),
             ),
           );
@@ -85,20 +87,21 @@ class CategoryColorPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.secondary,
+        color: colors.secondary,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        border: Border.all(color: colors.border, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Basic',
             style: TextStyle(
-              color: AppColors.textMuted,
+              color: colors.textMuted,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -145,7 +148,7 @@ class _ColorDot extends StatelessWidget {
         boxShadow: isSelected
             ? [
                 BoxShadow(
-                  color: color.withOpacity(0.6),
+                  color: color.withValues(alpha: 0.6),
                   blurRadius: 8,
                   spreadRadius: 1,
                 ),

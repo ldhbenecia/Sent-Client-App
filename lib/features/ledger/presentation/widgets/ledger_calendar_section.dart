@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../../../../../shared/theme/app_colors.dart';
+import '../../../../../shared/theme/app_color_theme.dart';
 import '../providers/ledger_provider.dart';
 
 // ══════════════════════════════════════════════════════════════════
@@ -21,9 +21,12 @@ class LedgerCalendarSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final dayTotals = ref.watch(ledgerDayTotalsProvider);
+    final locale = Localizations.localeOf(context).toString();
 
     return TableCalendar(
+      locale: locale,
       focusedDay: focusedMonth,
       firstDay: DateTime(2020),
       lastDay: DateTime(2030, 12, 31),
@@ -37,14 +40,14 @@ class LedgerCalendarSection extends ConsumerWidget {
       calendarFormat: CalendarFormat.month,
       availableCalendarFormats: const {CalendarFormat.month: ''},
       startingDayOfWeek: StartingDayOfWeek.monday,
-      daysOfWeekStyle: const DaysOfWeekStyle(
+      daysOfWeekStyle: DaysOfWeekStyle(
         weekdayStyle: TextStyle(
-          color: AppColors.textMuted,
+          color: colors.textMuted,
           fontSize: 11,
           fontWeight: FontWeight.w500,
         ),
         weekendStyle: TextStyle(
-          color: AppColors.textDisabled,
+          color: colors.textDisabled,
           fontSize: 11,
           fontWeight: FontWeight.w500,
         ),
@@ -107,14 +110,15 @@ class _DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final hasData = totals != null &&
         (totals!.expense > 0 || totals!.income > 0);
 
     final textColor = isOutside
         ? Colors.transparent
         : isSelected
-            ? AppColors.background
-            : AppColors.textPrimary;
+            ? colors.background
+            : colors.textPrimary;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -124,14 +128,14 @@ class _DayCell extends StatelessWidget {
           height: 34,
           alignment: Alignment.center,
           decoration: isSelected
-              ? const BoxDecoration(
-                  color: AppColors.textPrimary,
+              ? BoxDecoration(
+                  color: colors.textPrimary,
                   shape: BoxShape.circle,
                 )
               : isToday
                   ? BoxDecoration(
                       border: Border.all(
-                        color: AppColors.textMuted,
+                        color: colors.textMuted,
                         width: 1,
                       ),
                       shape: BoxShape.circle,

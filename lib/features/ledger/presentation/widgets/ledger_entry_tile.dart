@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../domain/models/ledger_category.dart';
 import '../../domain/models/ledger_entry.dart';
 import '../../domain/models/ledger_enums.dart';
@@ -24,6 +25,8 @@ class LedgerEntryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final isIncome = entry.type == LedgerType.income;
     final amountColor =
         isIncome ? const Color(0xFF32D74B) : const Color(0xFFFF6467);
@@ -44,13 +47,13 @@ class LedgerEntryTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: category != null
                     ? category!.color.withValues(alpha: 0.15)
-                    : AppColors.secondary,
+                    : colors.secondary,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 category?.icon ?? Icons.receipt_rounded,
                 size: 18,
-                color: category?.color ?? AppColors.textMuted,
+                color: category?.color ?? colors.textMuted,
               ),
             ),
             const SizedBox(width: 12),
@@ -64,8 +67,8 @@ class LedgerEntryTile extends StatelessWidget {
                     entry.memo?.isNotEmpty == true
                         ? entry.memo!
                         : (category?.name ?? entry.type.label),
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
+                    style: TextStyle(
+                      color: colors.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -75,8 +78,8 @@ class LedgerEntryTile extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     entry.paymentMethod.label,
-                    style: const TextStyle(
-                      color: AppColors.textDisabled,
+                    style: TextStyle(
+                      color: colors.textDisabled,
                       fontSize: 12,
                     ),
                   ),
@@ -86,7 +89,7 @@ class LedgerEntryTile extends StatelessWidget {
 
             // 금액
             Text(
-              '$amountSign${_formatAmount(entry.amount)}원',
+              '$amountSign${_formatAmount(entry.amount)}${l10n.currencySymbol}',
               style: TextStyle(
                 color: amountColor,
                 fontSize: 15,
@@ -99,12 +102,12 @@ class LedgerEntryTile extends StatelessWidget {
               GestureDetector(
                 onTap: onDelete,
                 behavior: HitTestBehavior.opaque,
-                child: const Padding(
-                  padding: EdgeInsets.all(4),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
                   child: Icon(
                     Icons.close_rounded,
                     size: 15,
-                    color: AppColors.textDisabled,
+                    color: colors.textDisabled,
                   ),
                 ),
               ),

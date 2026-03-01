@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../../shared/theme/app_colors.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../shared/theme/app_color_theme.dart';
 import '../../domain/models/todo_category.dart';
 
 // ══════════════════════════════════════════════════════════════════
@@ -19,12 +20,14 @@ class CategoryPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         border: Border(
-          top: BorderSide(color: AppColors.border, width: 0.5),
+          top: BorderSide(color: colors.border, width: 0.5),
         ),
       ),
       child: Column(
@@ -36,7 +39,7 @@ class CategoryPickerSheet extends StatelessWidget {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: colors.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -44,10 +47,10 @@ class CategoryPickerSheet extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 8, 16, 8),
             child: Row(
               children: [
-                const Text(
-                  '카테고리 선택',
+                Text(
+                  l10n.categorySelect,
                   style: TextStyle(
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
                   ),
@@ -59,10 +62,10 @@ class CategoryPickerSheet extends StatelessWidget {
                       Navigator.of(context).pop();
                       onManage!();
                     },
-                    child: const Text(
+                    child: Text(
                       '편집',
                       style: TextStyle(
-                        color: AppColors.textMuted,
+                        color: colors.textMuted,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -83,29 +86,29 @@ class CategoryPickerSheet extends StatelessWidget {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: AppColors.secondary,
+                      color: colors.secondary,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.block_rounded,
-                        size: 16, color: AppColors.textMuted),
+                    child: Icon(Icons.block_rounded,
+                        size: 16, color: colors.textMuted),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    '없음',
+                  Text(
+                    l10n.none,
                     style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                       fontSize: 15,
                     ),
                   ),
                   const Spacer(),
                   if (selectedId == null)
-                    const Icon(Icons.check_rounded,
-                        size: 18, color: AppColors.textPrimary),
+                    Icon(Icons.check_rounded,
+                        size: 18, color: colors.textPrimary),
                 ],
               ),
             ),
           ),
-          const Divider(height: 0.5, color: AppColors.border, indent: 20),
+          Divider(height: 0.5, color: colors.border, indent: 20),
           // 카테고리 목록
           ...categories.map((cat) {
             final isSelected = cat.id == selectedId;
@@ -120,7 +123,7 @@ class CategoryPickerSheet extends StatelessWidget {
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: cat.color.withOpacity(0.15),
+                        color: cat.color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(cat.icon, size: 16, color: cat.color),
@@ -128,15 +131,15 @@ class CategoryPickerSheet extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       cat.name,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 15,
                       ),
                     ),
                     const Spacer(),
                     if (isSelected)
-                      const Icon(Icons.check_rounded,
-                          size: 18, color: AppColors.textPrimary),
+                      Icon(Icons.check_rounded,
+                          size: 18, color: colors.textPrimary),
                   ],
                 ),
               ),

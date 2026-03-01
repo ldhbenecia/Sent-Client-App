@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../../shared/theme/app_colors.dart';
+import 'package:intl/intl.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../shared/theme/app_color_theme.dart';
 import '../providers/todo_provider.dart';
 import '../../domain/models/todo_category.dart';
 import '../../domain/models/todo_item.dart';
@@ -22,35 +24,35 @@ class TodoListSection extends ConsumerWidget {
   final Map<String?, List<TodoItem>> grouped;
   final List<TodoCategory> categories;
 
-  String _dateLabel(DateTime date) {
+  String _dateLabel(BuildContext context, DateTime date) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    if (date == today) return '오늘';
-    const months = [
-      '1월', '2월', '3월', '4월', '5월', '6월',
-      '7월', '8월', '9월', '10월', '11월', '12월'
-    ];
-    return '${months[date.month - 1]} ${date.day}일';
+    if (date == today) return l10n.today;
+    return DateFormat.MMMd(locale).format(date);
   }
 
-  String _remainingText(Map<String?, List<TodoItem>> grouped) {
+  String _remainingText(AppLocalizations l10n, Map<String?, List<TodoItem>> grouped) {
     final all = grouped.values.expand((e) => e).toList();
     final remaining = all.where((t) => !t.isDone).length;
     if (all.isEmpty) return '';
-    if (remaining == 0) return '전량 완료했습니다.';
-    return '${remaining}개의 할 일이 남아있습니다.';
+    if (remaining == 0) return l10n.allDone;
+    return l10n.remainingCount(remaining);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final allTodos = grouped.values.expand((e) => e).toList();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final isToday = selectedDate == today;
 
     return RefreshIndicator(
-      color: AppColors.textPrimary,
-      backgroundColor: AppColors.card,
+      color: colors.textPrimary,
+      backgroundColor: colors.card,
       onRefresh: () => ref.refresh(todoItemsProvider.future),
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -63,9 +65,9 @@ class TodoListSection extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  _dateLabel(selectedDate),
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  _dateLabel(context, selectedDate),
+                  style: TextStyle(
+                    color: colors.textPrimary,
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.4,
@@ -75,9 +77,9 @@ class TodoListSection extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      _remainingText(grouped),
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      _remainingText(l10n, grouped),
+                      style: TextStyle(
+                        color: colors.textMuted,
                         fontSize: 12,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -92,13 +94,13 @@ class TodoListSection extends ConsumerWidget {
                   child: Container(
                     width: 28,
                     height: 28,
-                    decoration: const BoxDecoration(
-                      color: AppColors.secondary,
+                    decoration: BoxDecoration(
+                      color: colors.secondary,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.add_rounded,
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                       size: 18,
                     ),
                   ),
@@ -128,7 +130,7 @@ class TodoListSection extends ConsumerWidget {
                     orElse: () => TodoCategory(
                       id: catId,
                       name: '기타',
-                      color: AppColors.textMuted,
+                      color: colors.textMuted,
                       icon: Icons.circle_outlined,
                     ),
                   )
@@ -159,10 +161,10 @@ class TodoListSection extends ConsumerWidget {
                         return Column(
                           children: [
                             if (idx > 0)
-                              const Divider(
+                              Divider(
                                 height: 0.5,
                                 thickness: 0.5,
-                                color: AppColors.border,
+                                color: colors.border,
                                 indent: 50,
                               ),
                             TodoTile(
@@ -211,15 +213,17 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            isToday ? '할 일을 추가해보세요' : '할 일이 없습니다',
-            style: const TextStyle(
-              color: AppColors.textDisabled,
+            isToday ? l10n.todoAddTask : l10n.todoEmptyTitle,
+            style: TextStyle(
+              color: colors.textDisabled,
               fontSize: 14,
             ),
           ),
@@ -236,21 +240,21 @@ class _EmptyState extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 7),
                     decoration: BoxDecoration(
-                      color: AppColors.secondary,
+                      color: colors.secondary,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: AppColors.border, width: 0.5),
+                          color: colors.border, width: 0.5),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.add_rounded,
-                            size: 13, color: AppColors.textMuted),
+                        Icon(Icons.add_rounded,
+                            size: 13, color: colors.textMuted),
                         const SizedBox(width: 4),
                         Text(
                           cat.name,
-                          style: const TextStyle(
-                            color: AppColors.textMuted,
+                          style: TextStyle(
+                            color: colors.textMuted,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -283,10 +287,10 @@ class _CategoryBadge extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
         decoration: BoxDecoration(
-          color: category.color.withOpacity(0.22),
+          color: category.color.withValues(alpha: 0.22),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: category.color.withOpacity(0.35),
+            color: category.color.withValues(alpha: 0.35),
             width: 0.5,
           ),
         ),

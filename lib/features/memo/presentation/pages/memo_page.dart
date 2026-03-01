@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
 
 class MemoPage extends StatelessWidget {
@@ -7,15 +8,17 @@ class MemoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         title: const Text('SENT'),
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.menu_rounded,
-              color: AppColors.textMuted,
+              color: colors.textMuted,
               size: 22,
             ),
             onPressed: () => showAppNavMenu(context),
@@ -23,27 +26,27 @@ class MemoPage extends StatelessWidget {
           const SizedBox(width: 4),
         ],
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.edit_note_rounded, size: 52, color: AppColors.textDisabled),
-            SizedBox(height: 16),
+            Icon(Icons.edit_note_rounded, size: 52, color: colors.textDisabled),
+            const SizedBox(height: 16),
             Text(
-              '메모가 없습니다',
+              l10n.memoEmptyTitle,
               style: TextStyle(
-                color: AppColors.textMuted,
+                color: colors.textMuted,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.3,
               ),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
-              '아래 + 버튼으로\n첫 번째 메모를 작성해보세요',
+              l10n.memoEmptySubtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.textDisabled,
+                color: colors.textDisabled,
                 fontSize: 13,
                 letterSpacing: -0.1,
                 height: 1.6,
@@ -53,9 +56,10 @@ class MemoPage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'memo_fab',
         onPressed: () {},
-        backgroundColor: AppColors.foreground,
-        foregroundColor: AppColors.background,
+        backgroundColor: colors.foreground,
+        foregroundColor: colors.background,
         elevation: 0,
         shape: const CircleBorder(),
         child: const Icon(Icons.add_rounded, size: 28),

@@ -39,8 +39,7 @@ class ChatRepository {
       final res = await _dio.get(
         '/api/v1/chat/rooms/$roomId/messages',
         queryParameters: {
-          if (lastMessageTimestamp != null)
-            'lastMessageTimestamp': lastMessageTimestamp,
+          'lastMessageTimestamp': lastMessageTimestamp,
           'size': size,
         },
       );

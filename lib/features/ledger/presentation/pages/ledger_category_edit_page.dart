@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../../todo/presentation/widgets/category_pickers.dart';
 import '../providers/ledger_provider.dart';
 import '../../domain/models/ledger_category.dart';
@@ -69,7 +71,7 @@ class _LedgerCategoryEditPageState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: AppColors.destructiveRed,
+          backgroundColor: context.colors.destructiveRed,
         ),
       );
     } finally {
@@ -79,17 +81,19 @@ class _LedgerCategoryEditPageState
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left_rounded,
-              color: AppColors.textPrimary, size: 28),
+          icon: Icon(Icons.chevron_left_rounded,
+              color: colors.textPrimary, size: 28),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          '카테고리 편집',
-          style: TextStyle(
+        title: Text(
+          l10n.categoryEdit,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.3,
@@ -99,7 +103,7 @@ class _LedgerCategoryEditPageState
       ),
       body: Column(
         children: [
-          const Divider(height: 0.5, color: AppColors.border),
+          Divider(height: 0.5, color: colors.border),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(20),
@@ -116,7 +120,7 @@ class _LedgerCategoryEditPageState
                 const SizedBox(height: 24),
 
                 // 아이콘 선택
-                _SectionLabel(label: '아이콘'),
+                _SectionLabel(label: l10n.categoryIcon),
                 const SizedBox(height: 12),
                 CategoryIconGrid(
                   selected: _selectedIcon,
@@ -127,7 +131,7 @@ class _LedgerCategoryEditPageState
 
                 // 색상 선택
                 _SectionLabel(
-                  label: '색상',
+                  label: l10n.categoryColor,
                   sub: colorToHex(_selectedColor),
                 ),
                 const SizedBox(height: 12),
@@ -142,7 +146,7 @@ class _LedgerCategoryEditPageState
 
           // 삭제 버튼 (수정 모드만)
           if (_isEdit) ...[
-            const Divider(height: 0.5, color: AppColors.border),
+            Divider(height: 0.5, color: colors.border),
             SafeArea(
               top: false,
               child: Padding(
@@ -151,34 +155,36 @@ class _LedgerCategoryEditPageState
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final deleteRed = context.colors.destructiveRed;
+                      final navigator = Navigator.of(context);
                       try {
                         await ref
                             .read(ledgerCategoriesProvider.notifier)
                             .remove(widget.category!.id);
-                        if (mounted) context.pop();
+                        if (mounted) navigator.pop();
                       } catch (e) {
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           SnackBar(
                             content: Text(
                                 e.toString().replaceAll('Exception: ', '')),
-                            backgroundColor: AppColors.destructiveRed,
+                            backgroundColor: deleteRed,
                           ),
                         );
                       }
                     },
                     style: TextButton.styleFrom(
                       backgroundColor:
-                          AppColors.destructiveRed.withValues(alpha: 0.12),
+                          colors.destructiveRed.withValues(alpha: 0.12),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      '삭제',
+                    child: Text(
+                      l10n.delete,
                       style: TextStyle(
-                        color: AppColors.destructiveRed,
+                        color: colors.destructiveRed,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -213,12 +219,14 @@ class _NameRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.secondary,
+        color: colors.secondary,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        border: Border.all(color: colors.border, width: 0.5),
       ),
       child: Row(
         children: [
@@ -235,15 +243,15 @@ class _NameRow extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: colors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
-              decoration: const InputDecoration(
-                hintText: '이름을 입력하세요',
+              decoration: InputDecoration(
+                hintText: l10n.categoryNameHint,
                 hintStyle: TextStyle(
-                  color: AppColors.textPlaceholder,
+                  color: colors.textPlaceholder,
                   fontSize: 15,
                 ),
                 border: InputBorder.none,
@@ -258,11 +266,11 @@ class _NameRow extends StatelessWidget {
           GestureDetector(
             onTap: onSave,
             child: Text(
-              '저장',
+              l10n.save,
               style: TextStyle(
                 color: onSave != null
-                    ? AppColors.textPrimary
-                    : AppColors.textDisabled,
+                    ? colors.textPrimary
+                    : colors.textDisabled,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -283,12 +291,13 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Row(
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.textMuted,
+          style: TextStyle(
+            color: colors.textMuted,
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
@@ -297,8 +306,8 @@ class _SectionLabel extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             sub!,
-            style: const TextStyle(
-              color: AppColors.textDisabled,
+            style: TextStyle(
+              color: colors.textDisabled,
               fontSize: 12,
             ),
           ),

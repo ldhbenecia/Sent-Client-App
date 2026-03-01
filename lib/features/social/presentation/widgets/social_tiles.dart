@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../../shared/theme/app_colors.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../shared/theme/app_color_theme.dart';
 import '../../domain/models/friend.dart';
 
 // ── 섹션 컨테이너 ──────────────────────────────────────────────────
@@ -10,6 +11,7 @@ class SocialSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
@@ -19,8 +21,8 @@ class SocialSection extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4, bottom: 10),
             child: Text(
               label,
-              style: const TextStyle(
-                color: AppColors.textMuted,
+              style: TextStyle(
+                color: colors.textMuted,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.6,
@@ -29,9 +31,9 @@ class SocialSection extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: colors.card,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border, width: 0.5),
+              border: Border.all(color: colors.border, width: 0.5),
             ),
             child: child,
           ),
@@ -55,13 +57,14 @@ class FriendTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
-        splashColor: Colors.white.withOpacity(0.04),
-        highlightColor: Colors.white.withOpacity(0.02),
+        splashColor: Colors.white.withValues(alpha: 0.04),
+        highlightColor: Colors.white.withValues(alpha: 0.02),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
@@ -74,8 +77,8 @@ class FriendTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   friend.friendDisplayName,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: colors.textPrimary,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
@@ -83,10 +86,10 @@ class FriendTile extends StatelessWidget {
               ),
               IconButton(
                 onPressed: onDelete,
-                icon: const Icon(
+                icon: Icon(
                   Icons.person_remove_rounded,
                   size: 18,
-                  color: AppColors.textDisabled,
+                  color: colors.textDisabled,
                 ),
                 padding: EdgeInsets.zero,
                 constraints:
@@ -114,6 +117,7 @@ class FriendRequestTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
@@ -126,8 +130,8 @@ class FriendRequestTile extends StatelessWidget {
           Expanded(
             child: Text(
               request.friendDisplayName,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: colors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -138,12 +142,12 @@ class FriendRequestTile extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.secondary,
+                color: colors.secondary,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text('수락',
+              child: Text(AppLocalizations.of(context)!.accept,
                   style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                       fontSize: 13,
                       fontWeight: FontWeight.w600)),
             ),
@@ -154,13 +158,13 @@ class FriendRequestTile extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: colors.card,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: colors.border),
               ),
-              child: const Text('거절',
+              child: Text(AppLocalizations.of(context)!.reject,
                   style: TextStyle(
-                      color: AppColors.textMuted,
+                      color: colors.textMuted,
                       fontSize: 13,
                       fontWeight: FontWeight.w500)),
             ),
@@ -179,19 +183,20 @@ class SocialAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       width: 40,
       height: 40,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.secondary,
+        color: colors.secondary,
       ),
       clipBehavior: Clip.antiAlias,
       child: imageUrl != null
           ? Image.network(
               imageUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _Initials(name),
+              errorBuilder: (c, o, e) => _Initials(name),
             )
           : _Initials(name),
     );
@@ -204,12 +209,13 @@ class _Initials extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
     return Center(
       child: Text(
         initial,
-        style: const TextStyle(
-          color: AppColors.textPrimary,
+        style: TextStyle(
+          color: colors.textPrimary,
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
@@ -224,28 +230,30 @@ class EmptyFriendsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(Icons.people_outline_rounded,
-            size: 52, color: AppColors.textDisabled),
-        SizedBox(height: 16),
+            size: 52, color: colors.textDisabled),
+        const SizedBox(height: 16),
         Text(
-          '친구가 없습니다',
+          l10n.friendsEmpty,
           style: TextStyle(
-            color: AppColors.textMuted,
+            color: colors.textMuted,
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.3,
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         Text(
-          '오른쪽 위 버튼으로\n첫 번째 친구를 추가해보세요',
+          l10n.friendsEmptySubtitle,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppColors.textDisabled,
+            color: colors.textDisabled,
             fontSize: 13,
             letterSpacing: -0.1,
             height: 1.6,

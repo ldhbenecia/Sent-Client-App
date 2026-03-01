@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../../shared/theme/app_colors.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../shared/theme/app_color_theme.dart';
 import '../../domain/models/todo_item.dart';
 
 // ══════════════════════════════════════════════════════════════════
@@ -21,6 +22,7 @@ class TodoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return InkWell(
       onTap: onEdit,
       child: Padding(
@@ -36,17 +38,17 @@ class TodoTile extends StatelessWidget {
                 height: 22,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: item.isDone ? AppColors.textDisabled : Colors.transparent,
+                  color: item.isDone ? colors.textDisabled : Colors.transparent,
                   border: Border.all(
                     color: item.isDone
-                        ? AppColors.textDisabled
-                        : AppColors.textMuted,
+                        ? colors.textDisabled
+                        : colors.textMuted,
                     width: 1.5,
                   ),
                 ),
                 child: item.isDone
-                    ? const Icon(Icons.check_rounded,
-                        size: 13, color: AppColors.background)
+                    ? Icon(Icons.check_rounded,
+                        size: 13, color: colors.background)
                     : null,
               ),
             ),
@@ -59,21 +61,21 @@ class TodoTile extends StatelessWidget {
                     item.title,
                     style: TextStyle(
                       color: item.isDone
-                          ? AppColors.textDisabled
-                          : AppColors.textPrimary,
+                          ? colors.textDisabled
+                          : colors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       decoration:
                           item.isDone ? TextDecoration.lineThrough : null,
-                      decorationColor: AppColors.textDisabled,
+                      decorationColor: colors.textDisabled,
                     ),
                   ),
                   if (item.time != null) ...[
                     const SizedBox(height: 2),
                     Text(
                       _formatTime(item.time!),
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: colors.textMuted,
                         fontSize: 12,
                       ),
                     ),
@@ -106,48 +108,51 @@ class _MoreButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return GestureDetector(
       onTap: () => _showOptions(context),
       behavior: HitTestBehavior.opaque,
-      child: const Padding(
-        padding: EdgeInsets.all(6),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
         child: Icon(Icons.more_horiz_rounded,
-            size: 18, color: AppColors.textMuted),
+            size: 18, color: colors.textMuted),
       ),
     );
   }
 
   void _showOptions(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         margin: const EdgeInsets.fromLTRB(12, 0, 12, 40),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: colors.card,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border, width: 0.5),
+          border: Border.all(color: colors.border, width: 0.5),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             _OptionTile(
-              label: '수정',
+              label: l10n.edit,
               icon: Icons.edit_rounded,
               onTap: () {
                 Navigator.pop(context);
                 onEdit();
               },
             ),
-            const Divider(
+            Divider(
                 height: 0.5,
-                color: AppColors.border,
+                color: colors.border,
                 indent: 16,
                 endIndent: 16),
             _OptionTile(
-              label: '삭제',
+              label: l10n.delete,
               icon: Icons.delete_outline_rounded,
-              color: AppColors.destructiveRed,
+              color: colors.destructiveRed,
               onTap: () {
                 Navigator.pop(context);
                 onDelete();
@@ -175,7 +180,8 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? AppColors.textPrimary;
+    final colors = context.colors;
+    final c = color ?? colors.textPrimary;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),

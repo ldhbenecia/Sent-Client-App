@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../../../../features/social/presentation/providers/friend_provider.dart';
 import '../../../../features/todo/presentation/providers/todo_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../../../shared/widgets/sent_logo.dart';
 import '../../data/services/oauth_service.dart';
 
@@ -44,7 +46,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       final msg = e.toString();
       // 사용자가 직접 취소한 경우는 에러 표시 안 함
       if (!msg.contains('UserCanceled') && !msg.contains('user_cancelled')) {
-        setState(() => _errorMessage = '로그인 중 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.');
+        setState(() => _errorMessage = AppLocalizations.of(context)!.loginError);
       }
     } finally {
       if (mounted) setState(() => _loadingProvider = null);
@@ -53,25 +55,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
               const Spacer(flex: 2),
-              _buildLogo(),
+              _buildLogo(colors, l10n),
               const Spacer(flex: 2),
-              _buildLoginCard(),
+              _buildLoginCard(colors, l10n),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 12),
-                _buildError(),
+                _buildError(colors),
               ],
               const SizedBox(height: 24),
-              _buildFooter(context),
+              _buildFooter(context, colors),
               const SizedBox(height: 16),
-              _buildCopyright(),
+              _buildCopyright(colors),
               const SizedBox(height: 32),
             ],
           ),
@@ -80,26 +84,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildLogo() {
-    return const Column(
+  Widget _buildLogo(AppColorTheme colors, AppLocalizations l10n) {
+    return Column(
       children: [
-        SentLogo(size: 84),
-        SizedBox(height: 20),
+        const SentLogo(size: 84),
+        const SizedBox(height: 20),
         Text(
           'SENT',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
             fontSize: 62,
             fontWeight: FontWeight.w600,
             letterSpacing: -1,
             height: 1.0,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
-          '일상을 체계적으로 관리하세요',
+          l10n.loginTagline,
           style: TextStyle(
-            color: AppColors.textMuted,
+            color: colors.textMuted,
             fontSize: 14,
             letterSpacing: -0.2,
           ),
@@ -108,28 +112,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildLoginCard() {
+  Widget _buildLoginCard(AppColorTheme colors, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.secondary,
+        color: colors.secondary,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border, width: 0.5),
+        border: Border.all(color: colors.border, width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
-            '소셜 계정으로 간편하게 시작하세요',
+          Text(
+            l10n.loginSubtitle,
             style: TextStyle(
-              color: AppColors.textMuted,
+              color: colors.textMuted,
               fontSize: 13,
               letterSpacing: -0.2,
             ),
           ),
           const SizedBox(height: 16),
           _SocialLoginButton(
-            label: 'Google로 계속하기',
+            label: l10n.continueWithGoogle,
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,
             icon: SvgPicture.asset('assets/icons/ic_google.svg', width: 26, height: 26),
@@ -138,7 +142,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
           const SizedBox(height: 10),
           _SocialLoginButton(
-            label: '네이버로 계속하기',
+            label: l10n.continueWithNaver,
             backgroundColor: const Color(0xFF03C75A),
             foregroundColor: Colors.white,
             icon: SvgPicture.asset('assets/icons/ic_naver.svg', width: 26, height: 26),
@@ -147,7 +151,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
           const SizedBox(height: 10),
           _SocialLoginButton(
-            label: '카카오로 계속하기',
+            label: l10n.continueWithKakao,
             backgroundColor: const Color(0xFFFEE500),
             foregroundColor: const Color(0xFF191919),
             icon: SvgPicture.asset('assets/icons/ic_kakao.svg', width: 26, height: 26),
@@ -159,26 +163,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildError() {
+  Widget _buildError(AppColorTheme colors) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.destructiveRed.withValues(alpha: 0.1),
+        color: colors.destructiveRed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.destructiveRed.withValues(alpha: 0.3),
+          color: colors.destructiveRed.withValues(alpha: 0.3),
           width: 0.5,
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: AppColors.destructiveRed, size: 16),
+          Icon(Icons.error_outline, color: colors.destructiveRed, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               _errorMessage!,
-              style: const TextStyle(
-                color: AppColors.destructiveRed,
+              style: TextStyle(
+                color: colors.destructiveRed,
                 fontSize: 13,
                 height: 1.5,
                 letterSpacing: -0.1,
@@ -190,12 +194,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
+  Widget _buildFooter(BuildContext context, AppColorTheme colors) {
+    final l10n = AppLocalizations.of(context)!;
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        style: const TextStyle(
-          color: AppColors.textDisabled,
+        style: TextStyle(
+          color: colors.textDisabled,
           fontSize: 12,
           height: 1.7,
           letterSpacing: -0.1,
@@ -213,13 +218,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             recognizer: TapGestureRecognizer()
               ..onTap = () => _showPolicySheet(
                     context: context,
-                    title: '서비스 이용약관',
+                    title: l10n.termsOfService,
                     content: _termsContent,
                   ),
           ),
           const TextSpan(text: '과 '),
           TextSpan(
-            text: '개인정보 처리방침',
+            text: l10n.privacyPolicy,
             style: const TextStyle(
               color: AppColors.primary400,
               decoration: TextDecoration.underline,
@@ -228,7 +233,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             recognizer: TapGestureRecognizer()
               ..onTap = () => _showPolicySheet(
                     context: context,
-                    title: '개인정보 처리방침',
+                    title: l10n.privacyPolicy,
                     content: _privacyContent,
                   ),
           ),
@@ -238,11 +243,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 
-  Widget _buildCopyright() {
-    return const Text(
+  Widget _buildCopyright(AppColorTheme colors) {
+    return Text(
       '© 2025 Sent. All rights reserved.',
       style: TextStyle(
-        color: AppColors.textPlaceholder,
+        color: colors.textPlaceholder,
         fontSize: 11,
         letterSpacing: -0.1,
       ),
@@ -273,19 +278,20 @@ class _PolicySheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
       minChildSize: 0.5,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.card,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: colors.card,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             border: Border(
-              top: BorderSide(color: AppColors.border, width: 0.5),
-              left: BorderSide(color: AppColors.border, width: 0.5),
-              right: BorderSide(color: AppColors.border, width: 0.5),
+              top: BorderSide(color: colors.border, width: 0.5),
+              left: BorderSide(color: colors.border, width: 0.5),
+              right: BorderSide(color: colors.border, width: 0.5),
             ),
           ),
           child: Column(
@@ -296,7 +302,7 @@ class _PolicySheet extends StatelessWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: colors.border,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -307,8 +313,8 @@ class _PolicySheet extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.3,
@@ -320,29 +326,29 @@ class _PolicySheet extends StatelessWidget {
                       child: Container(
                         width: 28,
                         height: 28,
-                        decoration: const BoxDecoration(
-                          color: AppColors.secondary,
+                        decoration: BoxDecoration(
+                          color: colors.secondary,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.close,
                           size: 16,
-                          color: AppColors.textMuted,
+                          color: colors.textMuted,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 0.5, color: AppColors.border),
+              Divider(height: 0.5, color: colors.border),
               Expanded(
                 child: SingleChildScrollView(
                   controller: scrollController,
                   padding: const EdgeInsets.all(24),
                   child: Text(
                     content,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: colors.textMuted,
                       fontSize: 13,
                       height: 1.9,
                       letterSpacing: -0.1,

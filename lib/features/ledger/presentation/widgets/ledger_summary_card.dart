@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../domain/models/ledger_summary.dart';
 
 class LedgerSummaryCard extends StatelessWidget {
@@ -9,18 +10,20 @@ class LedgerSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: colors.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.border),
       ),
       child: Row(
         children: [
           _SummaryItem(
-            label: '수입',
+            label: l10n.income,
             amount: summary.totalIncome,
             color: const Color(0xFF32D74B),
           ),
@@ -28,13 +31,13 @@ class LedgerSummaryCard extends StatelessWidget {
           _Divider(),
           const SizedBox(width: 1),
           _SummaryItem(
-            label: '지출',
+            label: l10n.expense,
             amount: summary.totalExpense,
             color: const Color(0xFFFF6467),
           ),
           _Divider(),
           _SummaryItem(
-            label: '순액',
+            label: l10n.netAmount,
             amount: summary.netAmount,
             color: summary.netAmount >= 0
                 ? const Color(0xFF32D74B)
@@ -50,10 +53,11 @@ class LedgerSummaryCard extends StatelessWidget {
 class _Divider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       width: 0.5,
       height: 32,
-      color: AppColors.border,
+      color: colors.border,
       margin: const EdgeInsets.symmetric(horizontal: 12),
     );
   }
@@ -72,31 +76,33 @@ class _SummaryItem extends StatelessWidget {
   final Color color;
   final bool isNet;
 
-  static String _format(int n) {
+  static String _format(int n, String symbol) {
     final abs = n.abs();
     final formatted = abs
         .toString()
         .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},');
-    return '${n < 0 ? '-' : ''}$formatted원';
+    return '${n < 0 ? '-' : ''}$formatted$symbol';
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final symbol = AppLocalizations.of(context)!.currencySymbol;
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.textMuted,
+            style: TextStyle(
+              color: colors.textMuted,
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 5),
           Text(
-            _format(amount),
+            _format(amount, symbol),
             style: TextStyle(
               color: color,
               fontSize: isNet ? 15 : 13,

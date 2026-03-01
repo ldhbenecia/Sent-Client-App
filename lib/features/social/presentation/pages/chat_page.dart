@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../domain/models/chat_message.dart';
 import '../providers/chat_provider.dart';
 
@@ -58,24 +60,25 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final chatAsync = ref.watch(chatNotifierProvider(widget.opponentId));
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.background,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             size: 18,
-            color: AppColors.textMuted,
+            color: colors.textMuted,
           ),
           onPressed: () => context.pop(),
         ),
         title: Text(
           widget.friendName,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
+          style: TextStyle(
+            color: colors.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -86,17 +89,17 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         children: [
           Expanded(
             child: chatAsync.when(
-              loading: () => const Center(
+              loading: () => Center(
                 child: CircularProgressIndicator(
-                  color: AppColors.textMuted,
+                  color: colors.textMuted,
                   strokeWidth: 1.5,
                 ),
               ),
               error: (e, _) => Center(
                 child: Text(
                   e.toString().replaceAll('Exception: ', ''),
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
+                  style: TextStyle(
+                    color: colors.textMuted,
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
@@ -113,12 +116,12 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 6),
-              color: AppColors.card,
-              child: const Text(
-                '서버에 연결 중...',
+              color: colors.card,
+              child: Text(
+                AppLocalizations.of(context)!.connectingToServer,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: AppColors.textDisabled,
+                  color: colors.textDisabled,
                   fontSize: 12,
                 ),
               ),
@@ -148,15 +151,16 @@ class _MessageList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final messages = chatState.messages;
 
     if (messages.isEmpty && !chatState.isLoadingMore) {
-      return const Center(
+      return Center(
         child: Text(
-          '아직 메시지가 없어요\n먼저 인사해보세요',
+          AppLocalizations.of(context)!.chatEmpty,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppColors.textDisabled,
+            color: colors.textDisabled,
             fontSize: 14,
             height: 1.7,
           ),
@@ -172,11 +176,11 @@ class _MessageList extends StatelessWidget {
       itemBuilder: (context, index) {
         // 위쪽 끝(가장 오래된 메시지 위) — 로딩 인디케이터
         if (index == messages.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
               child: CircularProgressIndicator(
-                color: AppColors.textMuted,
+                color: colors.textMuted,
                 strokeWidth: 1.5,
               ),
             ),
@@ -202,6 +206,7 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final time =
         DateTime.fromMillisecondsSinceEpoch(message.timestamp);
     final timeStr =
@@ -217,8 +222,8 @@ class _MessageBubble extends StatelessWidget {
             ? [
                 Text(
                   timeStr,
-                  style: const TextStyle(
-                    color: AppColors.textDisabled,
+                  style: TextStyle(
+                    color: colors.textDisabled,
                     fontSize: 10,
                   ),
                 ),
@@ -230,8 +235,8 @@ class _MessageBubble extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   timeStr,
-                  style: const TextStyle(
-                    color: AppColors.textDisabled,
+                  style: TextStyle(
+                    color: colors.textDisabled,
                     fontSize: 10,
                   ),
                 ),
@@ -249,13 +254,14 @@ class _Bubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.65,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isMe ? AppColors.primary600 : AppColors.card,
+        color: isMe ? AppColors.primary600 : colors.card,
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(18),
           topRight: const Radius.circular(18),
@@ -264,12 +270,12 @@ class _Bubble extends StatelessWidget {
         ),
         border: isMe
             ? null
-            : Border.all(color: AppColors.border, width: 0.5),
+            : Border.all(color: colors.border, width: 0.5),
       ),
       child: Text(
         content,
-        style: const TextStyle(
-          color: AppColors.textPrimary,
+        style: TextStyle(
+          color: colors.textPrimary,
           fontSize: 15,
           height: 1.4,
         ),
@@ -294,13 +300,14 @@ class _InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Container(
       padding: EdgeInsets.fromLTRB(12, 8, 12, 8 + bottomPadding),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
+      decoration: BoxDecoration(
+        color: colors.background,
         border: Border(
-          top: BorderSide(color: AppColors.border, width: 0.5),
+          top: BorderSide(color: colors.border, width: 0.5),
         ),
       ),
       child: Row(
@@ -309,23 +316,23 @@ class _InputBar extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: colors.card,
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.border, width: 0.5),
+                border: Border.all(color: colors.border, width: 0.5),
               ),
               child: TextField(
                 controller: controller,
                 enabled: enabled,
                 style: TextStyle(
                   color: enabled
-                      ? AppColors.textPrimary
-                      : AppColors.textDisabled,
+                      ? colors.textPrimary
+                      : colors.textDisabled,
                   fontSize: 15,
                 ),
                 decoration: InputDecoration(
-                  hintText: enabled ? '메시지' : '연결 중...',
-                  hintStyle: const TextStyle(
-                    color: AppColors.textPlaceholder,
+                  hintText: enabled ? AppLocalizations.of(context)!.messageHint : AppLocalizations.of(context)!.connectingHint,
+                  hintStyle: TextStyle(
+                    color: colors.textPlaceholder,
                     fontSize: 15,
                   ),
                   contentPadding:
@@ -348,12 +355,12 @@ class _InputBar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: enabled
                     ? AppColors.primary600
-                    : AppColors.textDisabled,
+                    : colors.textDisabled,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_upward_rounded,
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
                 size: 18,
               ),
             ),

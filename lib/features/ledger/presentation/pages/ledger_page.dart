@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/theme/app_colors.dart';
+import 'package:intl/intl.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
 import '../providers/ledger_provider.dart';
 import '../widgets/ledger_summary_card.dart';
@@ -23,15 +25,17 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
   DateTime? _selectedDay;
 
   Future<void> _confirmDelete(BuildContext context, String entryId) async {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: colors.card,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border, width: 0.5),
+          border: Border.all(color: colors.border, width: 0.5),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -40,26 +44,26 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
               child: Column(
                 children: [
-                  const Text(
-                    '내역을 삭제할까요?',
+                  Text(
+                    l10n.ledgerDeleteTitle,
                     style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    '삭제된 내역은 복구할 수 없습니다.',
+                  Text(
+                    l10n.ledgerDeleteMessage,
                     style: TextStyle(
-                      color: AppColors.textMuted,
+                      color: colors.textMuted,
                       fontSize: 13,
                     ),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, color: AppColors.border),
+            Divider(height: 1, color: colors.border),
             Row(
               children: [
                 Expanded(
@@ -73,17 +77,17 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                         ),
                       ),
                     ),
-                    child: const Text(
-                      '취소',
+                    child: Text(
+                      l10n.cancel,
                       style: TextStyle(
-                        color: AppColors.textMuted,
+                        color: colors.textMuted,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ),
-                Container(width: 0.5, height: 48, color: AppColors.border),
+                Container(width: 0.5, height: 48, color: colors.border),
                 Expanded(
                   child: TextButton(
                     onPressed: () => Navigator.of(context).pop(true),
@@ -95,10 +99,10 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                         ),
                       ),
                     ),
-                    child: const Text(
-                      '삭제',
+                    child: Text(
+                      l10n.delete,
                       style: TextStyle(
-                        color: AppColors.destructiveRed,
+                        color: colors.destructiveRed,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -138,6 +142,9 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
     final month = ref.watch(ledgerMonthProvider);
     final entriesAsync = ref.watch(ledgerEntriesProvider);
     final summaryAsync = ref.watch(ledgerSummaryProvider);
@@ -162,7 +169,7 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
     final focusedMonth = DateTime(month.year, month.month);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         title: const Text('SENT'),
         actions: [
@@ -171,7 +178,7 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
               _showCalendar
                   ? Icons.view_list_rounded
                   : Icons.calendar_month_rounded,
-              color: AppColors.textMuted,
+              color: colors.textMuted,
               size: 20,
             ),
             onPressed: () => setState(() {
@@ -180,9 +187,9 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
             }),
           ),
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.menu_rounded,
-              color: AppColors.textMuted,
+              color: colors.textMuted,
               size: 22,
             ),
             onPressed: () => showAppNavMenu(
@@ -204,8 +211,8 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
               children: [
                 IconButton(
                   onPressed: () => _changeMonth(month, -1),
-                  icon: const Icon(Icons.chevron_left_rounded,
-                      color: AppColors.textMuted),
+                  icon: Icon(Icons.chevron_left_rounded,
+                      color: colors.textMuted),
                   padding: EdgeInsets.zero,
                   constraints:
                       const BoxConstraints(minWidth: 32, minHeight: 32),
@@ -219,8 +226,8 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                     children: [
                       Text(
                         '${month.year}.${month.month.toString().padLeft(2, '0')}',
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
+                        style: TextStyle(
+                          color: colors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
@@ -228,9 +235,9 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                       ),
                       if (_selectedDay != null)
                         Text(
-                          '${_selectedDay!.month}월 ${_selectedDay!.day}일',
-                          style: const TextStyle(
-                            color: AppColors.textMuted,
+                          DateFormat.MMMd(locale).format(_selectedDay!),
+                          style: TextStyle(
+                            color: colors.textMuted,
                             fontSize: 11,
                           ),
                         ),
@@ -239,8 +246,8 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                 ),
                 IconButton(
                   onPressed: () => _changeMonth(month, 1),
-                  icon: const Icon(Icons.chevron_right_rounded,
-                      color: AppColors.textMuted),
+                  icon: Icon(Icons.chevron_right_rounded,
+                      color: colors.textMuted),
                   padding: EdgeInsets.zero,
                   constraints:
                       const BoxConstraints(minWidth: 32, minHeight: 32),
@@ -269,21 +276,21 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
             ),
 
           if (_showCalendar)
-            const Divider(height: 1, color: AppColors.border),
+            Divider(height: 1, color: colors.border),
 
           // ── 항목 리스트 ──────────────────────────────────────────
           Expanded(
             child: entriesAsync.when(
-              loading: () => const Center(
+              loading: () => Center(
                 child: CircularProgressIndicator(
-                  color: AppColors.textMuted,
+                  color: colors.textMuted,
                   strokeWidth: 2,
                 ),
               ),
-              error: (e, _) => const Center(
+              error: (e, _) => Center(
                 child: Text(
-                  '불러오기 실패',
-                  style: TextStyle(color: AppColors.textMuted),
+                  l10n.loadFailed,
+                  style: TextStyle(color: colors.textMuted),
                 ),
               ),
               data: (_) {
@@ -291,10 +298,10 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                   return Center(
                     child: Text(
                       _selectedDay != null
-                          ? '이 날 내역이 없습니다'
-                          : '이번 달 내역이 없습니다',
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                          ? l10n.ledgerEmptyDay
+                          : l10n.ledgerEmptyMonth,
+                      style: TextStyle(
+                        color: colors.textMuted,
                         fontSize: 14,
                       ),
                     ),
@@ -327,16 +334,17 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'ledger_fab',
         onPressed: () {
           ref.read(ledgerNewEntryInitialDateProvider.notifier).state =
               _selectedDay;
           context.push('/ledger/new');
         },
-        backgroundColor: AppColors.card,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: colors.card,
+        foregroundColor: colors.textPrimary,
         elevation: 0,
-        shape: const CircleBorder(
-          side: BorderSide(color: AppColors.border),
+        shape: CircleBorder(
+          side: BorderSide(color: colors.border),
         ),
         child: const Icon(Icons.add_rounded),
       ),
@@ -360,20 +368,20 @@ class _DateGroup extends StatelessWidget {
   final void Function(LedgerEntry) onEntryTap;
   final void Function(LedgerEntry) onEntryDelete;
 
-  static const _weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-
   @override
   Widget build(BuildContext context) {
-    final weekday = _weekdays[date.weekday - 1];
+    final colors = context.colors;
+    final locale = Localizations.localeOf(context).toString();
+    final dateLabel = '${DateFormat.MMMd(locale).format(date)} (${DateFormat.E(locale).format(date)})';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
           child: Text(
-            '${date.month}월 ${date.day}일 ($weekday)',
-            style: const TextStyle(
-              color: AppColors.textMuted,
+            dateLabel,
+            style: TextStyle(
+              color: colors.textMuted,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -382,17 +390,17 @@ class _DateGroup extends StatelessWidget {
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: colors.card,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border, width: 0.5),
+            border: Border.all(color: colors.border, width: 0.5),
           ),
           child: Column(
             children: [
               for (int i = 0; i < entries.length; i++) ...[
                 if (i > 0)
-                  const Divider(
+                  Divider(
                     height: 0.5,
-                    color: AppColors.border,
+                    color: colors.border,
                     indent: 16,
                     endIndent: 16,
                   ),

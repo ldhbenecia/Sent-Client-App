@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../providers/ledger_provider.dart';
 import '../../domain/models/ledger_category.dart';
 import '../../domain/models/ledger_entry.dart';
@@ -111,7 +113,7 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: AppColors.destructiveRed,
+          backgroundColor: context.colors.destructiveRed,
         ),
       );
     } finally {
@@ -154,6 +156,8 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final categories = ref.watch(ledgerCategoriesProvider).valueOrNull ?? [];
     final selectedCat = _categoryId != null
         ? categories.cast<LedgerCategory?>().firstWhere(
@@ -167,19 +171,19 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
         : const Color(0xFF32D74B);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left_rounded,
-              color: AppColors.textPrimary, size: 28),
+          icon: Icon(Icons.chevron_left_rounded,
+              color: colors.textPrimary, size: 28),
           onPressed: () => context.pop(),
         ),
         title: Text(
-          _isEdit ? '내역 수정' : '내역 추가',
-          style: const TextStyle(
+          _isEdit ? l10n.editEntry : l10n.addEntry,
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
             letterSpacing: -0.3,
           ),
         ),
@@ -188,20 +192,20 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
           TextButton(
             onPressed: _canSave ? _save : null,
             child: _isSaving
-                ? const SizedBox(
+                ? SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 1.5,
-                      color: AppColors.textMuted,
+                      color: colors.textMuted,
                     ),
                   )
                 : Text(
-                    _isEdit ? '수정' : '등록',
+                    _isEdit ? l10n.edit : l10n.register,
                     style: TextStyle(
                       color: _canSave
-                          ? AppColors.textPrimary
-                          : AppColors.textDisabled,
+                          ? colors.textPrimary
+                          : colors.textDisabled,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -212,7 +216,7 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
       ),
       body: Column(
         children: [
-          const Divider(height: 0.5, color: AppColors.border),
+          Divider(height: 0.5, color: colors.border),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -223,14 +227,14 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                   child: Row(
                     children: [
                       _TypeChip(
-                        label: '지출',
+                        label: l10n.expense,
                         selected: _type == LedgerType.expense,
                         color: const Color(0xFFFF6467),
                         onTap: () => setState(() => _type = LedgerType.expense),
                       ),
                       const SizedBox(width: 8),
                       _TypeChip(
-                        label: '수입',
+                        label: l10n.income,
                         selected: _type == LedgerType.income,
                         color: const Color(0xFF32D74B),
                         onTap: () => setState(() => _type = LedgerType.income),
@@ -256,15 +260,15 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                           style: TextStyle(
                             color: _parsedAmount > 0
                                 ? typeColor
-                                : AppColors.textPrimary,
+                                : colors.textPrimary,
                             fontSize: 36,
                             fontWeight: FontWeight.w700,
                             letterSpacing: -1,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: '0',
                             hintStyle: TextStyle(
-                              color: AppColors.textPlaceholder,
+                              color: colors.textPlaceholder,
                               fontSize: 36,
                               fontWeight: FontWeight.w700,
                               letterSpacing: -1,
@@ -280,10 +284,10 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Text(
-                        '원',
+                      Text(
+                        l10n.currencySymbol,
                         style: TextStyle(
-                          color: AppColors.textMuted,
+                          color: colors.textMuted,
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
                         ),
@@ -292,20 +296,20 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                   ),
                 ),
 
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Divider(
-                      height: 0.5, thickness: 0.5, color: AppColors.border),
+                      height: 0.5, thickness: 0.5, color: colors.border),
                 ),
 
                 // ── 거래일 ─────────────────────────────────────────
                 _FormRow(
-                  label: '거래일',
+                  label: l10n.transactionDate,
                   onTap: _pickDate,
                   trailing: Text(
                     _formatDate(_transactionDate),
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: colors.textMuted,
                       fontSize: 14,
                     ),
                   ),
@@ -318,10 +322,10 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        '결제수단',
+                      Text(
+                        l10n.paymentMethod,
                         style: TextStyle(
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
@@ -345,12 +349,12 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? AppColors.primary700
-                                      : AppColors.secondary,
+                                      : colors.secondary,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     color: isSelected
                                         ? AppColors.primary500
-                                        : AppColors.border,
+                                        : colors.border,
                                     width: 0.5,
                                   ),
                                 ),
@@ -359,8 +363,8 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: isSelected
-                                        ? AppColors.textPrimary
-                                        : AppColors.textDisabled,
+                                        ? colors.textPrimary
+                                        : colors.textDisabled,
                                     fontSize: 12,
                                     fontWeight: isSelected
                                         ? FontWeight.w600
@@ -376,15 +380,15 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                   ),
                 ),
 
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Divider(
-                      height: 0.5, thickness: 0.5, color: AppColors.border),
+                      height: 0.5, thickness: 0.5, color: colors.border),
                 ),
 
                 // ── 카테고리 ───────────────────────────────────────
                 _FormRow(
-                  label: '카테고리',
+                  label: l10n.ledgerCategory,
                   onTap: _pickCategory,
                   trailing: selectedCat != null
                       ? Row(
@@ -404,17 +408,17 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                             const SizedBox(width: 6),
                             Text(
                               selectedCat.name,
-                              style: const TextStyle(
-                                color: AppColors.textMuted,
+                              style: TextStyle(
+                                color: colors.textMuted,
                                 fontSize: 14,
                               ),
                             ),
                           ],
                         )
-                      : const Text(
-                          '없음',
+                      : Text(
+                          l10n.none,
                           style: TextStyle(
-                            color: AppColors.textDisabled,
+                            color: colors.textDisabled,
                             fontSize: 14,
                           ),
                         ),
@@ -425,14 +429,14 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
                   child: TextField(
                     controller: _memoCtrl,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
+                    style: TextStyle(
+                      color: colors.textPrimary,
                       fontSize: 15,
                     ),
-                    decoration: const InputDecoration(
-                      hintText: '메모 (선택)',
+                    decoration: InputDecoration(
+                      hintText: l10n.memoOptionalHint,
                       hintStyle: TextStyle(
-                        color: AppColors.textPlaceholder,
+                        color: colors.textPlaceholder,
                         fontSize: 15,
                       ),
                       border: InputBorder.none,
@@ -450,7 +454,7 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
 
           // ── 삭제 버튼 (수정 모드) ──────────────────────────────────
           if (_isEdit) ...[
-            const Divider(height: 0.5, color: AppColors.border),
+            Divider(height: 0.5, color: colors.border),
             SafeArea(
               top: false,
               child: Padding(
@@ -466,16 +470,16 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
                     },
                     style: TextButton.styleFrom(
                       backgroundColor:
-                          AppColors.destructiveRed.withValues(alpha: 0.12),
+                          colors.destructiveRed.withValues(alpha: 0.12),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      '삭제',
+                    child: Text(
+                      l10n.delete,
                       style: TextStyle(
-                        color: AppColors.destructiveRed,
+                        color: colors.destructiveRed,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -532,23 +536,24 @@ class _TypeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.15) : AppColors.secondary,
+          color: selected ? color.withValues(alpha: 0.15) : colors.secondary,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? color : AppColors.border,
+            color: selected ? color : colors.border,
             width: selected ? 1.0 : 0.5,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? color : AppColors.textMuted,
+            color: selected ? color : colors.textMuted,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -572,6 +577,7 @@ class _FormRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -580,8 +586,8 @@ class _FormRow extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: colors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -590,8 +596,8 @@ class _FormRow extends StatelessWidget {
             ?trailing,
             if (onTap != null) ...[
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right_rounded,
-                  size: 18, color: AppColors.textDisabled),
+              Icon(Icons.chevron_right_rounded,
+                  size: 18, color: colors.textDisabled),
             ],
           ],
         ),
@@ -612,10 +618,12 @@ class _CategoryPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
         top: false,
@@ -627,7 +635,7 @@ class _CategoryPickerSheet extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -636,10 +644,10 @@ class _CategoryPickerSheet extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  const Text(
-                    '카테고리 선택',
+                  Text(
+                    l10n.categorySelect,
                     style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -650,10 +658,10 @@ class _CategoryPickerSheet extends StatelessWidget {
                       Navigator.of(context).pop();
                       context.push('/ledger/categories');
                     },
-                    child: const Text(
-                      '관리',
+                    child: Text(
+                      l10n.manage,
                       style: TextStyle(
-                        color: AppColors.textMuted,
+                        color: colors.textMuted,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
@@ -666,16 +674,16 @@ class _CategoryPickerSheet extends StatelessWidget {
             // 없음 옵션
             ListTile(
               onTap: () => Navigator.of(context).pop(''),
-              leading: const Icon(Icons.block_rounded,
-                  color: AppColors.textMuted, size: 20),
-              title: const Text('없음',
-                  style: TextStyle(color: AppColors.textMuted, fontSize: 14)),
+              leading: Icon(Icons.block_rounded,
+                  color: colors.textMuted, size: 20),
+              title: Text(l10n.none,
+                  style: TextStyle(color: colors.textMuted, fontSize: 14)),
               trailing: selectedId == null
-                  ? const Icon(Icons.check_rounded,
-                      color: AppColors.textPrimary, size: 18)
+                  ? Icon(Icons.check_rounded,
+                      color: colors.textPrimary, size: 18)
                   : null,
             ),
-            const Divider(height: 0.5, color: AppColors.border, indent: 16),
+            Divider(height: 0.5, color: colors.border, indent: 16),
             ...categories.map((c) => ListTile(
                   onTap: () => Navigator.of(context).pop(c.id),
                   leading: Container(
@@ -688,11 +696,11 @@ class _CategoryPickerSheet extends StatelessWidget {
                     child: Icon(c.icon, size: 14, color: c.color),
                   ),
                   title: Text(c.name,
-                      style: const TextStyle(
-                          color: AppColors.textPrimary, fontSize: 14)),
+                      style: TextStyle(
+                          color: colors.textPrimary, fontSize: 14)),
                   trailing: selectedId == c.id
-                      ? const Icon(Icons.check_rounded,
-                          color: AppColors.textPrimary, size: 18)
+                      ? Icon(Icons.check_rounded,
+                          color: colors.textPrimary, size: 18)
                       : null,
                 )),
             const SizedBox(height: 8),
@@ -717,10 +725,12 @@ class _DatePickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
         top: false,
@@ -732,7 +742,7 @@ class _DatePickerSheet extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -740,10 +750,10 @@ class _DatePickerSheet extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
               child: Row(
                 children: [
-                  const Text(
-                    '거래일 선택',
+                  Text(
+                    l10n.selectDate,
                     style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -751,10 +761,10 @@ class _DatePickerSheet extends StatelessWidget {
                   const Spacer(),
                   TextButton(
                     onPressed: onConfirm,
-                    child: const Text(
-                      '확인',
+                    child: Text(
+                      l10n.confirm,
                       style: TextStyle(
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
