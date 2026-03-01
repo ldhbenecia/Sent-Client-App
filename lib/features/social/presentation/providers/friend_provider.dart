@@ -59,6 +59,24 @@ class FriendsNotifier extends AsyncNotifier<List<Friend>> {
 final friendsProvider =
     AsyncNotifierProvider<FriendsNotifier, List<Friend>>(FriendsNotifier.new);
 
+// ── 내가 보낸 친구 요청 목록 ──────────────────────────────────────
+class SentRequestsNotifier extends AsyncNotifier<List<SentFriendRequest>> {
+  @override
+  Future<List<SentFriendRequest>> build() =>
+      ref.read(friendRepositoryProvider).fetchSentRequests();
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () => ref.read(friendRepositoryProvider).fetchSentRequests(),
+    );
+  }
+}
+
+final sentRequestsProvider =
+    AsyncNotifierProvider<SentRequestsNotifier, List<SentFriendRequest>>(
+        SentRequestsNotifier.new);
+
 // ── 받은 친구 요청 목록 ────────────────────────────────────────────
 class PendingRequestsNotifier extends AsyncNotifier<List<FriendRequest>> {
   @override

@@ -75,13 +75,22 @@ class FriendTile extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  friend.friendDisplayName,
-                  style: TextStyle(
-                    color: colors.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      friend.friendDisplayName,
+                      style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (friend.friendProvider != null) ...[
+                      const SizedBox(height: 2),
+                      _ProviderBadge(provider: friend.friendProvider!),
+                    ],
+                  ],
                 ),
               ),
               IconButton(
@@ -98,6 +107,32 @@ class FriendTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── OAuth 프로바이더 뱃지 ─────────────────────────────────────────
+class _ProviderBadge extends StatelessWidget {
+  const _ProviderBadge({required this.provider});
+  final String provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final (label, color) = switch (provider.toLowerCase()) {
+      'google' => ('Google', const Color(0xFF4285F4)),
+      'naver'  => ('Naver',  const Color(0xFF03C75A)),
+      'kakao'  => ('Kakao',  const Color(0xFFFEE500)),
+      _        => (provider, const Color(0xFF525252)),
+    };
+
+    return Text(
+      label,
+      style: TextStyle(
+        color: color,
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.2,
       ),
     );
   }
@@ -219,6 +254,62 @@ class _Initials extends StatelessWidget {
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+}
+
+// ── 내가 보낸 요청 타일 ───────────────────────────────────────────
+class SentFriendRequestTile extends StatelessWidget {
+  const SentFriendRequestTile({super.key, required this.request});
+  final SentFriendRequest request;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+
+    final (statusLabel, statusColor) = switch (request.status) {
+      SentRequestStatus.accepted => (l10n.statusAccepted, const Color(0xFF32D74B)),
+      SentRequestStatus.rejected => (l10n.statusRejected, const Color(0xFFFF453A)),
+      SentRequestStatus.pending  => (l10n.statusPending,  const Color(0xFFFF9F0A)),
+    };
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          SocialAvatar(
+            imageUrl: request.receiverProfileImageUrl,
+            name: request.receiverDisplayName,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              request.receiverDisplayName,
+              style: TextStyle(
+                color: colors.textPrimary,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              statusLabel,
+              style: TextStyle(
+                color: statusColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

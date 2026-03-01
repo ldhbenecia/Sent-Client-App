@@ -65,6 +65,20 @@ class FriendRepository {
     }
   }
 
+  // GET /api/v1/friends/requests/sent
+  Future<List<SentFriendRequest>> fetchSentRequests() async {
+    try {
+      final res = await _dio.get('/api/v1/friends/requests/sent');
+      final list = res.data['data'] as List;
+      return list
+          .map((e) => SentFriendRequestDto.fromJson(e as Map<String, dynamic>)
+              .toDomain())
+          .toList();
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
+
   // DELETE /api/v1/friends/{friendId}
   Future<void> deleteFriend(int friendId) async {
     try {

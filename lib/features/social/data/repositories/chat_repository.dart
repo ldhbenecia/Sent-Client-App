@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/error/app_exception.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/models/chat_message.dart';
+import '../../domain/models/chat_room.dart';
 
 part 'chat_repository.g.dart';
 
@@ -15,6 +16,19 @@ class ChatRepository {
   const ChatRepository(this._dio);
 
   final Dio _dio;
+
+  // GET /api/v1/chat/rooms — 내 채팅방 목록 (최근 메시지 포함)
+  Future<List<ChatRoom>> fetchRooms() async {
+    try {
+      final res = await _dio.get('/api/v1/chat/rooms');
+      final list = res.data['data'] as List;
+      return list
+          .map((e) => ChatRoom.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
 
   // POST /api/v1/chat/rooms?opponentId={UUID} — 방 생성 또는 기존 방 반환
   Future<int> createOrGetRoom(String opponentId) async {
