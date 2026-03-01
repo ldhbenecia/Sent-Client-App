@@ -65,6 +65,13 @@ class SentRequestsNotifier extends AsyncNotifier<List<SentFriendRequest>> {
   Future<List<SentFriendRequest>> build() =>
       ref.read(friendRepositoryProvider).fetchSentRequests();
 
+  Future<void> cancel(int requestId) async {
+    await ref.read(friendRepositoryProvider).cancelRequest(requestId);
+    state = AsyncData(
+      state.requireValue.where((r) => r.id != requestId).toList(),
+    );
+  }
+
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(

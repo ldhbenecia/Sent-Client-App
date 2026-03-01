@@ -107,7 +107,12 @@ class SocialPage extends ConsumerWidget {
                     label: '${AppLocalizations.of(context)!.sentRequestsSection} ${pending.length}',
                     child: Column(
                       children: pending
-                          .map((r) => SentFriendRequestTile(request: r))
+                          .map((r) => SentFriendRequestTile(
+                                request: r,
+                                onCancel: () => ref
+                                    .read(sentRequestsProvider.notifier)
+                                    .cancel(r.id),
+                              ))
                           .toList(),
                     ),
                   ),

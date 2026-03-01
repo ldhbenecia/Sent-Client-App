@@ -261,8 +261,13 @@ class _Initials extends StatelessWidget {
 
 // ── 내가 보낸 요청 타일 ───────────────────────────────────────────
 class SentFriendRequestTile extends StatelessWidget {
-  const SentFriendRequestTile({super.key, required this.request});
+  const SentFriendRequestTile({
+    super.key,
+    required this.request,
+    this.onCancel,
+  });
   final SentFriendRequest request;
+  final VoidCallback? onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -294,21 +299,44 @@ class SentFriendRequestTile extends StatelessWidget {
               ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              statusLabel,
-              style: TextStyle(
-                color: statusColor,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+          if (onCancel != null) ...[
+            GestureDetector(
+              onTap: onCancel,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: colors.card,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: colors.border),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.cancel,
+                  style: TextStyle(
+                    color: colors.textMuted,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
-          ),
+          ] else ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                statusLabel,
+                style: TextStyle(
+                  color: statusColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

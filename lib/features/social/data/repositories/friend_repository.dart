@@ -79,6 +79,15 @@ class FriendRepository {
     }
   }
 
+  // DELETE /api/v1/friends/requests/{requestId}
+  Future<void> cancelRequest(int requestId) async {
+    try {
+      await _dio.delete('/api/v1/friends/requests/$requestId');
+    } on DioException catch (e) {
+      throw mapDioException(e);
+    }
+  }
+
   // DELETE /api/v1/friends/{friendId}
   Future<void> deleteFriend(int friendId) async {
     try {
