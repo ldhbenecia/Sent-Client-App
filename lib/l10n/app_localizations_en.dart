@@ -335,4 +335,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ledgerCategoryNew => 'New Category';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get alarmBefore5min => '5 min before';
+
+  @override
+  String get alarmBefore10min => '10 min before';
+
+  @override
+  String get alarmBefore15min => '15 min before';
+
+  @override
+  String get alarmBefore30min => '30 min before';
+
+  @override
+  String get alarmBefore1hour => '1 hour before';
 }

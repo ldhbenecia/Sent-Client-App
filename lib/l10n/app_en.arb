@@ -130,5 +130,12 @@
   "editEntry": "Edit Transaction",
   "selectDate": "Select Date",
   "ledgerCategory": "Ledger Categories",
-  "ledgerCategoryNew": "New Category"
+  "ledgerCategoryNew": "New Category",
+
+  "reset": "Reset",
+  "alarmBefore5min": "5 min before",
+  "alarmBefore10min": "10 min before",
+  "alarmBefore15min": "15 min before",
+  "alarmBefore30min": "30 min before",
+  "alarmBefore1hour": "1 hour before"
 }

@@ -735,6 +735,42 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'새로운 카테고리'**
   String get ledgerCategoryNew;
+
+  /// No description provided for @reset.
+  ///
+  /// In ko, this message translates to:
+  /// **'초기화'**
+  String get reset;
+
+  /// No description provided for @alarmBefore5min.
+  ///
+  /// In ko, this message translates to:
+  /// **'5분 전'**
+  String get alarmBefore5min;
+
+  /// No description provided for @alarmBefore10min.
+  ///
+  /// In ko, this message translates to:
+  /// **'10분 전'**
+  String get alarmBefore10min;
+
+  /// No description provided for @alarmBefore15min.
+  ///
+  /// In ko, this message translates to:
+  /// **'15분 전'**
+  String get alarmBefore15min;
+
+  /// No description provided for @alarmBefore30min.
+  ///
+  /// In ko, this message translates to:
+  /// **'30분 전'**
+  String get alarmBefore30min;
+
+  /// No description provided for @alarmBefore1hour.
+  ///
+  /// In ko, this message translates to:
+  /// **'1시간 전'**
+  String get alarmBefore1hour;
 }
 
 class _AppLocalizationsDelegate

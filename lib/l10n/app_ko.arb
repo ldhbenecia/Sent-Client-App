@@ -130,5 +130,12 @@
   "editEntry": "내역 수정",
   "selectDate": "거래일 선택",
   "ledgerCategory": "가계부 카테고리",
-  "ledgerCategoryNew": "새로운 카테고리"
+  "ledgerCategoryNew": "새로운 카테고리",
+
+  "reset": "초기화",
+  "alarmBefore5min": "5분 전",
+  "alarmBefore10min": "10분 전",
+  "alarmBefore15min": "15분 전",
+  "alarmBefore30min": "30분 전",
+  "alarmBefore1hour": "1시간 전"
 }

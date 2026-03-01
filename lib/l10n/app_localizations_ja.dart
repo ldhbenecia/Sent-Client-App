@@ -331,4 +331,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get ledgerCategoryNew => '新しいカテゴリ';
+
+  @override
+  String get reset => 'リセット';
+
+  @override
+  String get alarmBefore5min => '5分前';
+
+  @override
+  String get alarmBefore10min => '10分前';
+
+  @override
+  String get alarmBefore15min => '15分前';
+
+  @override
+  String get alarmBefore30min => '30分前';
+
+  @override
+  String get alarmBefore1hour => '1時間前';
 }

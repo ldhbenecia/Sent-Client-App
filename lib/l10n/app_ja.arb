@@ -130,5 +130,12 @@
   "editEntry": "取引を編集",
   "selectDate": "日付を選択",
   "ledgerCategory": "家計簿カテゴリ",
-  "ledgerCategoryNew": "新しいカテゴリ"
+  "ledgerCategoryNew": "新しいカテゴリ",
+
+  "reset": "リセット",
+  "alarmBefore5min": "5分前",
+  "alarmBefore10min": "10分前",
+  "alarmBefore15min": "15分前",
+  "alarmBefore30min": "30分前",
+  "alarmBefore1hour": "1時間前"
 }

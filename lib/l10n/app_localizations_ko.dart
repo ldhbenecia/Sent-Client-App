@@ -331,4 +331,22 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get ledgerCategoryNew => '새로운 카테고리';
+
+  @override
+  String get reset => '초기화';
+
+  @override
+  String get alarmBefore5min => '5분 전';
+
+  @override
+  String get alarmBefore10min => '10분 전';
+
+  @override
+  String get alarmBefore15min => '15분 전';
+
+  @override
+  String get alarmBefore30min => '30분 전';
+
+  @override
+  String get alarmBefore1hour => '1시간 전';
 }
