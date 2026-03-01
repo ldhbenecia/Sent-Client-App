@@ -514,6 +514,24 @@ abstract class AppLocalizations {
   /// **'거절'**
   String get reject;
 
+  /// No description provided for @myCode.
+  ///
+  /// In ko, this message translates to:
+  /// **'내 코드'**
+  String get myCode;
+
+  /// No description provided for @codeCopied.
+  ///
+  /// In ko, this message translates to:
+  /// **'코드가 복사됐습니다.'**
+  String get codeCopied;
+
+  /// No description provided for @copy.
+  ///
+  /// In ko, this message translates to:
+  /// **'복사'**
+  String get copy;
+
   /// No description provided for @addFriend.
   ///
   /// In ko, this message translates to:
@@ -523,14 +541,14 @@ abstract class AppLocalizations {
   /// No description provided for @addFriendSubtitle.
   ///
   /// In ko, this message translates to:
-  /// **'친구의 이메일을 입력해 검색하세요.'**
+  /// **'유저코드로 친구를 검색하세요.'**
   String get addFriendSubtitle;
 
-  /// No description provided for @emailHint.
+  /// No description provided for @codeHint.
   ///
   /// In ko, this message translates to:
-  /// **'이메일 주소'**
-  String get emailHint;
+  /// **'유저코드 (예: ABCD1234)'**
+  String get codeHint;
 
   /// No description provided for @search.
   ///

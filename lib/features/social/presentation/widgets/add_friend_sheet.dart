@@ -9,7 +9,7 @@ import 'social_tiles.dart';
 enum _SearchState { idle, loading, found, notFound, error }
 
 // ════════════════════════════════════════════════════════════════
-// 친구 추가 바텀시트 — 이메일 검색 플로우
+// 친구 추가 바텀시트 — 유저코드 검색 플로우
 // ════════════════════════════════════════════════════════════════
 class AddFriendSheet extends StatefulWidget {
   const AddFriendSheet({super.key, required this.ref});
@@ -20,7 +20,7 @@ class AddFriendSheet extends StatefulWidget {
 }
 
 class _AddFriendSheetState extends State<AddFriendSheet> {
-  final _emailController = TextEditingController();
+  final _codeController = TextEditingController();
   _SearchState _searchState = _SearchState.idle;
   UserSearchResult? _found;
   String? _errorMessage;
@@ -28,13 +28,13 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _codeController.dispose();
     super.dispose();
   }
 
   Future<void> _search() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) return;
+    final code = _codeController.text.trim();
+    if (code.isEmpty) return;
 
     setState(() {
       _searchState = _SearchState.loading;
@@ -44,7 +44,7 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
 
     try {
       final result =
-          await widget.ref.read(userRepositoryProvider).searchByEmail(email);
+          await widget.ref.read(userRepositoryProvider).searchByCode(code);
       if (!mounted) return;
       setState(() {
         if (result != null) {
@@ -70,7 +70,7 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
     try {
       await widget.ref
           .read(friendRepositoryProvider)
-          .addFriend(_found!.email);
+          .addFriend(_found!.userCode);
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       final displayName = _found!.displayName;
@@ -137,17 +137,18 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
           ),
           const SizedBox(height: 16),
 
-          // ── 이메일 입력 + 검색 ──────────────────────────────────
+          // ── 유저코드 입력 + 검색 ─────────────────────────────────
           Row(
             children: [
               Expanded(
                 child: TextField(
-                  controller: _emailController,
+                  controller: _codeController,
                   style: TextStyle(
                       color: colors.textPrimary, fontSize: 15),
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.visiblePassword,
+                  textCapitalization: TextCapitalization.characters,
                   decoration: InputDecoration(
-                    hintText: l10n.emailHint,
+                    hintText: l10n.codeHint,
                     hintStyle: TextStyle(
                         color: colors.textDisabled, fontSize: 14),
                     filled: true,
@@ -171,6 +172,8 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
                         horizontal: 14, vertical: 12),
                   ),
                   onSubmitted: (_) => _search(),
+                  maxLength: 8,
+                  buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
                 ),
               ),
               const SizedBox(width: 10),
@@ -274,7 +277,7 @@ class _UserCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  user.email,
+                  user.userCode,
                   style: TextStyle(
                       color: colors.textMuted, fontSize: 12),
                 ),

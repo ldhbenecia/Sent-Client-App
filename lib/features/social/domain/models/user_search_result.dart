@@ -1,11 +1,11 @@
 class UserSearchResult {
   const UserSearchResult({
-    required this.email,
+    required this.userCode,
     required this.displayName,
     this.profileImageUrl,
   });
 
-  final String email;
+  final String userCode;
   final String displayName;
   final String? profileImageUrl;
 }

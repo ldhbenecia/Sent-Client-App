@@ -220,13 +220,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get reject => '拒否';
 
   @override
+  String get myCode => 'マイコード';
+
+  @override
+  String get codeCopied => 'コードをコピーしました。';
+
+  @override
+  String get copy => 'コピー';
+
+  @override
   String get addFriend => '友達を追加';
 
   @override
-  String get addFriendSubtitle => 'メールアドレスで検索してください。';
+  String get addFriendSubtitle => 'ユーザーコードで友達を検索してください。';
 
   @override
-  String get emailHint => 'メールアドレス';
+  String get codeHint => 'ユーザーコード（例: ABCD1234）';
 
   @override
   String get search => '検索';

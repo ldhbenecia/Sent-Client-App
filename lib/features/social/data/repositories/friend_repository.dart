@@ -35,12 +35,12 @@ class FriendRepository {
     }
   }
 
-  // POST /api/v1/friends — body: { receiverEmail: String }
-  Future<void> addFriend(String receiverEmail) async {
+  // POST /api/v1/friends — body: { receiverCode: String }
+  Future<void> addFriend(String receiverCode) async {
     try {
       await _dio.post(
         '/api/v1/friends',
-        data: {'receiverEmail': receiverEmail},
+        data: {'receiverCode': receiverCode},
       );
     } on DioException catch (e) {
       throw mapDioException(e);

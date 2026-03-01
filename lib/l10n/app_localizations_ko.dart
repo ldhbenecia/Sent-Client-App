@@ -220,13 +220,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get reject => '거절';
 
   @override
+  String get myCode => '내 코드';
+
+  @override
+  String get codeCopied => '코드가 복사됐습니다.';
+
+  @override
+  String get copy => '복사';
+
+  @override
   String get addFriend => '친구 추가';
 
   @override
-  String get addFriendSubtitle => '친구의 이메일을 입력해 검색하세요.';
+  String get addFriendSubtitle => '유저코드로 친구를 검색하세요.';
 
   @override
-  String get emailHint => '이메일 주소';
+  String get codeHint => '유저코드 (예: ABCD1234)';
 
   @override
   String get search => '검색';

@@ -224,13 +224,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reject => 'Decline';
 
   @override
+  String get myCode => 'My Code';
+
+  @override
+  String get codeCopied => 'Code copied.';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
   String get addFriend => 'Add Friend';
 
   @override
-  String get addFriendSubtitle => 'Search by email address.';
+  String get addFriendSubtitle => 'Search by user code.';
 
   @override
-  String get emailHint => 'Email address';
+  String get codeHint => 'User code (e.g. ABCD1234)';
 
   @override
   String get search => 'Search';
