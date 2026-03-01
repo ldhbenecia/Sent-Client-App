@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/token_storage.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/theme/app_color_theme.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
+import '../providers/settings_provider.dart';
 import 'info_page.dart';
 import 'notifications_page.dart';
 import 'profile_page.dart';
@@ -15,10 +17,13 @@ class PreferencesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.colors;
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       appBar: AppBar(
-        title: const Text('설정'),
+        title: Text(l10n.settings),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
           onPressed: () => Navigator.of(context).pop(),
@@ -26,36 +31,68 @@ class PreferencesPage extends ConsumerWidget {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          // ── 설정 ───────────────────────────────────────────────
-          const _SectionHeader(label: '설정'),
+          // ── APPEARANCE ─────────────────────────────────────────
+          _SectionHeader(label: l10n.appearance.toUpperCase(), colors: c),
+          _ThemeSegmentTile(colors: c),
+          const SizedBox(height: 6),
+          _LanguageTile(colors: c),
+
+          const SizedBox(height: 28),
+
+          // ── ACCOUNT ────────────────────────────────────────────
+          _SectionHeader(label: l10n.account.toUpperCase(), colors: c),
           _NavTile(
-            label: '프로필',
-            onTap: () => _push(context, const ProfilePage()),
+            label: l10n.profile,
+            colors: c,
+            onTap: () => _push(context, ProfilePage()),
           ),
+          const SizedBox(height: 4),
           _NavTile(
-            label: '알림',
+            label: l10n.notifications,
+            colors: c,
             onTap: () => _push(context, const NotificationsPage()),
           ),
 
           const SizedBox(height: 28),
 
-          // ── 정보 ───────────────────────────────────────────────
-          const _SectionHeader(label: '정보'),
+          // ── INFO ────────────────────────────────────────────────
+          _SectionHeader(label: l10n.info.toUpperCase(), colors: c),
           _NavTile(
-            label: '정보',
+            label: l10n.info,
+            colors: c,
             onTap: () => _push(context, const InfoPage()),
           ),
 
           const SizedBox(height: 28),
 
-          // ── 계정 ───────────────────────────────────────────────
-          const _SectionHeader(label: '계정'),
-          _ActionTile(
-            label: '로그아웃',
-            color: AppColors.destructiveRed,
-            onTap: () => _logout(context, ref),
+          // ── ACCOUNT ACTIONS ─────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+            child: Material(
+              color: c.card,
+              borderRadius: BorderRadius.circular(14),
+              child: InkWell(
+                onTap: () => _logout(context, ref),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: c.border, width: 0.5),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  child: Text(
+                    l10n.logout,
+                    style: TextStyle(
+                      color: c.destructiveRed,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
 
           const SizedBox(height: 40),
@@ -67,8 +104,8 @@ class PreferencesPage extends ConsumerWidget {
   void _push(BuildContext context, Widget page) {
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => page,
-        transitionsBuilder: (_, animation, __, child) => SlideTransition(
+        pageBuilder: (c, a1, a2) => page,
+        transitionsBuilder: (c, animation, a1, child) => SlideTransition(
           position: animation.drive(
             Tween(begin: const Offset(1, 0), end: Offset.zero)
                 .chain(CurveTween(curve: Curves.easeOutCubic)),
@@ -81,29 +118,33 @@ class PreferencesPage extends ConsumerWidget {
   }
 
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
+    final c = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.card,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('로그아웃',
-            style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 17,
-                fontWeight: FontWeight.w600)),
-        content: const Text('로그아웃 하시겠어요?',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 15)),
+        backgroundColor: c.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          l10n.logoutConfirmTitle,
+          style: TextStyle(
+            color: c.textPrimary,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          l10n.logoutConfirmMessage,
+          style: TextStyle(color: c.textSecondary, fontSize: 15),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('취소',
-                style: TextStyle(color: AppColors.textMuted)),
+            child: Text(l10n.cancel, style: TextStyle(color: c.textMuted)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('로그아웃',
-                style: TextStyle(color: AppColors.destructiveRed)),
+            child: Text(l10n.logout, style: TextStyle(color: c.destructiveRed)),
           ),
         ],
       ),
@@ -125,12 +166,283 @@ class PreferencesPage extends ConsumerWidget {
 }
 
 // ════════════════════════════════════════════════════════════════
-// Tiles
+// 테마 선택 (세그먼트 컨트롤)
+// ════════════════════════════════════════════════════════════════
+
+class _ThemeSegmentTile extends ConsumerWidget {
+  const _ThemeSegmentTile({required this.colors});
+  final AppColorTheme colors;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = ref.watch(themeModeNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: colors.border, width: 0.5),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        child: Row(
+          children: [
+            Text(
+              l10n.theme,
+              style: TextStyle(
+                color: colors.textPrimary,
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            const Spacer(),
+            _ThemeSegment(
+              label: l10n.themeSystem,
+              mode: ThemeMode.system,
+              current: current,
+              colors: colors,
+            ),
+            const SizedBox(width: 6),
+            _ThemeSegment(
+              label: l10n.themeDark,
+              mode: ThemeMode.dark,
+              current: current,
+              colors: colors,
+            ),
+            const SizedBox(width: 6),
+            _ThemeSegment(
+              label: l10n.themeLight,
+              mode: ThemeMode.light,
+              current: current,
+              colors: colors,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeSegment extends ConsumerWidget {
+  const _ThemeSegment({
+    required this.label,
+    required this.mode,
+    required this.current,
+    required this.colors,
+  });
+
+  final String label;
+  final ThemeMode mode;
+  final ThemeMode current;
+  final AppColorTheme colors;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = current == mode;
+    return GestureDetector(
+      onTap: () => ref.read(themeModeNotifierProvider.notifier).set(mode),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? colors.foreground : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: selected ? colors.foreground : colors.border,
+            width: 0.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? colors.background : colors.textMuted,
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// 언어 선택
+// ════════════════════════════════════════════════════════════════
+
+class _LanguageTile extends ConsumerWidget {
+  const _LanguageTile({required this.colors});
+  final AppColorTheme colors;
+
+  static const _languages = [
+    (locale: Locale('ko'), label: '한국어'),
+    (locale: Locale('en'), label: 'English'),
+    (locale: Locale('ja'), label: '日本語'),
+  ];
+
+  String _currentLabel(Locale? locale, AppLocalizations l10n) {
+    if (locale == null) return l10n.systemDefault;
+    return _languages
+        .where((l) => l.locale.languageCode == locale.languageCode)
+        .map((l) => l.label)
+        .firstOrNull ??
+        l10n.systemDefault;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Material(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: () => _showLanguageSheet(context, ref, locale, l10n),
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: colors.border, width: 0.5),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+            child: Row(
+              children: [
+                Text(
+                  l10n.language,
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  _currentLabel(locale, l10n),
+                  style: TextStyle(
+                    color: colors.textMuted,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(Icons.chevron_right_rounded,
+                    color: colors.textDisabled, size: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageSheet(
+      BuildContext context, WidgetRef ref, Locale? current, AppLocalizations l10n) {
+    final c = context.colors;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        decoration: BoxDecoration(
+          color: c.card,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: c.border, width: 0.5),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+              child: Text(
+                l10n.language,
+                style: TextStyle(
+                  color: c.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Divider(height: 0.5, color: c.border),
+            _LanguageRow(
+              label: l10n.systemDefault,
+              selected: current == null,
+              colors: c,
+              onTap: () {
+                ref.read(localeNotifierProvider.notifier).set(null);
+                Navigator.of(context).pop();
+              },
+            ),
+            for (final lang in _languages) ...[
+              Divider(height: 0.5, color: c.border, indent: 20, endIndent: 20),
+              _LanguageRow(
+                label: lang.label,
+                selected: current?.languageCode == lang.locale.languageCode,
+                colors: c,
+                onTap: () {
+                  ref.read(localeNotifierProvider.notifier).set(lang.locale);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageRow extends StatelessWidget {
+  const _LanguageRow({
+    required this.label,
+    required this.selected,
+    required this.colors,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final AppColorTheme colors;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? colors.textPrimary : colors.textSecondary,
+                fontSize: 15,
+                fontWeight:
+                    selected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+            const Spacer(),
+            if (selected)
+              Icon(Icons.check_rounded, color: colors.textPrimary, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Shared Tiles
 // ════════════════════════════════════════════════════════════════
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.label});
+  const _SectionHeader({required this.label, required this.colors});
   final String label;
+  final AppColorTheme colors;
 
   @override
   Widget build(BuildContext context) {
@@ -138,9 +450,9 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
       child: Text(
         label,
-        style: const TextStyle(
-          color: AppColors.textMuted,
-          fontSize: 12,
+        style: TextStyle(
+          color: colors.textMuted,
+          fontSize: 11,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
         ),
@@ -150,16 +462,21 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _NavTile extends StatelessWidget {
-  const _NavTile({required this.label, required this.onTap});
+  const _NavTile({
+    required this.label,
+    required this.onTap,
+    required this.colors,
+  });
   final String label;
   final VoidCallback onTap;
+  final AppColorTheme colors;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Material(
-        color: AppColors.card,
+        color: colors.card,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           onTap: onTap,
@@ -167,60 +484,25 @@ class _NavTile extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border, width: 0.5),
+              border: Border.all(color: colors.border, width: 0.5),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
             child: Row(
               children: [
                 Expanded(
-                  child: Text(label,
-                      style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400)),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                 ),
-                const Icon(Icons.chevron_right_rounded,
-                    color: AppColors.textDisabled, size: 20),
+                Icon(Icons.chevron_right_rounded,
+                    color: colors.textDisabled, size: 20),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionTile extends StatelessWidget {
-  const _ActionTile({
-    required this.label,
-    required this.onTap,
-    this.color,
-  });
-  final String label;
-  final VoidCallback onTap;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      child: Material(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border, width: 0.5),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-            child: Text(label,
-                style: TextStyle(
-                    color: color ?? AppColors.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w400)),
           ),
         ),
       ),

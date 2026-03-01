@@ -21,7 +21,7 @@ import '../../features/ledger/presentation/pages/ledger_category_edit_page.dart'
 import '../../features/ledger/domain/models/ledger_entry.dart';
 import '../../features/ledger/domain/models/ledger_category.dart';
 import '../../shared/widgets/main_shell.dart';
-import '../../shared/theme/app_colors.dart';
+import '../../shared/theme/app_color_theme.dart';
 import '../storage/token_storage.dart';
 import '../../features/todo/presentation/providers/todo_provider.dart';
 
@@ -259,11 +259,11 @@ GoRouter appRouter(Ref ref) {
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colors.background,
       body: Center(
         child: Text(
           '페이지를 찾을 수 없습니다',
-          style: TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: context.colors.textSecondary),
         ),
       ),
     ),
