@@ -49,8 +49,11 @@ feat(chat): 채팅방 메시지 그룹 간격 개선
 feat(social): 보낸 친구 요청 전체 상태 표시
 feat(l10n): 알림 옵션 문자열 추가 (ko/en/ja)
 fix(core): 토큰 갱신 무한 루프 수정
+fix(ui): 햄버거 메뉴 탭 리플 제거
 chore(deps): table_calendar 패키지 추가
 ```
+
+> **필수**: scope는 반드시 괄호로 감싼다 — `feat(social):` O / `feat: social` X
 
 **커밋 분리 원칙** (중요):
 - **도메인별로 반드시 분리** — todo, chat, social, ledger 변경은 각각 별도 커밋
