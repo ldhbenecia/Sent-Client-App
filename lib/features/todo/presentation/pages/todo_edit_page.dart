@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -283,53 +284,69 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                 ),
 
                 // 시간 선택 (드럼 피커 토글)
-                _FormRow(
-                  label: l10n.todoTime,
-                  onTap: _toggleTimePicker,
-                  isExpanded: _showTimePicker,
-                  trailing: Text(
-                    _time != null ? _formatTime(_time!) : l10n.none,
-                    style: TextStyle(
-                      color: _time != null
-                          ? colors.textMuted
-                          : colors.textDisabled,
-                      fontSize: 14,
+                TapRegion(
+                  groupId: 'timePicker',
+                  child: _FormRow(
+                    label: l10n.todoTime,
+                    onTap: _toggleTimePicker,
+                    isExpanded: _showTimePicker,
+                    trailing: Text(
+                      _time != null ? _formatTime(_time!) : l10n.none,
+                      style: TextStyle(
+                        color: _time != null
+                            ? colors.textMuted
+                            : colors.textDisabled,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
 
                 // 인라인 시간 드럼 피커
                 if (_showTimePicker)
-                  _InlineTimePicker(
-                    initialTime: _time ?? const TimeOfDay(hour: 9, minute: 0),
-                    onConfirm: (t) =>
-                        setState(() { _time = t; _showTimePicker = false; }),
-                    onReset: () =>
-                        setState(() { _time = null; _showTimePicker = false; }),
+                  TapRegion(
+                    groupId: 'timePicker',
+                    onTapOutside: (_) =>
+                        setState(() => _showTimePicker = false),
+                    child: _InlineTimePicker(
+                      initialTime: _time ?? const TimeOfDay(hour: 9, minute: 0),
+                      onConfirm: (t) =>
+                          setState(() { _time = t; _showTimePicker = false; }),
+                      onReset: () =>
+                          setState(() { _time = null; _showTimePicker = false; }),
+                    ),
                   ),
 
                 // 알림 (토글)
-                _FormRow(
-                  label: l10n.todoNotification,
-                  onTap: _toggleAlarmPicker,
-                  isExpanded: _showAlarmPicker,
-                  trailing: Text(
-                    _alarmLabel(_alarmMinutes, l10n),
-                    style: TextStyle(
-                      color: _alarmMinutes != null
-                          ? colors.textMuted
-                          : colors.textDisabled,
-                      fontSize: 14,
+                TapRegion(
+                  groupId: 'alarmPicker',
+                  child: _FormRow(
+                    label: l10n.todoNotification,
+                    onTap: _toggleAlarmPicker,
+                    isExpanded: _showAlarmPicker,
+                    trailing: Text(
+                      _alarmLabel(_alarmMinutes, l10n),
+                      style: TextStyle(
+                        color: _alarmMinutes != null
+                            ? colors.textMuted
+                            : colors.textDisabled,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
 
                 // 인라인 알림 옵션 피커
                 if (_showAlarmPicker)
-                  _InlineAlarmOptions(
-                    selected: _alarmMinutes,
-                    onSelect: (v) =>
-                        setState(() { _alarmMinutes = v; _showAlarmPicker = false; }),
+                  TapRegion(
+                    groupId: 'alarmPicker',
+                    onTapOutside: (_) =>
+                        setState(() => _showAlarmPicker = false),
+                    child: _InlineAlarmOptions(
+                      selected: _alarmMinutes,
+                      onSelect: (v) =>
+                          setState(() { _alarmMinutes = v; _showAlarmPicker = false; }),
+                    ),
                   ),
               ],
             ),
@@ -345,7 +362,41 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                 child: SizedBox(
                   width: double.infinity,
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: colors.card,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          title: Text(
+                            l10n.delete,
+                            style: TextStyle(
+                                color: colors.textPrimary,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600),
+                          ),
+                          content: Text(
+                            l10n.deleteConfirm,
+                            style: TextStyle(
+                                color: colors.textSecondary, fontSize: 15),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: Text(l10n.cancel,
+                                  style: TextStyle(color: colors.textMuted)),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: Text(l10n.delete,
+                                  style: TextStyle(
+                                      color: colors.destructiveRed)),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmed != true || !context.mounted) return;
                       ref
                           .read(todoItemsProvider.notifier)
                           .remove(widget.todo!.id);
@@ -477,13 +528,36 @@ class _InlineTimePickerState extends State<_InlineTimePicker> {
     const itemExtent = 44.0;
     const pickerHeight = 220.0;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 2, 20, 4),
-      child: Container(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
         decoration: BoxDecoration(
-          color: colors.card,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: colors.border, width: 0.5),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    Colors.white.withValues(alpha: 0.09),
+                    Colors.white.withValues(alpha: 0.05),
+                  ]
+                : [
+                    Colors.black.withValues(alpha: 0.06),
+                    Colors.black.withValues(alpha: 0.02),
+                  ],
+          ),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.28)
+                : Colors.black.withValues(alpha: 0.10),
+            width: 0.8,
+          ),
         ),
         child: Column(
           children: [
@@ -603,6 +677,8 @@ class _InlineTimePickerState extends State<_InlineTimePicker> {
             ),
           ],
         ),
+          ),
+        ),
       ),
     );
   }
@@ -631,13 +707,36 @@ class _InlineAlarmOptions extends StatelessWidget {
       (60, l10n.alarmBefore1hour),
     ];
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 2, 20, 4),
-      child: Container(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
         decoration: BoxDecoration(
-          color: colors.card,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: colors.border, width: 0.5),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    Colors.white.withValues(alpha: 0.09),
+                    Colors.white.withValues(alpha: 0.05),
+                  ]
+                : [
+                    Colors.black.withValues(alpha: 0.06),
+                    Colors.black.withValues(alpha: 0.02),
+                  ],
+          ),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.28)
+                : Colors.black.withValues(alpha: 0.10),
+            width: 0.8,
+          ),
         ),
         child: Column(
           children: options.map((opt) {
@@ -645,7 +744,8 @@ class _InlineAlarmOptions extends StatelessWidget {
             final isSelected = selected == value;
             return InkWell(
               onTap: () => onSelect(value),
-              borderRadius: BorderRadius.circular(14),
+              splashFactory: NoSplash.splashFactory,
+              highlightColor: Colors.white.withValues(alpha: 0.06),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 13),
@@ -673,6 +773,8 @@ class _InlineAlarmOptions extends StatelessWidget {
               ),
             );
           }).toList(),
+        ),
+          ),
         ),
       ),
     );

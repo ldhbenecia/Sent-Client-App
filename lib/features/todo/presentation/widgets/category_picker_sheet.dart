@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../shared/theme/app_color_theme.dart';
@@ -22,12 +23,34 @@ class CategoryPickerSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
-    return Container(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
       decoration: BoxDecoration(
-        color: colors.card,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: isDark
+              ? [
+                  Colors.white.withValues(alpha: 0.26),
+                  Colors.white.withValues(alpha: 0.14),
+                ]
+              : [
+                  const Color(0xF2111111),
+                  const Color(0xF50D0D0D),
+                ],
+        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         border: Border(
-          top: BorderSide(color: colors.border, width: 0.5),
+          top: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.35)
+                : Colors.white.withValues(alpha: 0.10),
+            width: 0.8,
+          ),
         ),
       ),
       child: Column(
@@ -150,6 +173,8 @@ class CategoryPickerSheet extends StatelessWidget {
             child: const SizedBox(height: 8),
           ),
         ],
+      ),
+        ),
       ),
     );
   }
