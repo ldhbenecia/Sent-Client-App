@@ -349,4 +349,46 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get alarmBefore1hour => '1시간 전';
+
+  @override
+  String get sentRequestAwaiting => '수락 대기 중';
+
+  @override
+  String get leaveChatRoom => '대화방 나가기';
+
+  @override
+  String get blockUser => '차단하기';
+
+  @override
+  String chatDateLabel(int year, int month, int day) {
+    return '$year년 $month월 $day일';
+  }
+
+  @override
+  String get sentRequestAccepted => '수락됨';
+
+  @override
+  String get sentRequestRejected => '거절됨';
+
+  @override
+  String get sentRequestsEmpty => '보낸 친구 요청이 없습니다.';
+
+  @override
+  String get noReceivedRequests => '받은 친구 요청이 없습니다.';
+
+  @override
+  String get deleteConfirm => '이 항목을 삭제할까요?';
+
+  @override
+  String friendRejectConfirm(String name) {
+    return '$name님의 친구 요청을 거절할까요?';
+  }
+
+  @override
+  String friendRequestCancelConfirm(String name) {
+    return '$name님께 보낸 친구 요청을 취소할까요?';
+  }
+
+  @override
+  String get friendRequestCancel => '요청 취소';
 }

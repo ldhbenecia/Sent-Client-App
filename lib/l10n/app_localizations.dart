@@ -771,6 +771,78 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'1시간 전'**
   String get alarmBefore1hour;
+
+  /// No description provided for @sentRequestAwaiting.
+  ///
+  /// In ko, this message translates to:
+  /// **'수락 대기 중'**
+  String get sentRequestAwaiting;
+
+  /// No description provided for @leaveChatRoom.
+  ///
+  /// In ko, this message translates to:
+  /// **'대화방 나가기'**
+  String get leaveChatRoom;
+
+  /// No description provided for @blockUser.
+  ///
+  /// In ko, this message translates to:
+  /// **'차단하기'**
+  String get blockUser;
+
+  /// No description provided for @chatDateLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'{year}년 {month}월 {day}일'**
+  String chatDateLabel(int year, int month, int day);
+
+  /// No description provided for @sentRequestAccepted.
+  ///
+  /// In ko, this message translates to:
+  /// **'수락됨'**
+  String get sentRequestAccepted;
+
+  /// No description provided for @sentRequestRejected.
+  ///
+  /// In ko, this message translates to:
+  /// **'거절됨'**
+  String get sentRequestRejected;
+
+  /// No description provided for @sentRequestsEmpty.
+  ///
+  /// In ko, this message translates to:
+  /// **'보낸 친구 요청이 없습니다.'**
+  String get sentRequestsEmpty;
+
+  /// No description provided for @noReceivedRequests.
+  ///
+  /// In ko, this message translates to:
+  /// **'받은 친구 요청이 없습니다.'**
+  String get noReceivedRequests;
+
+  /// No description provided for @deleteConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'이 항목을 삭제할까요?'**
+  String get deleteConfirm;
+
+  /// No description provided for @friendRejectConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}님의 친구 요청을 거절할까요?'**
+  String friendRejectConfirm(String name);
+
+  /// No description provided for @friendRequestCancelConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}님께 보낸 친구 요청을 취소할까요?'**
+  String friendRequestCancelConfirm(String name);
+
+  /// No description provided for @friendRequestCancel.
+  ///
+  /// In ko, this message translates to:
+  /// **'요청 취소'**
+  String get friendRequestCancel;
 }
 
 class _AppLocalizationsDelegate

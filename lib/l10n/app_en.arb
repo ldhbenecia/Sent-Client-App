@@ -137,5 +137,39 @@
   "alarmBefore10min": "10 min before",
   "alarmBefore15min": "15 min before",
   "alarmBefore30min": "30 min before",
-  "alarmBefore1hour": "1 hour before"
+  "alarmBefore1hour": "1 hour before",
+
+  "sentRequestAwaiting": "Awaiting response",
+
+  "leaveChatRoom": "Leave chat",
+  "blockUser": "Block user",
+
+  "chatDateLabel": "{month}/{day}/{year}",
+  "@chatDateLabel": {
+    "placeholders": {
+      "year": { "type": "int" },
+      "month": { "type": "int" },
+      "day": { "type": "int" }
+    }
+  },
+
+  "sentRequestAccepted": "Accepted",
+  "sentRequestRejected": "Declined",
+  "sentRequestsEmpty": "No friend requests sent.",
+  "noReceivedRequests": "No friend requests received.",
+
+  "deleteConfirm": "Delete this item?",
+  "friendRejectConfirm": "Decline {name}'s friend request?",
+  "@friendRejectConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "friendRequestCancelConfirm": "Cancel your friend request to {name}?",
+  "@friendRequestCancelConfirm": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "friendRequestCancel": "Cancel Request"
 }

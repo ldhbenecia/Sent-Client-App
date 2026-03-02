@@ -349,4 +349,46 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get alarmBefore1hour => '1時間前';
+
+  @override
+  String get sentRequestAwaiting => '承認待ち';
+
+  @override
+  String get leaveChatRoom => 'トークルームを出る';
+
+  @override
+  String get blockUser => 'ブロック';
+
+  @override
+  String chatDateLabel(int year, int month, int day) {
+    return '$year年$month月$day日';
+  }
+
+  @override
+  String get sentRequestAccepted => '承認済み';
+
+  @override
+  String get sentRequestRejected => '拒否済み';
+
+  @override
+  String get sentRequestsEmpty => '送ったフレンドリクエストはありません。';
+
+  @override
+  String get noReceivedRequests => '受け取ったフレンドリクエストはありません。';
+
+  @override
+  String get deleteConfirm => 'このアイテムを削除しますか？';
+
+  @override
+  String friendRejectConfirm(String name) {
+    return '$nameさんのフレンドリクエストを拒否しますか？';
+  }
+
+  @override
+  String friendRequestCancelConfirm(String name) {
+    return '$nameさんへのフレンドリクエストをキャンセルしますか？';
+  }
+
+  @override
+  String get friendRequestCancel => 'リクエストをキャンセル';
 }

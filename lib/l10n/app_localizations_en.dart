@@ -353,4 +353,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alarmBefore1hour => '1 hour before';
+
+  @override
+  String get sentRequestAwaiting => 'Awaiting response';
+
+  @override
+  String get leaveChatRoom => 'Leave chat';
+
+  @override
+  String get blockUser => 'Block user';
+
+  @override
+  String chatDateLabel(int year, int month, int day) {
+    return '$month/$day/$year';
+  }
+
+  @override
+  String get sentRequestAccepted => 'Accepted';
+
+  @override
+  String get sentRequestRejected => 'Declined';
+
+  @override
+  String get sentRequestsEmpty => 'No friend requests sent.';
+
+  @override
+  String get noReceivedRequests => 'No friend requests received.';
+
+  @override
+  String get deleteConfirm => 'Delete this item?';
+
+  @override
+  String friendRejectConfirm(String name) {
+    return 'Decline $name\'s friend request?';
+  }
+
+  @override
+  String friendRequestCancelConfirm(String name) {
+    return 'Cancel your friend request to $name?';
+  }
+
+  @override
+  String get friendRequestCancel => 'Cancel Request';
 }
