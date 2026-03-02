@@ -257,8 +257,8 @@ class _NavRow extends StatelessWidget {
         : Colors.white.withValues(alpha: 0.92);
     return InkWell(
       onTap: () { Haptics.light(); onTap(); },
-      splashColor: Colors.white.withValues(alpha: 0.06),
-      highlightColor: Colors.white.withValues(alpha: 0.04),
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.white.withValues(alpha: 0.07),
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 22,
