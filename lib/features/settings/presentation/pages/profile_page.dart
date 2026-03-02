@@ -190,9 +190,9 @@ class _UserCodeTileState extends State<_UserCodeTile> {
                   widget.userCode,
                   style: TextStyle(
                     color: colors.textPrimary,
-                    fontSize: 22,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    letterSpacing: 3.0,
+                    letterSpacing: 1.5,
                   ),
                 ),
               ],

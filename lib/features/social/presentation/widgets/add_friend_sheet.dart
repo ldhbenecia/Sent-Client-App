@@ -74,6 +74,8 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       final displayName = _found!.displayName;
+      // 보낸 요청 목록 갱신
+      widget.ref.read(sentRequestsProvider.notifier).refresh();
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.friendRequestSent(displayName))),

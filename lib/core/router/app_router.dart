@@ -14,6 +14,7 @@ import '../../features/todo/domain/models/todo_item.dart';
 import '../../features/memo/presentation/pages/memo_page.dart';
 import '../../features/social/presentation/pages/social_page.dart';
 import '../../features/social/presentation/pages/chat_page.dart';
+import '../../features/social/presentation/pages/friend_requests_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/ledger/presentation/pages/ledger_page.dart';
 import '../../features/ledger/presentation/pages/ledger_entry_edit_page.dart';
@@ -189,6 +190,15 @@ GoRouter appRouter(Ref ref) {
                 builder: (context, state) => const SocialPage(),
                 routes: [
                   GoRoute(
+                    path: 'requests',
+                    name: 'social-requests',
+                    pageBuilder: (context, state) => CustomTransitionPage(
+                      child: const FriendRequestsPage(),
+                      transitionsBuilder: (context, animation, secondary, child) =>
+                          _slideRightFade(animation, child),
+                    ),
+                  ),
+                  GoRoute(
                     path: 'chats',
                     name: 'social-chats',
                     pageBuilder: (context, state) => CustomTransitionPage(
@@ -207,6 +217,7 @@ GoRouter appRouter(Ref ref) {
                         child: ChatPage(
                           opponentId: extra['opponentId'] as String,
                           friendName: extra['friendName'] as String,
+                          opponentProfileImageUrl: extra['opponentProfileImageUrl'] as String?,
                         ),
                         transitionsBuilder: (context, animation, secondary, child) =>
                             _slideRightFade(animation, child),
@@ -232,6 +243,13 @@ GoRouter appRouter(Ref ref) {
     ],
     errorBuilder: (context, state) => Scaffold(
       backgroundColor: context.colors.background,
+      appBar: AppBar(
+        backgroundColor: context.colors.background,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+      ),
       body: Center(
         child: Text(
           '페이지를 찾을 수 없습니다',

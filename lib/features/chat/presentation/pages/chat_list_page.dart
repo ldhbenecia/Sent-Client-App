@@ -139,6 +139,7 @@ class _ChatRoomTile extends StatelessWidget {
           extra: {
             'opponentId': room.opponentId,
             'friendName': room.opponentName,
+            'opponentProfileImageUrl': room.opponentProfileImageUrl,
           },
         ),
         splashColor: Colors.white.withValues(alpha: 0.04),

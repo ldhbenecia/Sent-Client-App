@@ -18,19 +18,17 @@ class SocialPage extends ConsumerWidget {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
     final friendsAsync = ref.watch(friendsProvider);
-    final requestsAsync = ref.watch(pendingRequestsProvider);
+    final receivedAsync = ref.watch(pendingRequestsProvider);
     final sentAsync = ref.watch(sentRequestsProvider);
+    final receivedCount = receivedAsync.valueOrNull?.length ?? 0;
+    final sentCount = sentAsync.valueOrNull?.length ?? 0;
+    final hasAnyRequests = receivedCount > 0 || sentCount > 0;
 
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
         title: const Text('SENT'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.chat_bubble_outline_rounded,
-                color: colors.textMuted, size: 20),
-            onPressed: () => context.push('/social/chats'),
-          ),
           IconButton(
             icon: Icon(Icons.person_add_alt_1_rounded,
                 color: colors.textMuted, size: 22),
@@ -62,66 +60,15 @@ class SocialPage extends ConsumerWidget {
               child: _MyCodeCard(),
             ),
 
-            // ── 받은 요청 섹션 ────────────────────────────────────
-            requestsAsync.when(
-              data: (requests) {
-                if (requests.isEmpty) {
-                  return const SliverToBoxAdapter(child: SizedBox.shrink());
-                }
-                return SliverToBoxAdapter(
-                  child: SocialSection(
-                    label: '${l10n.friendRequestsSection} ${requests.length}',
-                    child: Column(
-                      children: requests
-                          .map((r) => FriendRequestTile(
-                                request: r,
-                                onAccept: () => ref
-                                    .read(pendingRequestsProvider.notifier)
-                                    .accept(r.id),
-                                onReject: () => ref
-                                    .read(pendingRequestsProvider.notifier)
-                                    .reject(r.id),
-                              ))
-                          .toList(),
-                    ),
-                  ),
-                );
-              },
-              loading: () =>
-                  const SliverToBoxAdapter(child: SizedBox.shrink()),
-              error: (e, st) =>
-                  const SliverToBoxAdapter(child: SizedBox.shrink()),
-            ),
-
-            // ── 보낸 요청 섹션 ────────────────────────────────────
-            sentAsync.when(
-              data: (sentList) {
-                if (sentList.isEmpty) {
-                  return const SliverToBoxAdapter(child: SizedBox.shrink());
-                }
-                return SliverToBoxAdapter(
-                  child: SocialSection(
-                    label: '${AppLocalizations.of(context)!.sentRequestsSection} ${sentList.length}',
-                    child: Column(
-                      children: sentList
-                          .map((r) => SentFriendRequestTile(
-                                request: r,
-                                onCancel: r.status == SentRequestStatus.pending
-                                    ? () => ref
-                                        .read(sentRequestsProvider.notifier)
-                                        .cancel(r.id)
-                                    : null,
-                              ))
-                          .toList(),
-                    ),
-                  ),
-                );
-              },
-              loading: () =>
-                  const SliverToBoxAdapter(child: SizedBox.shrink()),
-              error: (e, _) =>
-                  const SliverToBoxAdapter(child: SizedBox.shrink()),
-            ),
+            // ── 친구 요청 행 (보낸/받은 중 하나라도 있으면 표시) ───
+            if (hasAnyRequests)
+              SliverToBoxAdapter(
+                child: _RequestsRow(
+                  receivedCount: receivedCount,
+                  sentCount: sentCount,
+                  onTap: () => context.push('/social/requests'),
+                ),
+              ),
 
             // ── 친구 목록 섹션 ────────────────────────────────────
             friendsAsync.when(
@@ -144,6 +91,7 @@ class SocialPage extends ConsumerWidget {
                                   extra: {
                                     'opponentId': f.friendId,
                                     'friendName': f.friendDisplayName,
+                                    'opponentProfileImageUrl': f.friendProfileImageUrl,
                                   },
                                 ),
                                 onDelete: () =>
@@ -256,6 +204,79 @@ class SocialPage extends ConsumerWidget {
   }
 }
 
+// ── 친구 요청 배지 행 ─────────────────────────────────────────────────
+class _RequestsRow extends StatelessWidget {
+  const _RequestsRow({
+    required this.receivedCount,
+    required this.sentCount,
+    required this.onTap,
+  });
+
+  final int receivedCount;
+  final int sentCount;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final hasReceived = receivedCount > 0;
+
+    final label = switch ((receivedCount, sentCount)) {
+      (final r, _) when r > 0 => '받은 친구 요청 $r건',
+      (_, final s) when s > 0 => '보낸 친구 요청 $s건',
+      _ => '친구 요청',
+    };
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: hasReceived
+                ? const Color(0xFFFF3B30).withValues(alpha: 0.10)
+                : colors.card,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: hasReceived
+                  ? const Color(0xFFFF3B30).withValues(alpha: 0.25)
+                  : colors.border,
+              width: 0.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              if (hasReceived)
+                Container(
+                  width: 6,
+                  height: 6,
+                  margin: const EdgeInsets.only(right: 10),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF3B30),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              Text(
+                label,
+                style: TextStyle(
+                  color: colors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
+              Icon(Icons.chevron_right_rounded,
+                  size: 16, color: colors.textMuted),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 // ── 내 유저코드 카드 ──────────────────────────────────────────────────
 class _MyCodeCard extends ConsumerStatefulWidget {
   const _MyCodeCard();
@@ -323,9 +344,9 @@ class _MyCodeCardState extends ConsumerState<_MyCodeCard> {
                         profile.userCode,
                         style: TextStyle(
                           color: colors.textPrimary,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 4.5,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.5,
                         ),
                       ),
                     ],

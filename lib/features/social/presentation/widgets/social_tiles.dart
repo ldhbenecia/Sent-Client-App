@@ -189,7 +189,35 @@ class FriendRequestTile extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: onReject,
+            onTap: () async {
+              final l10n = AppLocalizations.of(context)!;
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: colors.card,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  content: Text(
+                    l10n.friendRejectConfirm(request.friendDisplayName),
+                    style: TextStyle(
+                        color: colors.textSecondary, fontSize: 15),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(false),
+                      child: Text(l10n.cancel,
+                          style: TextStyle(color: colors.textMuted)),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                      child: Text(l10n.reject,
+                          style: TextStyle(color: colors.destructiveRed)),
+                    ),
+                  ],
+                ),
+              );
+              if (confirmed == true) onReject();
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
@@ -259,7 +287,7 @@ class _Initials extends StatelessWidget {
   }
 }
 
-// ── 내가 보낸 요청 타일 ───────────────────────────────────────────
+// ── 내가 보낸 요청 타일 (모든 상태) ────────────────────────────────
 class SentFriendRequestTile extends StatelessWidget {
   const SentFriendRequestTile({
     super.key,
@@ -274,44 +302,119 @@ class SentFriendRequestTile extends StatelessWidget {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
 
-    final (statusLabel, statusColor) = switch (request.status) {
-      SentRequestStatus.accepted => (l10n.statusAccepted, const Color(0xFF32D74B)),
-      SentRequestStatus.rejected => (l10n.statusRejected, const Color(0xFFFF453A)),
-      SentRequestStatus.pending  => (l10n.statusPending,  const Color(0xFFFF9F0A)),
+    final (badgeColor, badgeIcon, statusText) = switch (request.status) {
+      SentRequestStatus.pending => (
+          const Color(0xFFFF9F0A),
+          Icons.schedule_rounded,
+          l10n.sentRequestAwaiting,
+        ),
+      SentRequestStatus.accepted => (
+          const Color(0xFF34C759),
+          Icons.check_rounded,
+          l10n.sentRequestAccepted,
+        ),
+      SentRequestStatus.rejected => (
+          Colors.redAccent,
+          Icons.close_rounded,
+          l10n.sentRequestRejected,
+        ),
     };
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
-          SocialAvatar(
-            imageUrl: request.receiverProfileImageUrl,
-            name: request.receiverDisplayName,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              request.receiverDisplayName,
-              style: TextStyle(
-                color: colors.textPrimary,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
+          // 아바타 + 상태 배지
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              SocialAvatar(
+                imageUrl: request.receiverProfileImageUrl,
+                name: request.receiverDisplayName,
               ),
+              Positioned(
+                right: -3,
+                bottom: -3,
+                child: Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: badgeColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: colors.card, width: 1.5),
+                  ),
+                  child: Icon(badgeIcon, size: 9, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 14),
+          // 이름 + 상태 서브텍스트
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  request.receiverDisplayName,
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  statusText,
+                  style: TextStyle(
+                    color: colors.textDisabled,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ),
-          if (onCancel != null) ...[
+          // 취소 버튼 (pending만)
+          if (request.status == SentRequestStatus.pending && onCancel != null)
             GestureDetector(
-              onTap: onCancel,
+              onTap: () async {
+                final l10n = AppLocalizations.of(context)!;
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: colors.card,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    content: Text(
+                      l10n.friendRequestCancelConfirm(
+                          request.receiverDisplayName),
+                      style: TextStyle(
+                          color: colors.textSecondary, fontSize: 15),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(false),
+                        child: Text(l10n.cancel,
+                            style: TextStyle(color: colors.textMuted)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(ctx).pop(true),
+                        child: Text(l10n.friendRequestCancel,
+                            style: TextStyle(color: colors.destructiveRed)),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true) onCancel!();
+              },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                 decoration: BoxDecoration(
-                  color: colors.card,
+                  color: colors.secondary,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: colors.border),
+                  border: Border.all(color: colors.border, width: 0.5),
                 ),
                 child: Text(
-                  AppLocalizations.of(context)!.cancel,
+                  l10n.cancel,
                   style: TextStyle(
                     color: colors.textMuted,
                     fontSize: 13,
@@ -320,23 +423,6 @@ class SentFriendRequestTile extends StatelessWidget {
                 ),
               ),
             ),
-          ] else ...[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                statusLabel,
-                style: TextStyle(
-                  color: statusColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );
