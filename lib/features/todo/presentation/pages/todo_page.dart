@@ -51,7 +51,10 @@ class _TodoPageState extends ConsumerState<TodoPage> {
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
-        title: const Text('SENT'),
+        title: GestureDetector(
+          onTap: () => context.go('/home'),
+          child: const Text('SENT'),
+        ),
         actions: [
           IconButton(
             icon: Icon(

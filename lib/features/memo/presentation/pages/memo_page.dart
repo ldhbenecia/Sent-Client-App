@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
 import '../../../../shared/utils/haptics.dart';
@@ -14,7 +15,10 @@ class MemoPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
-        title: const Text('SENT'),
+        title: GestureDetector(
+          onTap: () => context.go('/home'),
+          child: const Text('SENT'),
+        ),
         actions: [
           IconButton(
             icon: Icon(

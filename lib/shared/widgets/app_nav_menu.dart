@@ -61,6 +61,10 @@ void showAppNavMenu(
                     child: FadeTransition(
                       opacity: curved,
                       child: _AppNavMenuCard(
+                        onHomeTap: () {
+                          Navigator.of(ctx).pop();
+                          pageContext.go('/home');
+                        },
                         onTodoTap: () {
                           Navigator.of(ctx).pop();
                           pageContext.go('/todo');
@@ -111,6 +115,7 @@ void showAppNavMenu(
 // ══════════════════════════════════════════════════════════════════
 class _AppNavMenuCard extends StatelessWidget {
   const _AppNavMenuCard({
+    required this.onHomeTap,
     required this.onTodoTap,
     required this.onMemoTap,
     required this.onSocialTap,
@@ -120,6 +125,7 @@ class _AppNavMenuCard extends StatelessWidget {
     this.onLedgerCategoryTap,
   });
 
+  final VoidCallback onHomeTap;
   final VoidCallback onTodoTap;
   final VoidCallback onMemoTap;
   final VoidCallback onSocialTap;
@@ -204,6 +210,7 @@ class _AppNavMenuCard extends StatelessWidget {
                 Divider(height: 0.5, color: Colors.white.withValues(alpha: 0.10)),
 
                 // 섹션 이동
+                _NavRow(label: 'Home', onTap: onHomeTap),
                 _NavRow(label: 'Todo', onTap: onTodoTap),
                 _NavRow(label: 'Ledger', onTap: onLedgerTap),
                 _NavRow(label: 'Social', onTap: onSocialTap),
