@@ -3,20 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../auth/auth_state.dart';
+import '../config/app_config.dart';
 import '../storage/token_storage.dart';
 
 part 'api_client.g.dart';
-
-const _baseUrl = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'http://localhost:8080',
-);
 
 @riverpod
 Dio dio(Ref ref) {
   final dio = Dio(
     BaseOptions(
-      baseUrl: _baseUrl,
+      baseUrl: AppConfig.apiBaseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {'Content-Type': 'application/json'},
@@ -85,15 +81,17 @@ Future<bool> _refreshToken(Dio dio, TokenStorage tokenStorage) async {
 
     // 인터셉터 없는 별도 Dio로 호출 → 401 시 재귀 루프 방지
     // refresh_token은 쿠키로 전송 (서버가 @CookieValue로 읽음)
-    final cleanDio = Dio(BaseOptions(
-      baseUrl: dio.options.baseUrl,
-      connectTimeout: dio.options.connectTimeout,
-      receiveTimeout: dio.options.receiveTimeout,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cookie': 'refresh_token=$refreshToken',
-      },
-    ));
+    final cleanDio = Dio(
+      BaseOptions(
+        baseUrl: dio.options.baseUrl,
+        connectTimeout: dio.options.connectTimeout,
+        receiveTimeout: dio.options.receiveTimeout,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cookie': 'refresh_token=$refreshToken',
+        },
+      ),
+    );
 
     final response = await cleanDio.post('/api/auth/reissue');
 
