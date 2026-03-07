@@ -6,12 +6,13 @@ import '../../../../core/storage/token_storage.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
+import '../../../ledger/presentation/pages/ledger_category_page.dart';
+import '../../../todo/presentation/pages/category_page.dart';
 import '../providers/settings_provider.dart';
 import 'info_page.dart';
 import 'notifications_page.dart';
 import 'profile_page.dart';
 
-// ════════════════════════════════════════════════════════════════
 class PreferencesPage extends ConsumerWidget {
   const PreferencesPage({super.key});
 
@@ -31,43 +32,66 @@ class PreferencesPage extends ConsumerWidget {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 20),
-
-          // ── APPEARANCE ─────────────────────────────────────────
+          const SizedBox(height: 14),
+          _AccountHeroCard(colors: c),
+          const SizedBox(height: 14),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _QuickActionTile(
+                    label: l10n.notifications,
+                    icon: Icons.notifications_none_rounded,
+                    colors: c,
+                    onTap: () => _push(context, const NotificationsPage()),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _QuickActionTile(
+                    label: l10n.todoCategory,
+                    icon: Icons.checklist_rounded,
+                    colors: c,
+                    onTap: () => _push(context, const CategoryPage()),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _QuickActionTile(
+                    label: l10n.ledgerCategory,
+                    icon: Icons.account_balance_wallet_outlined,
+                    colors: c,
+                    onTap: () => _push(context, const LedgerCategoryPage()),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
           _SectionHeader(label: l10n.appearance.toUpperCase(), colors: c),
           _ThemeSegmentTile(colors: c),
           const SizedBox(height: 6),
           _LanguageTile(colors: c),
-
           const SizedBox(height: 28),
-
-          // ── ACCOUNT ────────────────────────────────────────────
           _SectionHeader(label: l10n.account.toUpperCase(), colors: c),
           _NavTile(
             label: l10n.profile,
+            subtitle: l10n.manage,
+            icon: Icons.person_outline_rounded,
             colors: c,
             onTap: () => _push(context, ProfilePage()),
           ),
-          const SizedBox(height: 4),
-          _NavTile(
-            label: l10n.notifications,
-            colors: c,
-            onTap: () => _push(context, const NotificationsPage()),
-          ),
-
           const SizedBox(height: 28),
-
-          // ── INFO ────────────────────────────────────────────────
           _SectionHeader(label: l10n.info.toUpperCase(), colors: c),
           _NavTile(
             label: l10n.info,
+            subtitle: l10n.legalInfo,
+            icon: Icons.info_outline_rounded,
             colors: c,
             onTap: () => _push(context, const InfoPage()),
           ),
-
           const SizedBox(height: 28),
-
-          // ── ACCOUNT ACTIONS ─────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
             child: Material(
@@ -81,20 +105,33 @@ class PreferencesPage extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: c.border, width: 0.5),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-                  child: Text(
-                    l10n.logout,
-                    style: TextStyle(
-                      color: c.destructiveRed,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 16,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.logout_rounded,
+                        color: c.destructiveRed,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.logout,
+                        style: TextStyle(
+                          color: c.destructiveRed,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-
           const SizedBox(height: 40),
         ],
       ),
@@ -107,8 +144,10 @@ class PreferencesPage extends ConsumerWidget {
         pageBuilder: (c, a1, a2) => page,
         transitionsBuilder: (c, animation, a1, child) => SlideTransition(
           position: animation.drive(
-            Tween(begin: const Offset(1, 0), end: Offset.zero)
-                .chain(CurveTween(curve: Curves.easeOutCubic)),
+            Tween(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).chain(CurveTween(curve: Curves.easeOutCubic)),
           ),
           child: child,
         ),
@@ -156,18 +195,15 @@ class PreferencesPage extends ConsumerWidget {
     final refreshToken = await tokenStorage.getRefreshToken();
     if (refreshToken != null) {
       try {
-        await AuthRepository(ref.read(dioProvider))
-            .logout(refreshToken: refreshToken);
+        await AuthRepository(
+          ref.read(dioProvider),
+        ).logout(refreshToken: refreshToken);
       } catch (_) {}
     }
     await tokenStorage.clearTokens();
     ref.read(authStateNotifierProvider).logout();
   }
 }
-
-// ════════════════════════════════════════════════════════════════
-// 테마 선택 (세그먼트 컨트롤)
-// ════════════════════════════════════════════════════════════════
 
 class _ThemeSegmentTile extends ConsumerWidget {
   const _ThemeSegmentTile({required this.colors});
@@ -267,10 +303,6 @@ class _ThemeSegment extends ConsumerWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
-// 언어 선택
-// ════════════════════════════════════════════════════════════════
-
 class _LanguageTile extends ConsumerWidget {
   const _LanguageTile({required this.colors});
   final AppColorTheme colors;
@@ -284,9 +316,9 @@ class _LanguageTile extends ConsumerWidget {
   String _currentLabel(Locale? locale, AppLocalizations l10n) {
     if (locale == null) return l10n.systemDefault;
     return _languages
-        .where((l) => l.locale.languageCode == locale.languageCode)
-        .map((l) => l.label)
-        .firstOrNull ??
+            .where((l) => l.locale.languageCode == locale.languageCode)
+            .map((l) => l.label)
+            .firstOrNull ??
         l10n.systemDefault;
   }
 
@@ -322,14 +354,14 @@ class _LanguageTile extends ConsumerWidget {
                 const Spacer(),
                 Text(
                   _currentLabel(locale, l10n),
-                  style: TextStyle(
-                    color: colors.textMuted,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: colors.textMuted, fontSize: 14),
                 ),
                 const SizedBox(width: 4),
-                Icon(Icons.chevron_right_rounded,
-                    color: colors.textDisabled, size: 20),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.textDisabled,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -339,7 +371,11 @@ class _LanguageTile extends ConsumerWidget {
   }
 
   void _showLanguageSheet(
-      BuildContext context, WidgetRef ref, Locale? current, AppLocalizations l10n) {
+    BuildContext context,
+    WidgetRef ref,
+    Locale? current,
+    AppLocalizations l10n,
+  ) {
     final c = context.colors;
     showModalBottomSheet(
       context: context,
@@ -421,8 +457,7 @@ class _LanguageRow extends StatelessWidget {
               style: TextStyle(
                 color: selected ? colors.textPrimary : colors.textSecondary,
                 fontSize: 15,
-                fontWeight:
-                    selected ? FontWeight.w600 : FontWeight.w400,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
             const Spacer(),
@@ -434,10 +469,6 @@ class _LanguageRow extends StatelessWidget {
     );
   }
 }
-
-// ════════════════════════════════════════════════════════════════
-// Shared Tiles
-// ════════════════════════════════════════════════════════════════
 
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader({required this.label, required this.colors});
@@ -461,15 +492,129 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
+class _AccountHeroCard extends StatelessWidget {
+  const _AccountHeroCard({required this.colors});
+  final AppColorTheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colors.border, width: 0.5),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: colors.secondary,
+                shape: BoxShape.circle,
+                border: Border.all(color: colors.border, width: 0.5),
+              ),
+              child: Icon(
+                Icons.settings_rounded,
+                color: colors.textPrimary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.appName,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    l10n.loginTagline,
+                    style: TextStyle(color: colors.textMuted, fontSize: 13),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickActionTile extends StatelessWidget {
+  const _QuickActionTile({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    required this.colors,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final AppColorTheme colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: colors.card,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colors.border, width: 0.5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          child: Column(
+            children: [
+              Icon(icon, color: colors.textSecondary, size: 20),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _NavTile extends StatelessWidget {
   const _NavTile({
     required this.label,
     required this.onTap,
     required this.colors,
+    this.subtitle,
+    this.icon,
   });
   final String label;
   final VoidCallback onTap;
   final AppColorTheme colors;
+  final String? subtitle;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -489,18 +634,40 @@ class _NavTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
             child: Row(
               children: [
+                if (icon != null) ...[
+                  Icon(icon, color: colors.textMuted, size: 18),
+                  const SizedBox(width: 10),
+                ],
                 Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: colors.textPrimary,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          color: colors.textPrimary,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle!,
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded,
-                    color: colors.textDisabled, size: 20),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.textDisabled,
+                  size: 20,
+                ),
               ],
             ),
           ),
