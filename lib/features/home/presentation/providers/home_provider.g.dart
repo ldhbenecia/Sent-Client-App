@@ -7,7 +7,7 @@ part of 'home_provider.dart';
 // **************************************************************************
 
 String _$currentBranchIndexHash() =>
-    r'674dd63370b4ca8f79ce2847198a2e1138aa3749';
+    r'f3a4ad97dbbdf8ea62c4bceeb6730e059a1a2532';
 
 /// See also [CurrentBranchIndex].
 @ProviderFor(CurrentBranchIndex)
@@ -23,7 +23,7 @@ final currentBranchIndexProvider =
     );
 
 typedef _$CurrentBranchIndex = AutoDisposeNotifier<int>;
-String _$homeMonthHash() => r'39721fa253652ee39dc6b63596330a8fb05e12dc';
+String _$homeMonthHash() => r'aa7da4c2033a458a57de320d14f44fb2393aa960';
 
 /// See also [HomeMonth].
 @ProviderFor(HomeMonth)

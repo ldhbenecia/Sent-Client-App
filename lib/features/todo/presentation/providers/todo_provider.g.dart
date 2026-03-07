@@ -79,7 +79,7 @@ final datesWithTodosProvider = AutoDisposeProvider<Set<DateTime>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef DatesWithTodosRef = AutoDisposeProviderRef<Set<DateTime>>;
-String _$selectedDateHash() => r'e4d3ebcadd7fba7dd917a0d7899da38c35899b1d';
+String _$selectedDateHash() => r'9a998ec6c89651f9a2a7659ef174743edba78750';
 
 /// See also [SelectedDate].
 @ProviderFor(SelectedDate)
@@ -95,7 +95,7 @@ final selectedDateProvider =
     );
 
 typedef _$SelectedDate = AutoDisposeNotifier<DateTime>;
-String _$focusedMonthHash() => r'7b86242c6f61d57ddb621666611dc045cf9378b9';
+String _$focusedMonthHash() => r'db3222637be48d9614e8c4cec5affb9dc633558a';
 
 /// See also [FocusedMonth].
 @ProviderFor(FocusedMonth)
