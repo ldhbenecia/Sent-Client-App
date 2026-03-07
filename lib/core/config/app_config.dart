@@ -5,6 +5,10 @@ class AppConfig {
     'API_BASE_URL',
     defaultValue: 'http://localhost:8080',
   );
+  static const appVersion = String.fromEnvironment(
+    'APP_VERSION',
+    defaultValue: '0.1.0',
+  );
 
   static const oauthCallbackScheme = 'sent';
   static const oauthCallbackUrl = 'sent://oauth/callback';

@@ -28,4 +28,5 @@ fi
 echo "▶ [PROD] API: $API_BASE_URL | DEV_MODE: $DEV_MODE"
 flutter run \
   --dart-define=API_BASE_URL="$API_BASE_URL" \
-  --dart-define=DEV_MODE="$DEV_MODE"
+  --dart-define=DEV_MODE="$DEV_MODE" \
+  --dart-define=APP_VERSION="${APP_VERSION:-0.1.0}"

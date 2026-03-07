@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/config/app_config.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
 
@@ -23,7 +24,7 @@ class InfoPage extends StatelessWidget {
           const SizedBox(height: 16),
 
           // ── 앱 버전 ─────────────────────────────────────────────
-          _InfoRow(label: l10n.version, detail: '1.0.0'),
+          _InfoRow(label: l10n.version, detail: AppConfig.appVersion),
 
           const SizedBox(height: 28),
 
@@ -50,7 +51,7 @@ class InfoPage extends StatelessWidget {
             onTap: () => showLicensePage(
               context: context,
               applicationName: 'Sent',
-              applicationVersion: '1.0.0',
+              applicationVersion: AppConfig.appVersion,
             ),
           ),
 
@@ -113,8 +114,10 @@ class _PolicySheet extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 child: Row(
                   children: [
                     Text(
@@ -136,8 +139,11 @@ class _PolicySheet extends StatelessWidget {
                           color: colors.secondary,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.close,
-                            size: 16, color: colors.textMuted),
+                        child: Icon(
+                          Icons.close,
+                          size: 16,
+                          color: colors.textMuted,
+                        ),
                       ),
                     ),
                   ],
@@ -212,19 +218,24 @@ class _NavTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: colors.border, width: 0.5),
             ),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
             child: Row(
               children: [
                 Expanded(
-                  child: Text(label,
-                      style: TextStyle(
-                          color: colors.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400)),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: colors.textPrimary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                 ),
-                Icon(Icons.chevron_right_rounded,
-                    color: colors.textDisabled, size: 20),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: colors.textDisabled,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -253,14 +264,15 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: TextStyle(
-                  color: colors.textPrimary,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400)),
-          Text(detail,
-              style: TextStyle(
-                  color: colors.textMuted, fontSize: 14)),
+          Text(
+            label,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          Text(detail, style: TextStyle(color: colors.textMuted, fontSize: 14)),
         ],
       ),
     );
