@@ -49,14 +49,18 @@ class HomePage extends ConsumerWidget {
                 onPrev: () {
                   Haptics.light();
                   final prev = DateTime(month.year, month.month - 1);
-                  ref.read(homeMonthProvider.notifier).state =
-                      (year: prev.year, month: prev.month);
+                  ref.read(homeMonthProvider.notifier).set((
+                    year: prev.year,
+                    month: prev.month,
+                  ));
                 },
                 onNext: () {
                   Haptics.light();
                   final next = DateTime(month.year, month.month + 1);
-                  ref.read(homeMonthProvider.notifier).state =
-                      (year: next.year, month: next.month);
+                  ref.read(homeMonthProvider.notifier).set((
+                    year: next.year,
+                    month: next.month,
+                  ));
                 },
               ),
             ),
@@ -66,9 +70,11 @@ class HomePage extends ConsumerWidget {
               child: todoAsync.when(
                 data: (stats) => _TodoStatsCard(stats: stats),
                 loading: () => _TodoStatsCard(
-                    stats: TodoStatistics.empty(month.year, month.month)),
+                  stats: TodoStatistics.empty(month.year, month.month),
+                ),
                 error: (e, _) => _TodoStatsCard(
-                    stats: TodoStatistics.empty(month.year, month.month)),
+                  stats: TodoStatistics.empty(month.year, month.month),
+                ),
               ),
             ),
 
@@ -77,8 +83,7 @@ class HomePage extends ConsumerWidget {
               child: ledgerAsync.when(
                 data: (summary) => _LedgerCard(summary: summary),
                 loading: () => _LedgerCard(summary: LedgerSummary.empty()),
-                error: (e, _) =>
-                    _LedgerCard(summary: LedgerSummary.empty()),
+                error: (e, _) => _LedgerCard(summary: LedgerSummary.empty()),
               ),
             ),
 
@@ -139,10 +144,7 @@ class _MonthNavigator extends StatelessWidget {
 
 // ── 글래스 카드 래퍼 (누름 시 스케일 + 밝기만 변화) ─────────────────
 class _GlassCard extends StatefulWidget {
-  const _GlassCard({
-    required this.child,
-    this.onTap,
-  });
+  const _GlassCard({required this.child, this.onTap});
 
   final Widget child;
   final VoidCallback? onTap;
@@ -164,8 +166,10 @@ class _GlassCardState extends State<_GlassCard>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnim = Tween(begin: 1.0, end: 0.97)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+    _scaleAnim = Tween(
+      begin: 1.0,
+      end: 0.97,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
     _tAnim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
   }
 
@@ -230,7 +234,8 @@ class _GlassCardState extends State<_GlassCard>
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20)),
+                          top: Radius.circular(20),
+                        ),
                         gradient: LinearGradient(
                           colors: [
                             Colors.white.withValues(alpha: 0.06),
@@ -286,10 +291,14 @@ class _TodoStatsCardState extends ConsumerState<_TodoStatsCard>
       duration: const Duration(milliseconds: 900),
       vsync: this,
     );
-    _rateAnim = Tween(begin: 0.0, end: _targetRate)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
-    _countAnim = Tween(begin: 0.0, end: _targetCount)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _rateAnim = Tween(
+      begin: 0.0,
+      end: _targetRate,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _countAnim = Tween(
+      begin: 0.0,
+      end: _targetCount,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
     _ctrl.forward();
   }
 
@@ -300,8 +309,7 @@ class _TodoStatsCardState extends ConsumerState<_TodoStatsCard>
         old.stats.completedCount != widget.stats.completedCount) {
       // 홈 탭(0)이 활성이면 즉시 애니메이션, 아니면 복귀 시까지 대기
       if (ref.read(currentBranchIndexProvider) == 0) {
-        _startAnimation(
-            fromRate: _rateAnim.value, fromCount: _countAnim.value);
+        _startAnimation(fromRate: _rateAnim.value, fromCount: _countAnim.value);
       } else {
         _pendingFromRate = _rateAnim.value;
         _pendingFromCount = _countAnim.value;
@@ -311,10 +319,14 @@ class _TodoStatsCardState extends ConsumerState<_TodoStatsCard>
 
   void _startAnimation({required double fromRate, required double fromCount}) {
     setState(() {
-      _rateAnim = Tween(begin: fromRate, end: _targetRate)
-          .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
-      _countAnim = Tween(begin: fromCount, end: _targetCount)
-          .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+      _rateAnim = Tween(
+        begin: fromRate,
+        end: _targetRate,
+      ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+      _countAnim = Tween(
+        begin: fromCount,
+        end: _targetCount,
+      ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
     });
     _ctrl.forward(from: 0.0);
   }
@@ -365,12 +377,17 @@ class _TodoStatsCardState extends ConsumerState<_TodoStatsCard>
                   children: [
                     Text(
                       '${_countAnim.value.round()} / ${widget.stats.totalCount}',
-                      style:
-                          TextStyle(color: colors.textDisabled, fontSize: 12),
+                      style: TextStyle(
+                        color: colors.textDisabled,
+                        fontSize: 12,
+                      ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(Icons.chevron_right_rounded,
-                        color: colors.textDisabled, size: 14),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: colors.textDisabled,
+                      size: 14,
+                    ),
                   ],
                 ),
               ],
@@ -519,8 +536,10 @@ class _CategoryBarState extends ConsumerState<_CategoryBar>
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _rateAnim = Tween(begin: 0.0, end: _targetRate)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _rateAnim = Tween(
+      begin: 0.0,
+      end: _targetRate,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
     _ctrl.forward();
   }
 
@@ -539,8 +558,10 @@ class _CategoryBarState extends ConsumerState<_CategoryBar>
 
   void _startAnimation({required double fromRate}) {
     setState(() {
-      _rateAnim = Tween(begin: fromRate, end: _targetRate)
-          .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+      _rateAnim = Tween(
+        begin: fromRate,
+        end: _targetRate,
+      ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
     });
     _ctrl.forward(from: 0.0);
   }
@@ -590,8 +611,7 @@ class _CategoryBarState extends ConsumerState<_CategoryBar>
               child: LinearProgressIndicator(
                 value: _rateAnim.value,
                 backgroundColor: colors.secondary,
-                valueColor:
-                    const AlwaysStoppedAnimation(Color(0xFF32D74B)),
+                valueColor: const AlwaysStoppedAnimation(Color(0xFF32D74B)),
                 minHeight: 5,
               ),
             ),
@@ -610,9 +630,10 @@ class _LedgerCard extends StatelessWidget {
 
   static String _fmt(int n, String sym) {
     final abs = n.abs();
-    final s = abs
-        .toString()
-        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},');
+    final s = abs.toString().replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+$)'),
+      (m) => '${m[1]},',
+    );
     return '${n < 0 ? '-' : ''}$s$sym';
   }
 
@@ -654,8 +675,11 @@ class _LedgerCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(Icons.chevron_right_rounded,
-                      color: colors.textDisabled, size: 14),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: colors.textDisabled,
+                    size: 14,
+                  ),
                 ],
               ),
             ],
@@ -700,9 +724,10 @@ class _LedgerRow extends StatelessWidget {
   final String symbol;
 
   static String _fmt(int n, String sym) {
-    final s = n
-        .toString()
-        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},');
+    final s = n.toString().replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+$)'),
+      (m) => '${m[1]},',
+    );
     return '$s$sym';
   }
 
@@ -722,8 +747,10 @@ class _LedgerRow extends StatelessWidget {
                 Container(
                   width: 8,
                   height: 8,
-                  decoration:
-                      BoxDecoration(color: color, shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                  ),
                 ),
                 const SizedBox(width: 6),
                 Text(

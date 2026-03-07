@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'core/storage/shared_preferences_provider.dart';
 import 'core/router/app_router.dart';
 import 'shared/theme/app_theme.dart';
 import 'features/settings/presentation/providers/settings_provider.dart';
@@ -8,7 +10,13 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: SentApp()));
+  final prefs = await SharedPreferences.getInstance();
+  runApp(
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      child: const SentApp(),
+    ),
+  );
 }
 
 class SentApp extends ConsumerWidget {
@@ -32,11 +40,7 @@ class SentApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('ko'),
-        Locale('en'),
-        Locale('ja'),
-      ],
+      supportedLocales: const [Locale('ko'), Locale('en'), Locale('ja')],
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );

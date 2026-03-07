@@ -1,25 +1,34 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../ledger/domain/models/ledger_summary.dart';
 import '../../../ledger/presentation/providers/ledger_provider.dart';
 import '../../data/repositories/todo_statistics_repository.dart';
 import '../../domain/models/todo_statistics.dart';
 
-// ── 현재 브랜치(탭) 인덱스 ─────────────────────────────────────────
-final currentBranchIndexProvider = StateProvider<int>((ref) => 0);
+part 'home_provider.g.dart';
 
-// ── 선택 월 상태 ───────────────────────────────────────────────────
-final homeMonthProvider = StateProvider<({int year, int month})>((ref) {
-  final now = DateTime.now();
-  return (year: now.year, month: now.month);
-});
+typedef YearMonth = ({int year, int month});
 
-// ── Todo 통계 ──────────────────────────────────────────────────────
-final homeTodoStatisticsProvider =
-    AsyncNotifierProvider<HomeTodoStatisticsNotifier, TodoStatistics>(
-  HomeTodoStatisticsNotifier.new,
-);
+@riverpod
+class CurrentBranchIndex extends _$CurrentBranchIndex {
+  @override
+  int build() => 0;
 
-class HomeTodoStatisticsNotifier extends AsyncNotifier<TodoStatistics> {
+  void set(int index) => state = index;
+}
+
+@riverpod
+class HomeMonth extends _$HomeMonth {
+  @override
+  YearMonth build() {
+    final now = DateTime.now();
+    return (year: now.year, month: now.month);
+  }
+
+  void set(YearMonth month) => state = month;
+}
+
+@riverpod
+class HomeTodoStatistics extends _$HomeTodoStatistics {
   @override
   Future<TodoStatistics> build() {
     final month = ref.watch(homeMonthProvider);
@@ -29,13 +38,8 @@ class HomeTodoStatisticsNotifier extends AsyncNotifier<TodoStatistics> {
   }
 }
 
-// ── 가계부 요약 (기존 ledgerEntryRepositoryProvider 재사용) ─────────
-final homeLedgerSummaryProvider =
-    AsyncNotifierProvider<HomeLedgerSummaryNotifier, LedgerSummary>(
-  HomeLedgerSummaryNotifier.new,
-);
-
-class HomeLedgerSummaryNotifier extends AsyncNotifier<LedgerSummary> {
+@riverpod
+class HomeLedgerSummary extends _$HomeLedgerSummary {
   @override
   Future<LedgerSummary> build() {
     final month = ref.watch(homeMonthProvider);

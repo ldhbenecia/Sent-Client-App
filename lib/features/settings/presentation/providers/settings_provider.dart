@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/storage/shared_preferences_provider.dart';
 
 part 'settings_provider.g.dart';
 
@@ -11,24 +11,16 @@ class ThemeModeNotifier extends _$ThemeModeNotifier {
 
   @override
   ThemeMode build() {
-    _load();
-    return ThemeMode.system;
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final saved = prefs.getString(_key);
+    if (saved == null) return ThemeMode.system;
+    return ThemeMode.values.byName(saved);
   }
 
   Future<void> set(ThemeMode mode) async {
+    final prefs = ref.read(sharedPreferencesProvider);
     state = mode;
-    final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, mode.name);
-  }
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString(_key);
-    if (saved != null) {
-      try {
-        state = ThemeMode.values.byName(saved);
-      } catch (_) {}
-    }
   }
 }
 
@@ -39,25 +31,19 @@ class LocaleNotifier extends _$LocaleNotifier {
 
   @override
   Locale? build() {
-    _load();
-    return null; // null = 시스템 기본값
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final code = prefs.getString(_key);
+    if (code == null) return null;
+    return Locale(code);
   }
 
   Future<void> set(Locale? locale) async {
+    final prefs = ref.read(sharedPreferencesProvider);
     state = locale;
-    final prefs = await SharedPreferences.getInstance();
     if (locale == null) {
       await prefs.remove(_key);
     } else {
       await prefs.setString(_key, locale.languageCode);
-    }
-  }
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString(_key);
-    if (code != null) {
-      state = Locale(code);
     }
   }
 }

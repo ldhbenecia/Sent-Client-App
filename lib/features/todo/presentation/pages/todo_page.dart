@@ -30,11 +30,15 @@ class _TodoPageState extends ConsumerState<TodoPage> {
   }
 
   void _changeMonth(int yearDelta, int monthDelta) {
-    final next = DateTime(_focusedDay.year + yearDelta,
-        _focusedDay.month + monthDelta);
+    final next = DateTime(
+      _focusedDay.year + yearDelta,
+      _focusedDay.month + monthDelta,
+    );
     setState(() => _focusedDay = next);
-    ref.read(focusedMonthProvider.notifier).state =
-        (year: next.year, month: next.month);
+    ref.read(focusedMonthProvider.notifier).set((
+      year: next.year,
+      month: next.month,
+    ));
   }
 
   @override
@@ -45,8 +49,7 @@ class _TodoPageState extends ConsumerState<TodoPage> {
     final datesWithTodos = ref.watch(datesWithTodosProvider);
     final grouped = ref.watch(todosForSelectedDateProvider);
     final todosAsync = ref.watch(todoItemsProvider);
-    final categories =
-        ref.watch(todoCategoriesProvider).valueOrNull ?? [];
+    final categories = ref.watch(todoCategoriesProvider).valueOrNull ?? [];
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -57,11 +60,7 @@ class _TodoPageState extends ConsumerState<TodoPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(
-              Icons.menu_rounded,
-              color: colors.textMuted,
-              size: 22,
-            ),
+            icon: Icon(Icons.menu_rounded, color: colors.textMuted, size: 22),
             onPressed: () => _showMenu(context),
           ),
           const SizedBox(width: 4),
@@ -95,14 +94,15 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                       selectedDayPredicate: (day) =>
                           isSameDay(day, selectedDate),
                       onDaySelected: (selected, focused) {
-                        ref.read(selectedDateProvider.notifier).state =
-                            DateTime(selected.year, selected.month, selected.day);
+                        ref.read(selectedDateProvider.notifier).set(selected);
                         setState(() => _focusedDay = focused);
                       },
                       onPageChanged: (focused) {
                         setState(() => _focusedDay = focused);
-                        ref.read(focusedMonthProvider.notifier).state =
-                            (year: focused.year, month: focused.month);
+                        ref.read(focusedMonthProvider.notifier).set((
+                          year: focused.year,
+                          month: focused.month,
+                        ));
                       },
                       headerVisible: false,
                       calendarFormat: CalendarFormat.month,
@@ -116,7 +116,9 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                       ),
                       calendarBuilders: CalendarBuilders(
                         dowBuilder: (context, day) {
-                          final locale = Localizations.localeOf(context).toString();
+                          final locale = Localizations.localeOf(
+                            context,
+                          ).toString();
                           final label = DateFormat.E(locale).format(day);
                           final isSun = day.weekday == DateTime.sunday;
                           final isSat = day.weekday == DateTime.saturday;
@@ -136,39 +138,55 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                         },
                         defaultBuilder: (context, day, _) {
                           final hasTodo = datesWithTodos.contains(
-                              DateTime(day.year, day.month, day.day));
-                          return buildTodoDayCell(context, day,
-                              isSelected: false,
-                              isToday: false,
-                              isOutside: false,
-                              hasTodo: hasTodo);
+                            DateTime(day.year, day.month, day.day),
+                          );
+                          return buildTodoDayCell(
+                            context,
+                            day,
+                            isSelected: false,
+                            isToday: false,
+                            isOutside: false,
+                            hasTodo: hasTodo,
+                          );
                         },
                         outsideBuilder: (context, day, _) {
                           final hasTodo = datesWithTodos.contains(
-                              DateTime(day.year, day.month, day.day));
-                          return buildTodoDayCell(context, day,
-                              isSelected: false,
-                              isToday: false,
-                              isOutside: true,
-                              hasTodo: hasTodo);
+                            DateTime(day.year, day.month, day.day),
+                          );
+                          return buildTodoDayCell(
+                            context,
+                            day,
+                            isSelected: false,
+                            isToday: false,
+                            isOutside: true,
+                            hasTodo: hasTodo,
+                          );
                         },
                         todayBuilder: (context, day, _) {
                           final hasTodo = datesWithTodos.contains(
-                              DateTime(day.year, day.month, day.day));
-                          return buildTodoDayCell(context, day,
-                              isSelected: false,
-                              isToday: true,
-                              isOutside: false,
-                              hasTodo: hasTodo);
+                            DateTime(day.year, day.month, day.day),
+                          );
+                          return buildTodoDayCell(
+                            context,
+                            day,
+                            isSelected: false,
+                            isToday: true,
+                            isOutside: false,
+                            hasTodo: hasTodo,
+                          );
                         },
                         selectedBuilder: (context, day, _) {
                           final hasTodo = datesWithTodos.contains(
-                              DateTime(day.year, day.month, day.day));
-                          return buildTodoDayCell(context, day,
-                              isSelected: true,
-                              isToday: isSameDay(day, DateTime.now()),
-                              isOutside: false,
-                              hasTodo: hasTodo);
+                            DateTime(day.year, day.month, day.day),
+                          );
+                          return buildTodoDayCell(
+                            context,
+                            day,
+                            isSelected: true,
+                            isToday: isSameDay(day, DateTime.now()),
+                            isOutside: false,
+                            hasTodo: hasTodo,
+                          );
                         },
                       ),
                     ),
@@ -198,8 +216,11 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.wifi_off_rounded,
-                          color: colors.textDisabled, size: 40),
+                      Icon(
+                        Icons.wifi_off_rounded,
+                        color: colors.textDisabled,
+                        size: 40,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         e.toString().replaceAll('Exception: ', ''),
@@ -211,12 +232,14 @@ class _TodoPageState extends ConsumerState<TodoPage> {
                       ),
                       const SizedBox(height: 12),
                       TextButton(
-                        onPressed: () =>
-                            ref.invalidate(todoItemsProvider),
-                        child: Text(l10n.retry,
-                            style: TextStyle(
-                                color: colors.textMuted,
-                                fontSize: 13)),
+                        onPressed: () => ref.invalidate(todoItemsProvider),
+                        child: Text(
+                          l10n.retry,
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
                     ],
                   ),

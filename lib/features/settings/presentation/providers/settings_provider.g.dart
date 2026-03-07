@@ -6,7 +6,7 @@ part of 'settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$themeModeNotifierHash() => r'3bc7e1673529e4c3a95ffd6ea415a8362db5f4c8';
+String _$themeModeNotifierHash() => r'e926a0501ca2b3e9cdb0d6b035d4eaeae95307b3';
 
 /// See also [ThemeModeNotifier].
 @ProviderFor(ThemeModeNotifier)
@@ -22,7 +22,7 @@ final themeModeNotifierProvider =
     );
 
 typedef _$ThemeModeNotifier = AutoDisposeNotifier<ThemeMode>;
-String _$localeNotifierHash() => r'd4e73474a305cac276641dff8f108a0192e7a215';
+String _$localeNotifierHash() => r'2a5b1a672eced08f1b3fea0f8c1ef14c6d169864';
 
 /// See also [LocaleNotifier].
 @ProviderFor(LocaleNotifier)
