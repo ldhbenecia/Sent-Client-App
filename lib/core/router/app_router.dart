@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../auth/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/settings/presentation/pages/preferences_page.dart';
 import '../../features/todo/presentation/pages/todo_page.dart';
 import '../../features/todo/presentation/pages/todo_edit_page.dart';
@@ -26,6 +28,7 @@ import '../../shared/widgets/main_shell.dart';
 import '../../shared/theme/app_color_theme.dart';
 import '../storage/token_storage.dart';
 import '../../features/todo/presentation/providers/todo_provider.dart';
+import '../../features/home/presentation/providers/home_provider.dart';
 
 part 'app_router.g.dart';
 
@@ -51,7 +54,7 @@ GoRouter appRouter(Ref ref) {
       try {
         final hasToken = await tokenStorage.hasToken();
         if (!hasToken && !isAuthRoute) return '/auth/login';
-        if (hasToken && isAuthRoute) return '/todo';
+        if (hasToken && isAuthRoute) return '/home';
       } catch (_) {
         if (!isAuthRoute) return '/auth/login';
       }
@@ -77,7 +80,17 @@ GoRouter appRouter(Ref ref) {
         navigatorContainerBuilder: (context, shell, children) =>
             _AnimatedBranchContainer(shell: shell, children: children),
         branches: [
-          // ── Tab 0: Todo ──────────────────────────────────────────
+          // ── Tab 0: Home ──────────────────────────────────────────
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                name: 'home',
+                builder: (context, state) => const HomePage(),
+              ),
+            ],
+          ),
+          // ── Tab 1: Todo ──────────────────────────────────────────
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -261,7 +274,7 @@ GoRouter appRouter(Ref ref) {
 }
 
 // ── 탭 전환 애니메이션 컨테이너 ─────────────────────────────────────
-class _AnimatedBranchContainer extends StatefulWidget {
+class _AnimatedBranchContainer extends ConsumerStatefulWidget {
   const _AnimatedBranchContainer({
     required this.shell,
     required this.children,
@@ -271,11 +284,12 @@ class _AnimatedBranchContainer extends StatefulWidget {
   final List<Widget> children;
 
   @override
-  State<_AnimatedBranchContainer> createState() =>
+  ConsumerState<_AnimatedBranchContainer> createState() =>
       _AnimatedBranchContainerState();
 }
 
-class _AnimatedBranchContainerState extends State<_AnimatedBranchContainer> {
+class _AnimatedBranchContainerState
+    extends ConsumerState<_AnimatedBranchContainer> {
   late final PageController _controller;
 
   @override
@@ -288,6 +302,13 @@ class _AnimatedBranchContainerState extends State<_AnimatedBranchContainer> {
   void didUpdateWidget(_AnimatedBranchContainer old) {
     super.didUpdateWidget(old);
     if (widget.shell.currentIndex != old.shell.currentIndex) {
+      // build 중 provider 수정 금지 → 다음 프레임으로 지연
+      final newIndex = widget.shell.currentIndex;
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.read(currentBranchIndexProvider.notifier).state = newIndex;
+        }
+      });
       _controller.animateToPage(
         widget.shell.currentIndex,
         duration: const Duration(milliseconds: 280),
