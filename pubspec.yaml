@@ -12,7 +12,6 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  cupertino_icons: ^1.0.8
   intl: ^0.20.0
 
   # 상태 관리
@@ -43,8 +42,6 @@ dependencies:
   stomp_dart_client: ^3.0.1
 
   # 유틸
-  freezed_annotation: ^3.0.0
-  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
