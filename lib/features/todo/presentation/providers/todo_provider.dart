@@ -5,6 +5,7 @@ import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/todo_repository.dart';
 import '../../domain/models/todo_category.dart';
 import '../../domain/models/todo_item.dart';
+import '../../../home/presentation/providers/home_provider.dart';
 
 // ── Repository providers ──────────────────────────────────────────
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
@@ -97,6 +98,7 @@ class TodoItemsNotifier extends AsyncNotifier<List<TodoItem>> {
           time: item.time,
         );
     state = AsyncData([...state.requireValue, created]);
+    ref.invalidate(homeTodoStatisticsProvider);
   }
 
   Future<void> edit(TodoItem item) async {
@@ -109,6 +111,7 @@ class TodoItemsNotifier extends AsyncNotifier<List<TodoItem>> {
       state = AsyncData(
         state.requireValue.map((t) => t.id == item.id ? updated : t).toList(),
       );
+      ref.invalidate(homeTodoStatisticsProvider);
     } catch (e) {
       state = AsyncData(prev);
       rethrow;
@@ -121,6 +124,7 @@ class TodoItemsNotifier extends AsyncNotifier<List<TodoItem>> {
     state = AsyncData(prev.where((t) => t.id != id).toList());
     try {
       await ref.read(todoRepositoryProvider).delete(id);
+      ref.invalidate(homeTodoStatisticsProvider);
     } catch (e) {
       state = AsyncData(prev);
       rethrow;
@@ -138,6 +142,7 @@ class TodoItemsNotifier extends AsyncNotifier<List<TodoItem>> {
     );
     try {
       await ref.read(todoRepositoryProvider).markDone(id, newDone);
+      ref.invalidate(homeTodoStatisticsProvider);
     } catch (e) {
       state = AsyncData(todos); // 롤백
       rethrow;
