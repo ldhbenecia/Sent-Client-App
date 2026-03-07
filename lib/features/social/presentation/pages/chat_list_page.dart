@@ -40,8 +40,11 @@ class ChatListPage extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.error_outline_rounded,
-                    color: colors.textDisabled, size: 40),
+                Icon(
+                  Icons.error_outline_rounded,
+                  color: colors.textDisabled,
+                  size: 40,
+                ),
                 const SizedBox(height: 12),
                 Text(
                   e.toString().replaceAll('Exception: ', ''),
@@ -66,8 +69,11 @@ class ChatListPage extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.chat_bubble_outline_rounded,
-                            size: 52, color: colors.textDisabled),
+                        Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 52,
+                          color: colors.textDisabled,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           l10n.chatListEmpty,
@@ -97,11 +103,8 @@ class ChatListPage extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: rooms.length,
-              separatorBuilder: (_, index) => Divider(
-                height: 0.5,
-                indent: 72,
-                color: colors.border,
-              ),
+              separatorBuilder: (_, index) =>
+                  Divider(height: 0.5, indent: 72, color: colors.border),
               itemBuilder: (context, index) =>
                   _ChatRoomTile(room: rooms[index]),
             );
@@ -126,7 +129,8 @@ class _ChatRoomTile extends StatelessWidget {
     if (room.lastMessageTimestamp != null) {
       msgDt = DateTime.fromMillisecondsSinceEpoch(room.lastMessageTimestamp!);
       final now = DateTime.now();
-      isToday = msgDt.year == now.year &&
+      isToday =
+          msgDt.year == now.year &&
           msgDt.month == now.month &&
           msgDt.day == now.day;
     }
@@ -171,10 +175,7 @@ class _ChatRoomTile extends StatelessWidget {
                         room.lastMessage!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: colors.textMuted,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: colors.textMuted, fontSize: 13),
                       ),
                     ],
                   ],

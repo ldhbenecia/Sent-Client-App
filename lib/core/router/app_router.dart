@@ -1,34 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../auth/auth_state.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/settings/presentation/pages/preferences_page.dart';
-import '../../features/todo/presentation/pages/todo_page.dart';
-import '../../features/todo/presentation/pages/todo_edit_page.dart';
-import '../../features/todo/presentation/pages/category_page.dart';
-import '../../features/todo/presentation/pages/category_edit_page.dart';
-import '../../features/todo/domain/models/todo_category.dart';
-import '../../features/todo/domain/models/todo_item.dart';
-import '../../features/memo/presentation/pages/memo_page.dart';
-import '../../features/social/presentation/pages/social_page.dart';
-import '../../features/social/presentation/pages/chat_page.dart';
-import '../../features/social/presentation/pages/friend_requests_page.dart';
-import '../../features/chat/presentation/pages/chat_list_page.dart';
-import '../../features/ledger/presentation/pages/ledger_page.dart';
-import '../../features/ledger/presentation/pages/ledger_entry_edit_page.dart';
-import '../../features/ledger/presentation/pages/ledger_category_page.dart';
-import '../../features/ledger/presentation/pages/ledger_category_edit_page.dart';
-import '../../features/ledger/domain/models/ledger_entry.dart';
-import '../../features/ledger/domain/models/ledger_category.dart';
+import '../../features/home/presentation/providers/home_provider.dart';
+import '../../features/todo/presentation/providers/todo_provider.dart';
 import '../../shared/widgets/main_shell.dart';
 import '../../shared/theme/app_color_theme.dart';
+import '../auth/auth_state.dart';
 import '../storage/token_storage.dart';
-import '../../features/todo/presentation/providers/todo_provider.dart';
-import '../../features/home/presentation/providers/home_provider.dart';
+import 'route_transitions.dart';
+import 'shell_branches.dart';
 
 part 'app_router.g.dart';
 
@@ -72,186 +56,14 @@ GoRouter appRouter(Ref ref) {
         pageBuilder: (context, state) => CustomTransitionPage(
           child: const PreferencesPage(),
           transitionsBuilder: (context, animation, secondary, child) =>
-              _slideRightFade(animation, child),
+              slideRightFadeTransition(animation, child),
         ),
       ),
       StatefulShellRoute(
         builder: (context, state, shell) => MainShell(navigationShell: shell),
         navigatorContainerBuilder: (context, shell, children) =>
             _AnimatedBranchContainer(shell: shell, children: children),
-        branches: [
-          // ── Tab 0: Home ──────────────────────────────────────────
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/home',
-                name: 'home',
-                builder: (context, state) => const HomePage(),
-              ),
-            ],
-          ),
-          // ── Tab 1: Todo ──────────────────────────────────────────
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/todo',
-                name: 'todo',
-                builder: (context, state) => const TodoPage(),
-                routes: [
-                  GoRoute(
-                    path: 'categories',
-                    name: 'categories',
-                    builder: (context, state) => const CategoryPage(),
-                    routes: [
-                      GoRoute(
-                        path: 'new',
-                        name: 'category-create',
-                        builder: (context, state) =>
-                            const CategoryEditPage(category: null),
-                      ),
-                      GoRoute(
-                        path: ':id/edit',
-                        name: 'category-edit',
-                        builder: (context, state) => CategoryEditPage(
-                          category: state.extra as TodoCategory?,
-                        ),
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: 'new',
-                    name: 'todo-create',
-                    pageBuilder: (context, state) => CustomTransitionPage(
-                      child: TodoEditPage(
-                        initialDate: state.extra as DateTime?,
-                      ),
-                      transitionsBuilder: (context, animation, secondary, child) =>
-                          _slideUpFade(animation, child),
-                    ),
-                  ),
-                  GoRoute(
-                    path: ':id/edit',
-                    name: 'todo-edit',
-                    pageBuilder: (context, state) => CustomTransitionPage(
-                      child: TodoEditPage(todo: state.extra as TodoItem?),
-                      transitionsBuilder: (context, animation, secondary, child) =>
-                          _slideUpFade(animation, child),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // ── Tab 1: Ledger ─────────────────────────────────────────
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/ledger',
-                name: 'ledger',
-                builder: (context, state) => const LedgerPage(),
-                routes: [
-                  GoRoute(
-                    path: 'categories',
-                    name: 'ledger-categories',
-                    builder: (context, state) =>
-                        const LedgerCategoryPage(),
-                    routes: [
-                      GoRoute(
-                        path: 'new',
-                        name: 'ledger-category-create',
-                        builder: (context, state) =>
-                            const LedgerCategoryEditPage(category: null),
-                      ),
-                      GoRoute(
-                        path: ':id/edit',
-                        name: 'ledger-category-edit',
-                        builder: (context, state) => LedgerCategoryEditPage(
-                          category: state.extra as LedgerCategory?,
-                        ),
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: 'new',
-                    name: 'ledger-create',
-                    pageBuilder: (context, state) => CustomTransitionPage(
-                      child: const LedgerEntryEditPage(),
-                      transitionsBuilder: (context, animation, secondary, child) =>
-                          _slideUpFade(animation, child),
-                    ),
-                  ),
-                  GoRoute(
-                    path: ':id/edit',
-                    name: 'ledger-edit',
-                    pageBuilder: (context, state) => CustomTransitionPage(
-                      child: LedgerEntryEditPage(
-                          entry: state.extra as LedgerEntry?),
-                      transitionsBuilder: (context, animation, secondary, child) =>
-                          _slideUpFade(animation, child),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // ── Tab 2: Social ────────────────────────────────────────
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/social',
-                name: 'social',
-                builder: (context, state) => const SocialPage(),
-                routes: [
-                  GoRoute(
-                    path: 'requests',
-                    name: 'social-requests',
-                    pageBuilder: (context, state) => CustomTransitionPage(
-                      child: const FriendRequestsPage(),
-                      transitionsBuilder: (context, animation, secondary, child) =>
-                          _slideRightFade(animation, child),
-                    ),
-                  ),
-                  GoRoute(
-                    path: 'chats',
-                    name: 'social-chats',
-                    pageBuilder: (context, state) => CustomTransitionPage(
-                      child: const ChatListPage(),
-                      transitionsBuilder: (context, animation, secondary, child) =>
-                          _slideRightFade(animation, child),
-                    ),
-                  ),
-                  GoRoute(
-                    path: 'chat',
-                    name: 'social-chat',
-                    pageBuilder: (context, state) {
-                      final extra =
-                          state.extra as Map<String, dynamic>;
-                      return CustomTransitionPage(
-                        child: ChatPage(
-                          opponentId: extra['opponentId'] as String,
-                          friendName: extra['friendName'] as String,
-                          opponentProfileImageUrl: extra['opponentProfileImageUrl'] as String?,
-                        ),
-                        transitionsBuilder: (context, animation, secondary, child) =>
-                            _slideRightFade(animation, child),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // ── Tab 3: Memo ──────────────────────────────────────────
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/memo',
-                name: 'memo',
-                builder: (context, state) => const MemoPage(),
-              ),
-            ],
-          ),
-        ],
+        branches: buildMainShellBranches(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
@@ -275,10 +87,7 @@ GoRouter appRouter(Ref ref) {
 
 // ── 탭 전환 애니메이션 컨테이너 ─────────────────────────────────────
 class _AnimatedBranchContainer extends ConsumerStatefulWidget {
-  const _AnimatedBranchContainer({
-    required this.shell,
-    required this.children,
-  });
+  const _AnimatedBranchContainer({required this.shell, required this.children});
 
   final StatefulNavigationShell shell;
   final List<Widget> children;
@@ -306,7 +115,7 @@ class _AnimatedBranchContainerState
       final newIndex = widget.shell.currentIndex;
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ref.read(currentBranchIndexProvider.notifier).state = newIndex;
+          ref.read(currentBranchIndexProvider.notifier).set(newIndex);
         }
       });
       _controller.animateToPage(
@@ -332,37 +141,3 @@ class _AnimatedBranchContainerState
     );
   }
 }
-
-// ── 페이지 전환 헬퍼 ────────────────────────────────────────────────
-
-/// 아래에서 위로 슬라이드 + 페이드인 (모달 스타일 — create/edit)
-Widget _slideUpFade(Animation<double> animation, Widget child) =>
-    FadeTransition(
-      opacity: CurvedAnimation(
-        parent: animation,
-        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
-      ),
-      child: SlideTransition(
-        position: animation.drive(
-          Tween(begin: const Offset(0, 1), end: Offset.zero)
-              .chain(CurveTween(curve: Curves.easeOutCubic)),
-        ),
-        child: child,
-      ),
-    );
-
-/// 오른쪽에서 왼쪽으로 슬라이드 + 페이드인 (push 스타일 — preferences)
-Widget _slideRightFade(Animation<double> animation, Widget child) =>
-    FadeTransition(
-      opacity: CurvedAnimation(
-        parent: animation,
-        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
-      ),
-      child: SlideTransition(
-        position: animation.drive(
-          Tween(begin: const Offset(1, 0), end: Offset.zero)
-              .chain(CurveTween(curve: Curves.easeOutCubic)),
-        ),
-        child: child,
-      ),
-    );
