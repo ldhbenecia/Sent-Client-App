@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
 import '../providers/ledger_provider.dart';
 import '../../domain/models/ledger_category.dart';
+import 'ledger_category_edit_page.dart';
 
 // ══════════════════════════════════════════════════════════════════
 // LedgerCategoryPage — 카테고리 목록 관리
@@ -22,9 +22,12 @@ class LedgerCategoryPage extends ConsumerWidget {
       backgroundColor: colors.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded,
-              color: colors.textPrimary, size: 28),
-          onPressed: () => context.pop(),
+          icon: Icon(
+            Icons.chevron_left_rounded,
+            color: colors.textPrimary,
+            size: 28,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           l10n.ledgerCategory,
@@ -41,8 +44,7 @@ class LedgerCategoryPage extends ConsumerWidget {
         backgroundColor: colors.card,
         onRefresh: () async => ref.invalidate(ledgerCategoriesProvider),
         child: categoriesAsync.when(
-          loading: () =>
-              const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: SizedBox(
@@ -53,16 +55,15 @@ class LedgerCategoryPage extends ConsumerWidget {
                   children: [
                     Text(
                       e.toString().replaceAll('Exception: ', ''),
-                      style: TextStyle(
-                          color: colors.textMuted, fontSize: 14),
+                      style: TextStyle(color: colors.textMuted, fontSize: 14),
                     ),
                     const SizedBox(height: 12),
                     TextButton(
-                      onPressed: () =>
-                          ref.invalidate(ledgerCategoriesProvider),
-                      child: Text(l10n.retry,
-                          style:
-                              TextStyle(color: colors.textPrimary)),
+                      onPressed: () => ref.invalidate(ledgerCategoriesProvider),
+                      child: Text(
+                        l10n.retry,
+                        style: TextStyle(color: colors.textPrimary),
+                      ),
                     ),
                   ],
                 ),
@@ -73,8 +74,12 @@ class LedgerCategoryPage extends ConsumerWidget {
             children: [
               // 새 카테고리 추가 버튼
               InkWell(
-                onTap: () =>
-                    context.push('/ledger/categories/new'),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const LedgerCategoryEditPage(category: null),
+                  ),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
                   child: Row(
@@ -86,8 +91,11 @@ class LedgerCategoryPage extends ConsumerWidget {
                           color: colors.secondary,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.circle_outlined,
-                            size: 13, color: colors.textDisabled),
+                        child: Icon(
+                          Icons.circle_outlined,
+                          size: 13,
+                          color: colors.textDisabled,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -105,27 +113,31 @@ class LedgerCategoryPage extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: colors.secondary,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                              color: colors.border, width: 0.5),
+                          border: Border.all(color: colors.border, width: 0.5),
                         ),
-                        child: Icon(Icons.add_rounded,
-                            size: 16, color: colors.textMuted),
+                        child: Icon(
+                          Icons.add_rounded,
+                          size: 16,
+                          color: colors.textMuted,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
 
-              Divider(
-                  height: 0.5, thickness: 0.5, color: colors.border),
+              Divider(height: 0.5, thickness: 0.5, color: colors.border),
 
-              ...categories.map((cat) => _CategoryListTile(
-                    category: cat,
-                    onTap: () => context.push(
-                      '/ledger/categories/${cat.id}/edit',
-                      extra: cat,
+              ...categories.map(
+                (cat) => _CategoryListTile(
+                  category: cat,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => LedgerCategoryEditPage(category: cat),
                     ),
-                  )),
+                  ),
+                ),
+              ),
 
               const SizedBox(height: 80),
             ],
@@ -137,10 +149,7 @@ class LedgerCategoryPage extends ConsumerWidget {
 }
 
 class _CategoryListTile extends StatelessWidget {
-  const _CategoryListTile({
-    required this.category,
-    required this.onTap,
-  });
+  const _CategoryListTile({required this.category, required this.onTap});
 
   final LedgerCategory category;
   final VoidCallback onTap;
@@ -183,8 +192,11 @@ class _CategoryListTile extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-            Icon(Icons.chevron_right_rounded,
-                size: 18, color: colors.textDisabled),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: colors.textDisabled,
+            ),
           ],
         ),
       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_color_theme.dart';
@@ -51,11 +50,13 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
     try {
       final notifier = ref.read(todoCategoriesProvider.notifier);
       if (_isEdit) {
-        await notifier.edit(widget.category!.copyWith(
-          name: name,
-          color: _selectedColor,
-          icon: _selectedIcon,
-        ));
+        await notifier.edit(
+          widget.category!.copyWith(
+            name: name,
+            color: _selectedColor,
+            icon: _selectedIcon,
+          ),
+        );
       } else {
         await notifier.add(
           name: name,
@@ -63,7 +64,7 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
           color: _selectedColor,
         );
       }
-      if (mounted) context.pop();
+      if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
       final colors = context.colors;
@@ -86,9 +87,12 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
       backgroundColor: colors.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded,
-              color: colors.textPrimary, size: 28),
-          onPressed: () => context.pop(),
+          icon: Icon(
+            Icons.chevron_left_rounded,
+            color: colors.textPrimary,
+            size: 28,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           l10n.categoryEdit,
@@ -160,12 +164,14 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
                         // 이 카테고리의 투두들 카테고리 해제
                         final todos =
                             ref.read(todoItemsProvider).valueOrNull ?? [];
-                        final todoNotifier =
-                            ref.read(todoItemsProvider.notifier);
+                        final todoNotifier = ref.read(
+                          todoItemsProvider.notifier,
+                        );
                         for (final todo in todos) {
                           if (todo.categoryId == widget.category!.id) {
-                            await todoNotifier
-                                .edit(todo.copyWith(clearCategory: true));
+                            await todoNotifier.edit(
+                              todo.copyWith(clearCategory: true),
+                            );
                           }
                         }
                         await ref
@@ -176,15 +182,17 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
                         messenger.showSnackBar(
                           SnackBar(
                             content: Text(
-                                e.toString().replaceAll('Exception: ', '')),
+                              e.toString().replaceAll('Exception: ', ''),
+                            ),
                             backgroundColor: deleteRed,
                           ),
                         );
                       }
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor:
-                          colors.destructiveRed.withValues(alpha: 0.12),
+                      backgroundColor: colors.destructiveRed.withValues(
+                        alpha: 0.12,
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -251,8 +259,7 @@ class _NameRow extends StatelessWidget {
               color: selectedColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
-            child:
-                Icon(selectedIcon, size: 18, color: selectedColor),
+            child: Icon(selectedIcon, size: 18, color: selectedColor),
           ),
           const SizedBox(width: 10),
           // 이름 입력
@@ -325,10 +332,7 @@ class _SectionHeader extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             sub!,
-            style: TextStyle(
-              color: colors.textDisabled,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: colors.textDisabled, fontSize: 12),
           ),
         ],
       ],

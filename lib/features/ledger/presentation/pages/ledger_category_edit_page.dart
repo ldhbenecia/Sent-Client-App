@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_color_theme.dart';
@@ -53,11 +52,13 @@ class _LedgerCategoryEditPageState
     try {
       final notifier = ref.read(ledgerCategoriesProvider.notifier);
       if (_isEdit) {
-        await notifier.edit(widget.category!.copyWith(
-          name: name,
-          color: _selectedColor,
-          icon: _selectedIcon,
-        ));
+        await notifier.edit(
+          widget.category!.copyWith(
+            name: name,
+            color: _selectedColor,
+            icon: _selectedIcon,
+          ),
+        );
       } else {
         await notifier.add(
           name: name,
@@ -65,7 +66,7 @@ class _LedgerCategoryEditPageState
           color: _selectedColor,
         );
       }
-      if (mounted) context.pop();
+      if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -87,9 +88,12 @@ class _LedgerCategoryEditPageState
       backgroundColor: colors.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded,
-              color: colors.textPrimary, size: 28),
-          onPressed: () => context.pop(),
+          icon: Icon(
+            Icons.chevron_left_rounded,
+            color: colors.textPrimary,
+            size: 28,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           l10n.categoryEdit,
@@ -137,8 +141,7 @@ class _LedgerCategoryEditPageState
                 const SizedBox(height: 12),
                 CategoryColorPicker(
                   selected: _selectedColor,
-                  onSelect: (color) =>
-                      setState(() => _selectedColor = color),
+                  onSelect: (color) => setState(() => _selectedColor = color),
                 ),
               ],
             ),
@@ -167,15 +170,17 @@ class _LedgerCategoryEditPageState
                         messenger.showSnackBar(
                           SnackBar(
                             content: Text(
-                                e.toString().replaceAll('Exception: ', '')),
+                              e.toString().replaceAll('Exception: ', ''),
+                            ),
                             backgroundColor: deleteRed,
                           ),
                         );
                       }
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor:
-                          colors.destructiveRed.withValues(alpha: 0.12),
+                      backgroundColor: colors.destructiveRed.withValues(
+                        alpha: 0.12,
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -306,10 +311,7 @@ class _SectionLabel extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             sub!,
-            style: TextStyle(
-              color: colors.textDisabled,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: colors.textDisabled, fontSize: 12),
           ),
         ],
       ],
