@@ -171,5 +171,9 @@
       "name": { "type": "String" }
     }
   },
-  "friendRequestCancel": "요청 취소"
+  "friendRequestCancel": "요청 취소",
+
+  "homeTodo": "투두",
+  "homeLedger": "가계부",
+  "homeNoTasks": "이번 달 할 일이 없어요"
 }

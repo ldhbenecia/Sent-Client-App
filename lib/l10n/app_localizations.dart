@@ -843,6 +843,24 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'요청 취소'**
   String get friendRequestCancel;
+
+  /// No description provided for @homeTodo.
+  ///
+  /// In ko, this message translates to:
+  /// **'투두'**
+  String get homeTodo;
+
+  /// No description provided for @homeLedger.
+  ///
+  /// In ko, this message translates to:
+  /// **'가계부'**
+  String get homeLedger;
+
+  /// No description provided for @homeNoTasks.
+  ///
+  /// In ko, this message translates to:
+  /// **'이번 달 할 일이 없어요'**
+  String get homeNoTasks;
 }
 
 class _AppLocalizationsDelegate

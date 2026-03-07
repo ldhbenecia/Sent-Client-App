@@ -391,4 +391,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get friendRequestCancel => '요청 취소';
+
+  @override
+  String get homeTodo => '투두';
+
+  @override
+  String get homeLedger => '가계부';
+
+  @override
+  String get homeNoTasks => '이번 달 할 일이 없어요';
 }

@@ -395,4 +395,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get friendRequestCancel => 'Cancel Request';
+
+  @override
+  String get homeTodo => 'Todo';
+
+  @override
+  String get homeLedger => 'Ledger';
+
+  @override
+  String get homeNoTasks => 'No tasks this month';
 }

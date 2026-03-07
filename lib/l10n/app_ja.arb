@@ -171,5 +171,9 @@
       "name": { "type": "String" }
     }
   },
-  "friendRequestCancel": "リクエストをキャンセル"
+  "friendRequestCancel": "リクエストをキャンセル",
+
+  "homeTodo": "Todo",
+  "homeLedger": "家計簿",
+  "homeNoTasks": "今月のタスクがありません"
 }

@@ -171,5 +171,9 @@
       "name": { "type": "String" }
     }
   },
-  "friendRequestCancel": "Cancel Request"
+  "friendRequestCancel": "Cancel Request",
+
+  "homeTodo": "Todo",
+  "homeLedger": "Ledger",
+  "homeNoTasks": "No tasks this month"
 }

@@ -391,4 +391,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get friendRequestCancel => 'リクエストをキャンセル';
+
+  @override
+  String get homeTodo => 'Todo';
+
+  @override
+  String get homeLedger => '家計簿';
+
+  @override
+  String get homeNoTasks => '今月のタスクがありません';
 }
