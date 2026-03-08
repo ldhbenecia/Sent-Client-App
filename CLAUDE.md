@@ -7,9 +7,13 @@ Flutter iOS 앱. 백엔드: `sent-server` (Kotlin/Spring Boot, localhost:8080).
 ## 실행
 
 ```bash
-./run.sh                                                      # 앱 실행 (권장)
-dart run build_runner build --delete-conflicting-outputs      # 코드 생성
-flutter build ios --no-codesign                               # 빌드 에러 확인
+./run.dev.sh                                                   # 개발 실행 (권장)
+./run.prod.sh                                                  # 운영 유사 환경 실행
+./run.sh                                                       # 기본 실행 별칭
+dart run build_runner build --delete-conflicting-outputs       # Riverpod 코드 생성
+flutter gen-l10n                                               # l10n 생성
+flutter analyze && flutter test                                # 기본 점검
+flutter build ios --no-codesign                                # iOS 빌드 에러 확인
 ```
 
 - `flutter run` 전에 시뮬레이터 **Booted 상태** 확인
@@ -33,11 +37,13 @@ type(scope): 한글 설명
 | `core` | lib/core/ |
 | `router` | lib/core/router/ |
 | `auth` | lib/features/auth/ |
+| `home` | lib/features/home/ |
 | `todo` | lib/features/todo/ |
 | `memo` | lib/features/memo/ |
 | `social` | lib/features/social/ |
-| `chat` | lib/features/chat/ + social/chat 관련 |
+| `chat` | lib/features/social/ 내 chat 관련 |
 | `ledger` | lib/features/ledger/ |
+| `settings` | lib/features/settings/ |
 | `ui` | lib/shared/ |
 | `l10n` | lib/l10n/ ARB + generated |
 | `env` | 환경설정, run.sh |
@@ -105,6 +111,6 @@ chore(deps): table_calendar 패키지 추가
 
 ## 주의사항
 
-- `.g.dart`, `.freezed.dart` 파일도 커밋한다
+- 생성 파일(`*.g.dart`, 사용 시 `*.freezed.dart`)은 함께 커밋한다
 - API URL 기본값: `http://localhost:8080`
 - GoRouter `extra`는 `StatefulShellBranch` 간 이동 시 유실될 수 있음 → Riverpod `StateProvider` 사용
