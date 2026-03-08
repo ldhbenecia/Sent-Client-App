@@ -298,23 +298,39 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                 ),
               ),
               data: (_) {
+                final bottomInset = MediaQuery.paddingOf(context).bottom;
+                final bottomNavReserved = 94.0 + bottomInset;
                 if (displayedEntries.isEmpty) {
-                  return Center(
-                    child: Text(
-                      _selectedDay != null
-                          ? l10n.ledgerEmptyDay
-                          : l10n.ledgerEmptyMonth,
-                      style: TextStyle(
-                        color: colors.textMuted,
-                        fontSize: 14,
-                      ),
-                    ),
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final visibleHeight =
+                          (constraints.maxHeight - bottomNavReserved)
+                              .clamp(100.0, constraints.maxHeight);
+                      final topOffset =
+                          (visibleHeight * 0.38).clamp(24.0, 96.0);
+
+                      return Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: topOffset),
+                          child: Text(
+                            _selectedDay != null
+                                ? l10n.ledgerEmptyDay
+                                : l10n.ledgerEmptyMonth,
+                            style: TextStyle(
+                              color: colors.textMuted,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   );
                 }
 
                 final dates = displayedEntries.keys.toList();
                 return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 100),
+                  padding: const EdgeInsets.only(bottom: 16),
                   itemCount: dates.length,
                   itemBuilder: (context, index) {
                     final date = dates[index];

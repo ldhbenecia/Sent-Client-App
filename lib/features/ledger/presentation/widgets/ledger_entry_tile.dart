@@ -34,8 +34,8 @@ class LedgerEntryTile extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      splashColor: Colors.white.withValues(alpha: 0.04),
-      highlightColor: Colors.white.withValues(alpha: 0.02),
+      splashColor: colors.textPrimary.withValues(alpha: 0.06),
+      highlightColor: colors.textPrimary.withValues(alpha: 0.03),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         child: Row(

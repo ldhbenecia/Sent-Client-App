@@ -203,7 +203,7 @@ class _TodoPageState extends ConsumerState<TodoPage> {
             child: todosAsync.when(
               loading: () => Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 80),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     color: colors.textMuted,
@@ -212,7 +212,7 @@ class _TodoPageState extends ConsumerState<TodoPage> {
               ),
               error: (e, _) => Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 80),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

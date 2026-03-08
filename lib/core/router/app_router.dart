@@ -60,7 +60,10 @@ GoRouter appRouter(Ref ref) {
         ),
       ),
       StatefulShellRoute(
-        builder: (context, state, shell) => MainShell(navigationShell: shell),
+        builder: (context, state, shell) => MainShell(
+          navigationShell: shell,
+          currentPath: state.uri.path,
+        ),
         navigatorContainerBuilder: (context, shell, children) =>
             _AnimatedBranchContainer(shell: shell, children: children),
         branches: buildMainShellBranches(),

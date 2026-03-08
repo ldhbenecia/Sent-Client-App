@@ -87,7 +87,7 @@ class HomePage extends ConsumerWidget {
               ),
             ),
 
-            const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
+            const SliverPadding(padding: EdgeInsets.only(bottom: 12)),
           ],
         ),
       ),
@@ -185,6 +185,7 @@ class _GlassCardState extends State<_GlassCard>
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTapDown: _down,
       onTap: () {
@@ -208,20 +209,47 @@ class _GlassCardState extends State<_GlassCard>
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color.lerp(
-                      const Color(0xFF1C1C1E),
-                      const Color(0xFF242426),
-                      t,
-                    )!,
-                    Color.lerp(
-                      const Color(0xFF0F0F0F),
-                      const Color(0xFF181818),
-                      t,
-                    )!,
-                  ],
+                  colors: isDark
+                      ? [
+                          Color.lerp(
+                            colors.card,
+                            colors.secondary,
+                            0.25 + (t * 0.20),
+                          )!,
+                          Color.lerp(
+                            colors.secondary,
+                            colors.card,
+                            0.20 + (t * 0.15),
+                          )!,
+                        ]
+                      : [
+                          Color.lerp(
+                            colors.background,
+                            colors.card,
+                            0.85 + (t * 0.05),
+                          )!,
+                          Color.lerp(
+                            colors.card,
+                            colors.secondary,
+                            0.55 + (t * 0.10),
+                          )!,
+                        ],
                 ),
-                border: Border.all(color: colors.border, width: 0.5),
+                border: Border.all(
+                  color: isDark
+                      ? colors.border
+                      : colors.border.withValues(alpha: 0.85),
+                  width: 0.7,
+                ),
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
               ),
               child: Stack(
                 children: [
@@ -238,8 +266,12 @@ class _GlassCardState extends State<_GlassCard>
                         ),
                         gradient: LinearGradient(
                           colors: [
-                            Colors.white.withValues(alpha: 0.06),
-                            Colors.white.withValues(alpha: 0.01),
+                            (isDark ? Colors.white : Colors.black).withValues(
+                              alpha: isDark ? 0.06 : 0.05,
+                            ),
+                            (isDark ? Colors.white : Colors.black).withValues(
+                              alpha: isDark ? 0.01 : 0.0,
+                            ),
                             Colors.transparent,
                           ],
                         ),
@@ -341,6 +373,7 @@ class _TodoStatsCardState extends ConsumerState<_TodoStatsCard>
   Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // 홈 탭으로 복귀할 때 대기 중인 애니메이션 실행
     ref.listen(currentBranchIndexProvider, (_, next) {
@@ -367,7 +400,7 @@ class _TodoStatsCardState extends ConsumerState<_TodoStatsCard>
                 Text(
                   l10n.homeTodo,
                   style: TextStyle(
-                    color: colors.textMuted,
+                    color: isDark ? colors.textMuted : colors.textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.6,
@@ -378,14 +411,14 @@ class _TodoStatsCardState extends ConsumerState<_TodoStatsCard>
                     Text(
                       '${_countAnim.value.round()} / ${widget.stats.totalCount}',
                       style: TextStyle(
-                        color: colors.textDisabled,
+                        color: colors.textMuted,
                         fontSize: 12,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Icon(
                       Icons.chevron_right_rounded,
-                      color: colors.textDisabled,
+                      color: colors.textMuted,
                       size: 14,
                     ),
                   ],
@@ -408,8 +441,10 @@ class _TodoStatsCardState extends ConsumerState<_TodoStatsCard>
                     CustomPaint(
                       painter: _ArcGaugePainter(
                         rate: _rateAnim.value,
-                        baseColor: colors.secondary,
-                        fillColor: const Color(0xFF32D74B),
+                        baseColor: isDark ? colors.secondary : colors.border,
+                        fillColor: isDark
+                            ? const Color(0xFF32D74B)
+                            : const Color(0xFF1F9D4C),
                       ),
                       size: const Size(160, 90),
                     ),
@@ -575,6 +610,7 @@ class _CategoryBarState extends ConsumerState<_CategoryBar>
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final name = widget.cat.categoryName ?? '기타';
 
     ref.listen(currentBranchIndexProvider, (_, next) {
@@ -595,11 +631,14 @@ class _CategoryBarState extends ConsumerState<_CategoryBar>
             children: [
               Text(
                 name,
-                style: TextStyle(color: colors.textSecondary, fontSize: 12),
+                style: TextStyle(
+                  color: isDark ? colors.textSecondary : colors.textPrimary,
+                  fontSize: 12,
+                ),
               ),
               Text(
                 '${widget.cat.completedCount}/${widget.cat.totalCount}',
-                style: TextStyle(color: colors.textDisabled, fontSize: 11),
+                style: TextStyle(color: colors.textMuted, fontSize: 11),
               ),
             ],
           ),
@@ -610,8 +649,12 @@ class _CategoryBarState extends ConsumerState<_CategoryBar>
               borderRadius: BorderRadius.circular(3),
               child: LinearProgressIndicator(
                 value: _rateAnim.value,
-                backgroundColor: colors.secondary,
-                valueColor: const AlwaysStoppedAnimation(Color(0xFF32D74B)),
+                backgroundColor: isDark ? colors.secondary : colors.border,
+                valueColor: AlwaysStoppedAnimation(
+                  isDark
+                      ? const Color(0xFF32D74B)
+                      : const Color(0xFF1F9D4C),
+                ),
                 minHeight: 5,
               ),
             ),
@@ -641,8 +684,13 @@ class _LedgerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final sym = l10n.currencySymbol;
     final total = summary.totalIncome + summary.totalExpense;
+    final incomeColor =
+        isDark ? const Color(0xFF32D74B) : const Color(0xFF1F9D4C);
+    final expenseColor =
+        isDark ? const Color(0xFFFF6467) : const Color(0xFFC62828);
 
     return _GlassCard(
       onTap: () => context.go('/ledger'),
@@ -656,7 +704,7 @@ class _LedgerCard extends StatelessWidget {
               Text(
                 l10n.homeLedger,
                 style: TextStyle(
-                  color: colors.textMuted,
+                  color: isDark ? colors.textMuted : colors.textSecondary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.6,
@@ -668,8 +716,8 @@ class _LedgerCard extends StatelessWidget {
                     '${summary.netAmount >= 0 ? '+' : ''}${_fmt(summary.netAmount, sym)}',
                     style: TextStyle(
                       color: summary.netAmount >= 0
-                          ? const Color(0xFF32D74B)
-                          : const Color(0xFFFF6467),
+                          ? incomeColor
+                          : expenseColor,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -677,7 +725,7 @@ class _LedgerCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: colors.textDisabled,
+                    color: colors.textMuted,
                     size: 14,
                   ),
                 ],
@@ -691,7 +739,7 @@ class _LedgerCard extends StatelessWidget {
             label: l10n.income,
             amount: summary.totalIncome,
             total: total,
-            color: const Color(0xFF32D74B),
+            color: incomeColor,
             symbol: sym,
           ),
           const SizedBox(height: 10),
@@ -699,7 +747,7 @@ class _LedgerCard extends StatelessWidget {
             label: l10n.expense,
             amount: summary.totalExpense,
             total: total,
-            color: const Color(0xFFFF6467),
+            color: expenseColor,
             symbol: sym,
           ),
         ],

@@ -141,10 +141,10 @@ class TodoListSection extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF141414),
+                    color: colors.card,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                        color: const Color(0xFF2C2C2C), width: 0.5),
+                        color: colors.border, width: 0.5),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

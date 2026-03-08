@@ -57,7 +57,7 @@ class LedgerCalendarSection extends ConsumerWidget {
         cellMargin: EdgeInsets.zero,
         cellPadding: EdgeInsets.zero,
       ),
-      rowHeight: 60,
+      rowHeight: 54,
       calendarBuilders: CalendarBuilders(
         defaultBuilder: (context, day, focusedDay) => _DayCell(
           day: day,
@@ -124,8 +124,8 @@ class _DayCell extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: 34,
-          height: 34,
+          width: 32,
+          height: 32,
           alignment: Alignment.center,
           decoration: isSelected
               ? BoxDecoration(
@@ -150,7 +150,7 @@ class _DayCell extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 3),
+        const SizedBox(height: 2),
         if (hasData && !isOutside)
           _AmountIndicator(
             expense: totals!.expense,
@@ -158,7 +158,7 @@ class _DayCell extends StatelessWidget {
             isSelected: isSelected,
           )
         else
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
       ],
     );
   }

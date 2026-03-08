@@ -12,6 +12,8 @@ class MemoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final fabBottomOffset = 90.0 + bottomInset;
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -60,14 +62,19 @@ class MemoPage extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'memo_fab',
-        onPressed: () { Haptics.medium(); },
-        backgroundColor: colors.foreground,
-        foregroundColor: colors.background,
-        elevation: 0,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add_rounded, size: 28),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: fabBottomOffset),
+        child: FloatingActionButton(
+          heroTag: 'memo_fab',
+          onPressed: () {
+            Haptics.medium();
+          },
+          backgroundColor: colors.foreground,
+          foregroundColor: colors.background,
+          elevation: 0,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.add_rounded, size: 28),
+        ),
       ),
     );
   }
