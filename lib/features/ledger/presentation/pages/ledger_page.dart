@@ -25,99 +25,86 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
   bool _showCalendar = true; // 기본값 달력 뷰
   DateTime? _selectedDay;
 
-  Future<void> _confirmDelete(BuildContext context, String entryId) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    LedgerEntry entry, {
+    LedgerCategory? category,
+  }) async {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showModalBottomSheet<bool>(
+    final subject = (entry.memo?.trim().isNotEmpty ?? false)
+        ? entry.memo!.trim()
+        : (category?.name ?? entry.type.label);
+    final formattedAmount = entry.amount
+        .toString()
+        .replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},');
+    final amountLabel =
+        '$formattedAmount${l10n.currencySymbol} · ${DateFormat.MMMd(Localizations.localeOf(context).toString()).format(entry.transactionDate)}';
+    final confirmed = await showDialog<bool>(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => Container(
-        margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-        decoration: BoxDecoration(
-          color: colors.card,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colors.border, width: 0.5),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
+        title: Text(
+          l10n.ledgerDeleteTitle,
+          style: TextStyle(
+            color: colors.textPrimary,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-              child: Column(
-                children: [
-                  Text(
-                    l10n.ledgerDeleteTitle,
-                    style: TextStyle(
-                      color: colors.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.ledgerDeleteMessage,
-                    style: TextStyle(
-                      color: colors.textMuted,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
+            Text(
+              subject,
+              style: TextStyle(
+                color: colors.textPrimary,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            Divider(height: 1, color: colors.border),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(16),
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      l10n.cancel,
-                      style: TextStyle(
-                        color: colors.textMuted,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(width: 0.5, height: 48, color: colors.border),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          bottomRight: Radius.circular(16),
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      l10n.delete,
-                      style: TextStyle(
-                        color: colors.destructiveRed,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            const SizedBox(height: 6),
+            Text(
+              amountLabel,
+              style: TextStyle(
+                color: colors.textMuted,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.ledgerDeleteMessage,
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: 15,
+              ),
             ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(color: colors.textMuted),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              l10n.delete,
+              style: TextStyle(color: colors.destructiveRed),
+            ),
+          ),
+        ],
       ),
     );
     if (confirmed == true) {
-      ref.read(ledgerEntriesProvider.notifier).remove(entryId);
+      ref.read(ledgerEntriesProvider.notifier).remove(entry.id);
     }
   }
 
@@ -139,6 +126,12 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
         _selectedDay = day;
       }
     });
+  }
+
+  void _openCreateEntry(BuildContext context) {
+    Haptics.medium();
+    ref.read(ledgerNewEntryInitialDateProvider.notifier).state = _selectedDay;
+    context.push('/ledger/new');
   }
 
   @override
@@ -177,6 +170,14 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
           child: const Text('SENT'),
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.add_rounded,
+              color: colors.textMuted,
+              size: 22,
+            ),
+            onPressed: () => _openCreateEntry(context),
+          ),
           IconButton(
             icon: Icon(
               _showCalendar
@@ -269,18 +270,35 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
           ),
 
           // ── 달력 뷰 (토글) ──────────────────────────────────────
-          if (_showCalendar)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-              child: LedgerCalendarSection(
-                focusedMonth: focusedMonth,
-                selectedDay: _selectedDay,
-                onDaySelected: _onDaySelected,
+          AnimatedSize(
+            duration: const Duration(milliseconds: 240),
+            curve: Curves.easeOutCubic,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: child,
               ),
+              child: _showCalendar
+                  ? Column(
+                      key: const ValueKey('ledger-calendar-visible'),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+                          child: LedgerCalendarSection(
+                            focusedMonth: focusedMonth,
+                            selectedDay: _selectedDay,
+                            onDaySelected: _onDaySelected,
+                          ),
+                        ),
+                        Divider(height: 1, color: colors.border),
+                      ],
+                    )
+                  : const SizedBox(key: ValueKey('ledger-calendar-hidden')),
             ),
-
-          if (_showCalendar)
-            Divider(height: 1, color: colors.border),
+          ),
 
           // ── 항목 리스트 ──────────────────────────────────────────
           Expanded(
@@ -300,6 +318,9 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
               data: (_) {
                 final bottomInset = MediaQuery.paddingOf(context).bottom;
                 final bottomNavReserved = 94.0 + bottomInset;
+                final listKey =
+                    'ledger-body-${_showCalendar ? 'calendar' : 'list'}-${_selectedDay?.millisecondsSinceEpoch ?? 0}-${displayedEntries.length}';
+
                 if (displayedEntries.isEmpty) {
                   return LayoutBuilder(
                     builder: (context, constraints) {
@@ -309,17 +330,27 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                       final topOffset =
                           (visibleHeight * 0.38).clamp(24.0, 96.0);
 
-                      return Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: topOffset),
-                          child: Text(
-                            _selectedDay != null
-                                ? l10n.ledgerEmptyDay
-                                : l10n.ledgerEmptyMonth,
-                            style: TextStyle(
-                              color: colors.textMuted,
-                              fontSize: 14,
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 180),
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeIn,
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                        child: Align(
+                          key: ValueKey(listKey),
+                          alignment: Alignment.topCenter,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: topOffset),
+                            child: Text(
+                              _selectedDay != null
+                                  ? l10n.ledgerEmptyDay
+                                  : l10n.ledgerEmptyMonth,
+                              style: TextStyle(
+                                color: colors.textMuted,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                         ),
@@ -329,45 +360,42 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                 }
 
                 final dates = displayedEntries.keys.toList();
-                return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  itemCount: dates.length,
-                  itemBuilder: (context, index) {
-                    final date = dates[index];
-                    final dayEntries = displayedEntries[date]!;
-                    return _DateGroup(
-                      date: date,
-                      entries: dayEntries,
-                      categoryMap: categoryMap,
-                      onEntryTap: (entry) => context.push(
-                        '/ledger/${entry.id}/edit',
-                        extra: entry,
-                      ),
-                      onEntryDelete: (entry) =>
-                          _confirmDelete(context, entry.id),
-                    );
-                  },
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  ),
+                  child: ListView.builder(
+                    key: ValueKey(listKey),
+                    padding: const EdgeInsets.only(bottom: 16),
+                    itemCount: dates.length,
+                    itemBuilder: (context, index) {
+                      final date = dates[index];
+                      final dayEntries = displayedEntries[date]!;
+                      return _DateGroup(
+                        date: date,
+                        entries: dayEntries,
+                        categoryMap: categoryMap,
+                        onEntryTap: (entry) => context.push(
+                          '/ledger/${entry.id}/edit',
+                          extra: entry,
+                        ),
+                        onEntryDelete: (entry) => _confirmDelete(
+                          context,
+                          entry,
+                          category: categoryMap[entry.categoryId],
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'ledger_fab',
-        onPressed: () {
-          Haptics.medium();
-          ref.read(ledgerNewEntryInitialDateProvider.notifier).state =
-              _selectedDay;
-          context.push('/ledger/new');
-        },
-        backgroundColor: colors.card,
-        foregroundColor: colors.textPrimary,
-        elevation: 0,
-        shape: CircleBorder(
-          side: BorderSide(color: colors.border),
-        ),
-        child: const Icon(Icons.add_rounded),
       ),
     );
   }
