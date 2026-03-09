@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../shared/theme/app_color_theme.dart';
+import '../../../../../shared/widgets/top_toast.dart';
 import '../../domain/models/user_search_result.dart';
 import '../providers/friend_provider.dart';
 import 'social_tiles.dart';
@@ -76,16 +77,12 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
       final displayName = _found!.displayName;
       // 보낸 요청 목록 갱신
       widget.ref.read(sentRequestsProvider.notifier).refresh();
+      showTopToast(context, l10n.friendRequestSent(displayName));
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.friendRequestSent(displayName))),
-      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _sending = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
-      );
+      showTopToast(context, e.toString().replaceAll('Exception: ', ''));
     }
   }
 

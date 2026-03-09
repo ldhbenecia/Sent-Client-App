@@ -126,6 +126,7 @@ class _MoreButton extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
         margin: const EdgeInsets.fromLTRB(12, 0, 12, 40),
@@ -141,7 +142,7 @@ class _MoreButton extends StatelessWidget {
               label: l10n.edit,
               icon: Icons.edit_rounded,
               onTap: () {
-                Navigator.pop(context);
+                Navigator.of(context, rootNavigator: true).pop();
                 onEdit();
               },
             ),
@@ -155,7 +156,7 @@ class _MoreButton extends StatelessWidget {
               icon: Icons.delete_outline_rounded,
               color: colors.destructiveRed,
               onTap: () {
-                Navigator.pop(context);
+                Navigator.of(context, rootNavigator: true).pop();
                 onDelete();
               },
             ),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
+import '../../../../shared/widgets/top_toast.dart';
 import '../providers/friend_provider.dart';
 import '../../domain/models/friend.dart';
 import '../widgets/social_tiles.dart';
@@ -188,11 +189,7 @@ class SocialPage extends ConsumerWidget {
       await ref.read(friendsProvider.notifier).delete(friend.id);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text(e.toString().replaceAll('Exception: ', ''))),
-        );
+        showTopToast(context, e.toString().replaceAll('Exception: ', ''));
       }
     }
   }
@@ -201,6 +198,7 @@ class SocialPage extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (_) => AddFriendSheet(ref: ref),
     );
@@ -295,14 +293,6 @@ class _MyCodeCardState extends ConsumerState<_MyCodeCard> {
     if (_copied) return;
     await Clipboard.setData(ClipboardData(text: code));
     setState(() => _copied = true);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.codeCopied),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) setState(() => _copied = false);
   }

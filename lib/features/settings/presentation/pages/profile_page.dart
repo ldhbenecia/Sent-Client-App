@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/widgets/top_toast.dart';
 import '../../../social/presentation/providers/friend_provider.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -123,9 +124,7 @@ class ProfilePage extends ConsumerWidget {
   }
 
   void _showComingSoon(BuildContext context, AppLocalizations l10n) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.comingSoon)),
-    );
+    showTopToast(context, l10n.comingSoon);
   }
 }
 
@@ -145,14 +144,6 @@ class _UserCodeTileState extends State<_UserCodeTile> {
     if (_copied) return;
     await Clipboard.setData(ClipboardData(text: widget.userCode));
     setState(() => _copied = true);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.codeCopied),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) setState(() => _copied = false);
   }

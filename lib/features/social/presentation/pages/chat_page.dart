@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/widgets/top_toast.dart';
 import '../../domain/models/chat_message.dart';
 import '../providers/chat_provider.dart';
 
@@ -549,10 +550,8 @@ class _OpponentProfileSheet extends StatelessWidget {
               label: l10n.blockUser,
               isDestructive: true,
               onTap: () {
+                showTopToast(context, l10n.comingSoon);
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.comingSoon)),
-                );
               },
             ),
             const SizedBox(height: 8),
