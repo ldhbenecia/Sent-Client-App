@@ -466,6 +466,36 @@ abstract class AppLocalizations {
   /// **'아래 + 버튼으로\n첫 번째 메모를 작성해보세요'**
   String get memoEmptySubtitle;
 
+  /// No description provided for @memoCategory.
+  ///
+  /// In ko, this message translates to:
+  /// **'메모 카테고리'**
+  String get memoCategory;
+
+  /// No description provided for @memoTitleHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'제목을 입력하세요'**
+  String get memoTitleHint;
+
+  /// No description provided for @memoContentHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'내용을 입력하세요 (선택)'**
+  String get memoContentHint;
+
+  /// No description provided for @memoTags.
+  ///
+  /// In ko, this message translates to:
+  /// **'태그'**
+  String get memoTags;
+
+  /// No description provided for @memoTagsHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'쉼표로 구분 (예: 공부, 독서)'**
+  String get memoTagsHint;
+
   /// No description provided for @friendsSection.
   ///
   /// In ko, this message translates to:

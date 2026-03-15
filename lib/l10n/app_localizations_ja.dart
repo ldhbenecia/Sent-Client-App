@@ -194,6 +194,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get memoEmptySubtitle => '下の＋ボタンで\n最初のメモを作成しましょう';
 
   @override
+  String get memoCategory => 'メモカテゴリ';
+
+  @override
+  String get memoTitleHint => 'タイトルを入力してください';
+
+  @override
+  String get memoContentHint => '内容を入力してください（任意）';
+
+  @override
+  String get memoTags => 'タグ';
+
+  @override
+  String get memoTagsHint => 'カンマ区切り（例: 勉強, 読書）';
+
+  @override
   String get friendsSection => '友達';
 
   @override

@@ -73,6 +73,11 @@
 
   "memoEmptyTitle": "메모가 없습니다",
   "memoEmptySubtitle": "아래 + 버튼으로\n첫 번째 메모를 작성해보세요",
+  "memoCategory": "메모 카테고리",
+  "memoTitleHint": "제목을 입력하세요",
+  "memoContentHint": "내용을 입력하세요 (선택)",
+  "memoTags": "태그",
+  "memoTagsHint": "쉼표로 구분 (예: 공부, 독서)",
 
   "friendsSection": "친구",
   "friendRequestsSection": "받은 친구 요청",

@@ -73,6 +73,11 @@
 
   "memoEmptyTitle": "No memos yet",
   "memoEmptySubtitle": "Tap the + button below\nto write your first memo",
+  "memoCategory": "Memo Categories",
+  "memoTitleHint": "Enter a title",
+  "memoContentHint": "Content (optional)",
+  "memoTags": "Tags",
+  "memoTagsHint": "Comma-separated (e.g. study, reading)",
 
   "friendsSection": "Friends",
   "friendRequestsSection": "Friend Requests",

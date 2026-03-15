@@ -73,6 +73,11 @@
 
   "memoEmptyTitle": "メモがありません",
   "memoEmptySubtitle": "下の＋ボタンで\n最初のメモを作成しましょう",
+  "memoCategory": "メモカテゴリ",
+  "memoTitleHint": "タイトルを入力してください",
+  "memoContentHint": "内容を入力してください（任意）",
+  "memoTags": "タグ",
+  "memoTagsHint": "カンマ区切り（例: 勉強, 読書）",
 
   "friendsSection": "友達",
   "friendRequestsSection": "フレンドリクエスト",

@@ -194,6 +194,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get memoEmptySubtitle => '아래 + 버튼으로\n첫 번째 메모를 작성해보세요';
 
   @override
+  String get memoCategory => '메모 카테고리';
+
+  @override
+  String get memoTitleHint => '제목을 입력하세요';
+
+  @override
+  String get memoContentHint => '내용을 입력하세요 (선택)';
+
+  @override
+  String get memoTags => '태그';
+
+  @override
+  String get memoTagsHint => '쉼표로 구분 (예: 공부, 독서)';
+
+  @override
   String get friendsSection => '친구';
 
   @override

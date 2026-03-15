@@ -197,6 +197,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap the + button below\nto write your first memo';
 
   @override
+  String get memoCategory => 'Memo Categories';
+
+  @override
+  String get memoTitleHint => 'Enter a title';
+
+  @override
+  String get memoContentHint => 'Content (optional)';
+
+  @override
+  String get memoTags => 'Tags';
+
+  @override
+  String get memoTagsHint => 'Comma-separated (e.g. study, reading)';
+
+  @override
   String get friendsSection => 'Friends';
 
   @override
