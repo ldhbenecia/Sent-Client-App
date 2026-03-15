@@ -165,8 +165,7 @@ class SocialPage extends ConsumerWidget {
                 fontWeight: FontWeight.w600)),
         content: Text(
           l10n.friendDeleteMessage(friend.friendDisplayName),
-          style:
-              TextStyle(color: colors.textSecondary, fontSize: 15),
+          style: TextStyle(color: colors.textSecondary, fontSize: 15),
         ),
         actions: [
           TextButton(
