@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/widgets/top_toast.dart';
 import '../providers/todo_provider.dart';
 import '../widgets/category_picker_sheet.dart';
 import '../../domain/models/todo_item.dart';
@@ -13,10 +14,11 @@ import '../../domain/models/todo_category.dart';
 // TodoEditPage — 투두 생성/수정
 // ══════════════════════════════════════════════════════════════════
 class TodoEditPage extends ConsumerStatefulWidget {
-  const TodoEditPage({super.key, this.todo, this.initialDate});
+  const TodoEditPage({super.key, this.todo, this.initialDate, this.initialCategoryId});
 
   final TodoItem? todo;
   final DateTime? initialDate;
+  final String? initialCategoryId;
 
   @override
   ConsumerState<TodoEditPage> createState() => _TodoEditPageState();
@@ -41,7 +43,7 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
     final todo = widget.todo;
     _titleCtrl = TextEditingController(text: todo?.title ?? '');
     _date = todo?.date ?? widget.initialDate ?? ref.read(selectedDateProvider);
-    _categoryId = todo?.categoryId;
+    _categoryId = todo?.categoryId ?? widget.initialCategoryId;
     _time = todo?.time;
   }
 
@@ -122,13 +124,7 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
       if (mounted) context.pop();
     } catch (e) {
       if (!mounted) return;
-      final colors = context.colors;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: colors.destructiveRed,
-        ),
-      );
+      showTopToast(context, e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

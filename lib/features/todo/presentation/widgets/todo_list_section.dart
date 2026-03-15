@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../shared/theme/app_color_theme.dart';
+import '../../../../../shared/utils/haptics.dart';
 import '../providers/todo_provider.dart';
 import '../../domain/models/todo_category.dart';
 import '../../domain/models/todo_item.dart';
@@ -88,20 +89,26 @@ class TodoListSection extends ConsumerWidget {
                 ] else
                   const Spacer(),
                 const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () =>
-                      context.push('/todo/new', extra: selectedDate),
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: colors.secondary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.add_rounded,
-                      color: colors.textPrimary,
-                      size: 18,
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Haptics.light();
+                      context.push('/todo/new', extra: {'date': selectedDate});
+                    },
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: colors.secondary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.add_rounded,
+                        color: colors.textPrimary,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ),
@@ -233,33 +240,42 @@ class _EmptyState extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: categories.take(4).map((cat) {
-                return GestureDetector(
-                  onTap: () =>
-                      context.push('/todo/new', extra: selectedDate),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: colors.secondary,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          color: colors.border, width: 0.5),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.add_rounded,
-                            size: 13, color: colors.textMuted),
-                        const SizedBox(width: 4),
-                        Text(
-                          cat.name,
-                          style: TextStyle(
-                            color: colors.textMuted,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                return Material(
+                  color: colors.secondary,
+                  borderRadius: BorderRadius.circular(10),
+                  child: InkWell(
+                    onTap: () {
+                      Haptics.light();
+                      context.push('/todo/new', extra: {
+                        'date': selectedDate,
+                        'categoryId': cat.id,
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 7),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: colors.border, width: 0.5),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add_rounded,
+                              size: 13, color: colors.textMuted),
+                          const SizedBox(width: 4),
+                          Text(
+                            cat.name,
+                            style: TextStyle(
+                              color: colors.textMuted,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );
