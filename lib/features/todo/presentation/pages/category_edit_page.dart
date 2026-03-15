@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/widgets/top_toast.dart';
 import '../providers/todo_provider.dart';
 import '../widgets/category_pickers.dart';
 import '../../domain/models/todo_category.dart';
@@ -67,13 +68,7 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
-      final colors = context.colors;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: colors.destructiveRed,
-        ),
-      );
+      showTopToast(context, e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -157,8 +152,6 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      final messenger = ScaffoldMessenger.of(context);
-                      final deleteRed = context.colors.destructiveRed;
                       final navigator = Navigator.of(context);
                       try {
                         // 이 카테고리의 투두들 카테고리 해제
@@ -179,14 +172,12 @@ class _CategoryEditPageState extends ConsumerState<CategoryEditPage> {
                             .remove(widget.category!.id);
                         if (mounted) navigator.pop();
                       } catch (e) {
-                        messenger.showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              e.toString().replaceAll('Exception: ', ''),
-                            ),
-                            backgroundColor: deleteRed,
-                          ),
-                        );
+                        if (mounted) {
+                          showTopToast(
+                            context,
+                            e.toString().replaceAll('Exception: ', ''),
+                          );
+                        }
                       }
                     },
                     style: TextButton.styleFrom(
