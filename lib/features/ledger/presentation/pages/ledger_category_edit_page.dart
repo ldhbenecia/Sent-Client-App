@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/widgets/top_toast.dart';
 import '../../../todo/presentation/widgets/category_pickers.dart';
 import '../providers/ledger_provider.dart';
 import '../../domain/models/ledger_category.dart';
@@ -69,12 +70,7 @@ class _LedgerCategoryEditPageState
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: context.colors.destructiveRed,
-        ),
-      );
+      showTopToast(context, e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -158,8 +154,6 @@ class _LedgerCategoryEditPageState
                   width: double.infinity,
                   child: TextButton(
                     onPressed: () async {
-                      final messenger = ScaffoldMessenger.of(context);
-                      final deleteRed = context.colors.destructiveRed;
                       final navigator = Navigator.of(context);
                       try {
                         await ref
@@ -167,14 +161,12 @@ class _LedgerCategoryEditPageState
                             .remove(widget.category!.id);
                         if (mounted) navigator.pop();
                       } catch (e) {
-                        messenger.showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              e.toString().replaceAll('Exception: ', ''),
-                            ),
-                            backgroundColor: deleteRed,
-                          ),
-                        );
+                        if (mounted) {
+                          showTopToast(
+                            context,
+                            e.toString().replaceAll('Exception: ', ''),
+                          );
+                        }
                       }
                     },
                     style: TextButton.styleFrom(

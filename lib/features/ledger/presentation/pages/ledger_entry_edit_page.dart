@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/widgets/top_toast.dart';
 import '../providers/ledger_provider.dart';
 import '../../domain/models/ledger_category.dart';
 import '../../domain/models/ledger_entry.dart';
@@ -110,12 +111,7 @@ class _LedgerEntryEditPageState extends ConsumerState<LedgerEntryEditPage> {
       if (mounted) context.pop();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: context.colors.destructiveRed,
-        ),
-      );
+      showTopToast(context, e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
