@@ -6,6 +6,11 @@ import '../../features/ledger/presentation/pages/ledger_category_edit_page.dart'
 import '../../features/ledger/presentation/pages/ledger_category_page.dart';
 import '../../features/ledger/presentation/pages/ledger_entry_edit_page.dart';
 import '../../features/ledger/presentation/pages/ledger_page.dart';
+import '../../features/memo/domain/models/memo_category.dart';
+import '../../features/memo/domain/models/memo_item.dart';
+import '../../features/memo/presentation/pages/memo_category_edit_page.dart';
+import '../../features/memo/presentation/pages/memo_category_page.dart';
+import '../../features/memo/presentation/pages/memo_edit_page.dart';
 import '../../features/memo/presentation/pages/memo_page.dart';
 import '../../features/social/presentation/pages/chat_page.dart';
 import '../../features/social/presentation/pages/chat_list_page.dart';
@@ -59,11 +64,17 @@ List<StatefulShellBranch> buildMainShellBranches() {
             GoRoute(
               path: 'new',
               name: 'todo-create',
-              pageBuilder: (context, state) => CustomTransitionPage(
-                child: TodoEditPage(initialDate: state.extra as DateTime?),
-                transitionsBuilder: (context, animation, secondary, child) =>
-                    slideUpFadeTransition(animation, child),
-              ),
+              pageBuilder: (context, state) {
+                final extra = state.extra as Map<String, dynamic>?;
+                return CustomTransitionPage(
+                  child: TodoEditPage(
+                    initialDate: extra?['date'] as DateTime?,
+                    initialCategoryId: extra?['categoryId'] as String?,
+                  ),
+                  transitionsBuilder: (context, animation, secondary, child) =>
+                      slideUpFadeTransition(animation, child),
+                );
+              },
             ),
             GoRoute(
               path: ':id/edit',
@@ -179,6 +190,46 @@ List<StatefulShellBranch> buildMainShellBranches() {
           path: '/memo',
           name: 'memo',
           builder: (context, state) => const MemoPage(),
+          routes: [
+            GoRoute(
+              path: 'categories',
+              name: 'memo-categories',
+              builder: (context, state) => const MemoCategoryPage(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  name: 'memo-category-create',
+                  builder: (context, state) =>
+                      const MemoCategoryEditPage(category: null),
+                ),
+                GoRoute(
+                  path: ':id/edit',
+                  name: 'memo-category-edit',
+                  builder: (context, state) => MemoCategoryEditPage(
+                    category: state.extra as MemoCategory?,
+                  ),
+                ),
+              ],
+            ),
+            GoRoute(
+              path: 'new',
+              name: 'memo-create',
+              pageBuilder: (context, state) => CustomTransitionPage(
+                child: const MemoEditPage(),
+                transitionsBuilder: (context, animation, secondary, child) =>
+                    slideUpFadeTransition(animation, child),
+              ),
+            ),
+            GoRoute(
+              path: ':id/edit',
+              name: 'memo-edit',
+              pageBuilder: (context, state) => CustomTransitionPage(
+                child: MemoEditPage(memo: state.extra as MemoItem?),
+                transitionsBuilder: (context, animation, secondary, child) =>
+                    slideUpFadeTransition(animation, child),
+              ),
+            ),
+          ],
         ),
       ],
     ),
