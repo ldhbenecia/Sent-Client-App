@@ -114,3 +114,21 @@ chore(deps): table_calendar 패키지 추가
 - 생성 파일(`*.g.dart`, 사용 시 `*.freezed.dart`)은 함께 커밋한다
 - API URL 기본값: `http://localhost:8080`
 - GoRouter `extra`는 `StatefulShellBranch` 간 이동 시 유실될 수 있음 → Riverpod `StateProvider` 사용
+- **`extendBody: true` + 빈 상태 중앙 정렬**: `MainShell` 에 `extendBody: true` 가 설정되어 있으므로 각 페이지의 body가 하단 nav bar 뒤까지 확장된다. `SliverFillRemaining` / `Center` 등으로 빈 상태를 중앙 정렬할 때 반드시 **nav bar 높이만큼 bottom padding** 을 추가해야 시각적 중앙에 위치한다.
+  ```dart
+  final sysPadBottom = MediaQuery.viewPaddingOf(context).bottom; // 시스템 safe area
+  final navBarHeight = 82.0 + sysPadBottom;                     // _LiquidGlassBottomNav SizedBox(82) + safe area
+  // SliverFillRemaining 빈 상태:
+  SliverFillRemaining(
+    hasScrollBody: false,
+    child: Padding(
+      padding: EdgeInsets.only(bottom: navBarHeight),
+      child: Center(child: emptyContent),
+    ),
+  )
+  // FAB 위치 (nav bar 위 ~24px):
+  floatingActionButton: Padding(
+    padding: EdgeInsets.only(bottom: 90.0), // = navBarHeight - sysPadBottom + 8
+    child: FloatingActionButton(...),
+  )
+  ```
