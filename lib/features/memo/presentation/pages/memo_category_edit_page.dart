@@ -158,14 +158,15 @@ class _MemoCategoryEditPageState extends ConsumerState<MemoCategoryEditPage> {
                             ref.read(memoItemsProvider).valueOrNull ?? [];
                         final memoNotifier =
                             ref.read(memoItemsProvider.notifier);
-                        for (final memo in memos) {
-                          if (memo.category?.id == widget.category!.id) {
-                            await memoNotifier.edit(
-                              memo.copyWith(clearCategory: true),
-                              categoryIdUpdated: true,
-                            );
-                          }
-                        }
+                        final toUpdate = memos
+                            .where((m) => m.category?.id == widget.category!.id)
+                            .toList();
+                        await Future.wait(
+                          toUpdate.map((memo) => memoNotifier.edit(
+                                memo.copyWith(clearCategory: true),
+                                categoryIdUpdated: true,
+                              )),
+                        );
                         await ref
                             .read(memoCategoriesProvider.notifier)
                             .remove(widget.category!.id);
