@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../shared/theme/app_color_theme.dart';
 import '../../../../../shared/utils/haptics.dart';
+import '../../../../../shared/utils/layout.dart';
 import '../providers/todo_provider.dart';
 import '../../domain/models/todo_category.dart';
 import '../../domain/models/todo_item.dart';
@@ -197,7 +198,7 @@ class TodoListSection extends ConsumerWidget {
             );
           }),
 
-        const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
+        SliverPadding(padding: EdgeInsets.only(bottom: navBarReservedHeight(context) + 16)),
       ],
     ),
     );
