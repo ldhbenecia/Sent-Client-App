@@ -83,6 +83,14 @@ chore(deps): table_calendar 패키지 추가
 - AsyncValue는 `.when()` 또는 `.valueOrNull ?? []` 패턴 사용
 - 목록 변경은 `AsyncNotifier` + 낙관적 업데이트 패턴 적용
 - `StateProvider`는 단순 UI 상태(선택 월, 선택 날짜 등)에만 사용
+- Repository는 `Provider<T>` 또는 `@riverpod T repository(Ref ref)` 로 제공
+- 파생 값(derived state)은 `@riverpod` 함수형 Provider로 정의
+
+**overlay 정책**:
+- `showTopToast` — 성공/실패 피드백 (짧은 메시지)
+- `showDialog` — 비가역적 동작 확인 (삭제 등)
+- `showModalBottomSheet` — 선택/액션 시트
+- `showModalBottomSheet`에서 `useRootNavigator: true`는 최상위 Shell에서 직접 열리는 시트에만 사용. push된 페이지에서 여는 시트는 불필요
 
 **UI/UX 규칙**:
 - 색상은 항상 `context.colors.*` 참조 (`AppColors.*` 직접 참조 금지; 카테고리 프리셋·로고 primary 스케일은 예외)
@@ -114,21 +122,26 @@ chore(deps): table_calendar 패키지 추가
 - 생성 파일(`*.g.dart`, 사용 시 `*.freezed.dart`)은 함께 커밋한다
 - API URL 기본값: `http://localhost:8080`
 - GoRouter `extra`는 `StatefulShellBranch` 간 이동 시 유실될 수 있음 → Riverpod `StateProvider` 사용
-- **`extendBody: true` + 빈 상태 중앙 정렬**: `MainShell` 에 `extendBody: true` 가 설정되어 있으므로 각 페이지의 body가 하단 nav bar 뒤까지 확장된다. `SliverFillRemaining` / `Center` 등으로 빈 상태를 중앙 정렬할 때 반드시 **nav bar 높이만큼 bottom padding** 을 추가해야 시각적 중앙에 위치한다.
+- **`extendBody: true` + 빈 상태 중앙 정렬**: `MainShell` 에 `extendBody: true` 가 설정되어 있으므로 각 페이지의 body가 하단 nav bar 뒤까지 확장된다. `SliverFillRemaining` / `Center` 등으로 빈 상태를 중앙 정렬할 때 반드시 **`navBarReservedHeight(context)`** 만큼 bottom padding 을 추가해야 시각적 중앙에 위치한다.
+  - helper: `lib/shared/utils/layout.dart` → `navBarReservedHeight(BuildContext context)` → `82.0 + max(sysPad, 12.0)`
+  - **모든 empty/loading/error state, 스크롤 리스트 하단 padding에 의무 적용**
   ```dart
-  final sysPadBottom = MediaQuery.viewPaddingOf(context).bottom; // 시스템 safe area
-  final navBarHeight = 82.0 + sysPadBottom;                     // _LiquidGlassBottomNav SizedBox(82) + safe area
+  import '../../../../shared/utils/layout.dart';
+
   // SliverFillRemaining 빈 상태:
   SliverFillRemaining(
     hasScrollBody: false,
     child: Padding(
-      padding: EdgeInsets.only(bottom: navBarHeight),
+      padding: EdgeInsets.only(bottom: navBarReservedHeight(context)),
       child: Center(child: emptyContent),
     ),
   )
-  // FAB 위치 (nav bar 위 ~24px):
-  floatingActionButton: Padding(
-    padding: EdgeInsets.only(bottom: 90.0), // = navBarHeight - sysPadBottom + 8
-    child: FloatingActionButton(...),
+  // 스크롤 리스트 하단:
+  SliverPadding(padding: EdgeInsets.only(bottom: navBarReservedHeight(context) + 24))
+  // Column > Expanded > Center:
+  Padding(
+    padding: EdgeInsets.only(bottom: navBarReservedHeight(context)),
+    child: Center(child: emptyContent),
   )
   ```
+- **탭 루트 화면의 FAB**: `floatingActionButton` 대신 **AppBar action 아이콘**으로 이동. `extendBody: true` 환경에서 FAB 포지셔닝은 복잡하고 오차가 발생하기 쉬움
