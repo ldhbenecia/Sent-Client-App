@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
 import '../../../../shared/utils/haptics.dart';
+import '../../../../shared/utils/layout.dart';
 import '../../../../shared/widgets/app_nav_menu.dart';
 import '../providers/ledger_provider.dart';
 import '../widgets/ledger_summary_card.dart';
@@ -303,59 +304,55 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
           // ── 항목 리스트 ──────────────────────────────────────────
           Expanded(
             child: entriesAsync.when(
-              loading: () => Center(
-                child: CircularProgressIndicator(
-                  color: colors.textMuted,
-                  strokeWidth: 2,
+              loading: () => Padding(
+                padding: EdgeInsets.only(
+                    bottom: navBarReservedHeight(context)),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: colors.textMuted,
+                    strokeWidth: 2,
+                  ),
                 ),
               ),
-              error: (e, _) => Center(
-                child: Text(
-                  l10n.loadFailed,
-                  style: TextStyle(color: colors.textMuted),
+              error: (e, _) => Padding(
+                padding: EdgeInsets.only(
+                    bottom: navBarReservedHeight(context)),
+                child: Center(
+                  child: Text(
+                    l10n.loadFailed,
+                    style: TextStyle(color: colors.textMuted),
+                  ),
                 ),
               ),
               data: (_) {
-                final bottomInset = MediaQuery.paddingOf(context).bottom;
-                final bottomNavReserved = 94.0 + bottomInset;
                 final listKey =
                     'ledger-body-${_showCalendar ? 'calendar' : 'list'}-${_selectedDay?.millisecondsSinceEpoch ?? 0}-${displayedEntries.length}';
 
                 if (displayedEntries.isEmpty) {
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      final visibleHeight =
-                          (constraints.maxHeight - bottomNavReserved)
-                              .clamp(100.0, constraints.maxHeight);
-                      final topOffset =
-                          (visibleHeight * 0.38).clamp(24.0, 96.0);
-
-                      return AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 180),
-                        switchInCurve: Curves.easeOut,
-                        switchOutCurve: Curves.easeIn,
-                        transitionBuilder: (child, animation) => FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        ),
-                        child: Align(
-                          key: ValueKey(listKey),
-                          alignment: Alignment.topCenter,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: topOffset),
-                            child: Text(
-                              _selectedDay != null
-                                  ? l10n.ledgerEmptyDay
-                                  : l10n.ledgerEmptyMonth,
-                              style: TextStyle(
-                                color: colors.textMuted,
-                                fontSize: 14,
-                              ),
-                            ),
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) => FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    ),
+                    child: Padding(
+                      key: ValueKey(listKey),
+                      padding: EdgeInsets.only(
+                          bottom: navBarReservedHeight(context)),
+                      child: Center(
+                        child: Text(
+                          _selectedDay != null
+                              ? l10n.ledgerEmptyDay
+                              : l10n.ledgerEmptyMonth,
+                          style: TextStyle(
+                            color: colors.textMuted,
+                            fontSize: 14,
                           ),
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   );
                 }
 
@@ -370,7 +367,8 @@ class _LedgerPageState extends ConsumerState<LedgerPage> {
                   ),
                   child: ListView.builder(
                     key: ValueKey(listKey),
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: EdgeInsets.only(
+                        bottom: navBarReservedHeight(context) + 16),
                     itemCount: dates.length,
                     itemBuilder: (context, index) {
                       final date = dates[index];

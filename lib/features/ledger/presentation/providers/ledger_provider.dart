@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/network/api_client.dart';
 import '../../data/repositories/ledger_category_repository.dart';
 import '../../data/repositories/ledger_entry_repository.dart';
@@ -7,6 +8,8 @@ import '../../domain/models/ledger_category.dart';
 import '../../domain/models/ledger_entry.dart';
 import '../../domain/models/ledger_enums.dart';
 import '../../domain/models/ledger_summary.dart';
+
+part 'ledger_provider.g.dart';
 
 // ── Repository providers ───────────────────────────────────────────
 final ledgerCategoryRepositoryProvider =
@@ -18,26 +21,22 @@ final ledgerEntryRepositoryProvider = Provider<LedgerEntryRepository>((ref) {
   return LedgerEntryRepository(ref.watch(dioProvider));
 });
 
-// ── 선택 월 상태 ───────────────────────────────────────────────────
+// ── 선택 월 상태 (ephemeral UI state → StateProvider 유지) ────────
 final ledgerMonthProvider =
     StateProvider<({int year, int month})>((ref) {
   final now = DateTime.now();
   return (year: now.year, month: now.month);
 });
 
-// ── 새 항목 추가 시 기본 거래일 (캘린더 선택일) ─────────────────────
+// ── 새 항목 추가 시 기본 거래일 (ephemeral UI state → StateProvider 유지) ──
 final ledgerNewEntryInitialDateProvider =
     StateProvider<DateTime?>((ref) => null);
 
 // ══════════════════════════════════════════════════════════════════
 // 카테고리 AsyncNotifier
 // ══════════════════════════════════════════════════════════════════
-final ledgerCategoriesProvider =
-    AsyncNotifierProvider<LedgerCategoriesNotifier, List<LedgerCategory>>(
-  LedgerCategoriesNotifier.new,
-);
-
-class LedgerCategoriesNotifier extends AsyncNotifier<List<LedgerCategory>> {
+@riverpod
+class LedgerCategories extends _$LedgerCategories {
   @override
   Future<List<LedgerCategory>> build() =>
       ref.read(ledgerCategoryRepositoryProvider).fetchAll();
@@ -76,12 +75,8 @@ class LedgerCategoriesNotifier extends AsyncNotifier<List<LedgerCategory>> {
 // ══════════════════════════════════════════════════════════════════
 // 항목 AsyncNotifier (월 단위)
 // ══════════════════════════════════════════════════════════════════
-final ledgerEntriesProvider =
-    AsyncNotifierProvider<LedgerEntriesNotifier, List<LedgerEntry>>(
-  LedgerEntriesNotifier.new,
-);
-
-class LedgerEntriesNotifier extends AsyncNotifier<List<LedgerEntry>> {
+@riverpod
+class LedgerEntries extends _$LedgerEntries {
   @override
   Future<List<LedgerEntry>> build() {
     final month = ref.watch(ledgerMonthProvider);
@@ -144,13 +139,8 @@ class LedgerEntriesNotifier extends AsyncNotifier<List<LedgerEntry>> {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// 월별 통계 AsyncNotifier
+// 월별 통계 (manual provider — LedgerSummary 도메인 모델과 이름 충돌 방지)
 // ══════════════════════════════════════════════════════════════════
-final ledgerSummaryProvider =
-    AsyncNotifierProvider<LedgerSummaryNotifier, LedgerSummary>(
-  LedgerSummaryNotifier.new,
-);
-
 class LedgerSummaryNotifier extends AsyncNotifier<LedgerSummary> {
   @override
   Future<LedgerSummary> build() {
@@ -161,9 +151,14 @@ class LedgerSummaryNotifier extends AsyncNotifier<LedgerSummary> {
   }
 }
 
+final ledgerSummaryProvider =
+    AsyncNotifierProvider<LedgerSummaryNotifier, LedgerSummary>(
+  LedgerSummaryNotifier.new,
+);
+
 // ── 날짜별 그룹 파생 Provider ─────────────────────────────────────
-final entriesByDateProvider =
-    Provider<Map<DateTime, List<LedgerEntry>>>((ref) {
+@riverpod
+Map<DateTime, List<LedgerEntry>> entriesByDate(Ref ref) {
   final entries = ref.watch(ledgerEntriesProvider).valueOrNull ?? [];
   final Map<DateTime, List<LedgerEntry>> grouped = {};
   for (final entry in entries) {
@@ -180,11 +175,11 @@ final entriesByDateProvider =
       ..sort((a, b) => b.key.compareTo(a.key)),
   );
   return sorted;
-});
+}
 
 // ── 일별 지출/수입 합계 파생 Provider ────────────────────────────
-final ledgerDayTotalsProvider =
-    Provider<Map<DateTime, ({int expense, int income})>>((ref) {
+@riverpod
+Map<DateTime, ({int expense, int income})> ledgerDayTotals(Ref ref) {
   final entries = ref.watch(ledgerEntriesProvider).valueOrNull ?? [];
   final Map<DateTime, ({int expense, int income})> totals = {};
   for (final entry in entries) {
@@ -199,4 +194,4 @@ final ledgerDayTotalsProvider =
         : (expense: prev.expense, income: prev.income + entry.amount);
   }
   return totals;
-});
+}
