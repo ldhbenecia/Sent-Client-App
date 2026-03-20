@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../../data/repositories/friend_repository.dart';
@@ -7,8 +8,20 @@ import '../../data/repositories/user_repository.dart';
 import '../../domain/models/friend.dart';
 import '../../domain/models/user_profile.dart';
 
+part 'friend_provider.g.dart';
+
+// ── Repository providers ───────────────────────────────────────────
+final friendRepositoryProvider = Provider<FriendRepository>((ref) {
+  return FriendRepository(ref.watch(dioProvider));
+});
+
+final userRepositoryProvider = Provider<UserRepository>((ref) {
+  return UserRepository(ref.watch(dioProvider));
+});
+
 // ── 내 프로필 (JWT sub → GET /api/v1/users/{id}) ──────────────────
-final myProfileProvider = FutureProvider<UserProfile?>((ref) async {
+@riverpod
+Future<UserProfile?> myProfile(Ref ref) async {
   final token = await ref.watch(tokenStorageProvider).getAccessToken();
   if (token == null) return null;
   try {
@@ -24,19 +37,11 @@ final myProfileProvider = FutureProvider<UserProfile?>((ref) async {
   } catch (_) {
     return null;
   }
-});
-
-// ── Repository providers ───────────────────────────────────────────
-final friendRepositoryProvider = Provider<FriendRepository>((ref) {
-  return FriendRepository(ref.watch(dioProvider));
-});
-
-final userRepositoryProvider = Provider<UserRepository>((ref) {
-  return UserRepository(ref.watch(dioProvider));
-});
+}
 
 // ── 친구 목록 ─────────────────────────────────────────────────────
-class FriendsNotifier extends AsyncNotifier<List<Friend>> {
+@riverpod
+class Friends extends _$Friends {
   @override
   Future<List<Friend>> build() =>
       ref.read(friendRepositoryProvider).fetchAll();
@@ -56,11 +61,9 @@ class FriendsNotifier extends AsyncNotifier<List<Friend>> {
   }
 }
 
-final friendsProvider =
-    AsyncNotifierProvider<FriendsNotifier, List<Friend>>(FriendsNotifier.new);
-
 // ── 내가 보낸 친구 요청 목록 ──────────────────────────────────────
-class SentRequestsNotifier extends AsyncNotifier<List<SentFriendRequest>> {
+@riverpod
+class SentRequests extends _$SentRequests {
   @override
   Future<List<SentFriendRequest>> build() =>
       ref.read(friendRepositoryProvider).fetchSentRequests();
@@ -80,12 +83,9 @@ class SentRequestsNotifier extends AsyncNotifier<List<SentFriendRequest>> {
   }
 }
 
-final sentRequestsProvider =
-    AsyncNotifierProvider<SentRequestsNotifier, List<SentFriendRequest>>(
-        SentRequestsNotifier.new);
-
 // ── 받은 친구 요청 목록 ────────────────────────────────────────────
-class PendingRequestsNotifier extends AsyncNotifier<List<FriendRequest>> {
+@riverpod
+class PendingRequests extends _$PendingRequests {
   @override
   Future<List<FriendRequest>> build() =>
       ref.read(friendRepositoryProvider).fetchPendingRequests();
@@ -112,7 +112,3 @@ class PendingRequestsNotifier extends AsyncNotifier<List<FriendRequest>> {
     );
   }
 }
-
-final pendingRequestsProvider =
-    AsyncNotifierProvider<PendingRequestsNotifier, List<FriendRequest>>(
-        PendingRequestsNotifier.new);

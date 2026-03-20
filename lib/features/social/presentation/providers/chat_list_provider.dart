@@ -1,8 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/repositories/chat_repository.dart';
 import '../../domain/models/chat_room.dart';
 
-class ChatListNotifier extends AsyncNotifier<List<ChatRoom>> {
+part 'chat_list_provider.g.dart';
+
+@riverpod
+class ChatList extends _$ChatList {
   @override
   Future<List<ChatRoom>> build() =>
       ref.read(chatRepositoryProvider).fetchRooms();
@@ -14,7 +17,3 @@ class ChatListNotifier extends AsyncNotifier<List<ChatRoom>> {
     );
   }
 }
-
-final chatListProvider =
-    AsyncNotifierProvider<ChatListNotifier, List<ChatRoom>>(
-        ChatListNotifier.new);
