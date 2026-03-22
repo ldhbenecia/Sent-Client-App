@@ -1,0 +1,20 @@
+{
+  "flutter": {
+    "platforms": {
+      "ios": {
+        "default": {
+          "projectId": "sent-74112",
+          "appId": "1:620214678156:ios:b09e2201ce2084f3ea41a9",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "sent-74112",
+          "configurations": { "ios": "1:620214678156:ios:b09e2201ce2084f3ea41a9" }
+        }
+      }
+    }
+  }
+}
