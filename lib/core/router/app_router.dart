@@ -10,6 +10,7 @@ import '../../features/todo/presentation/providers/todo_provider.dart';
 import '../../shared/widgets/main_shell.dart';
 import '../../shared/theme/app_color_theme.dart';
 import '../auth/auth_state.dart';
+import '../notification/fcm_token_provider.dart';
 import '../storage/token_storage.dart';
 import 'route_transitions.dart';
 import 'shell_branches.dart';
@@ -38,7 +39,11 @@ GoRouter appRouter(Ref ref) {
       try {
         final hasToken = await tokenStorage.hasToken();
         if (!hasToken && !isAuthRoute) return '/auth/login';
-        if (hasToken && isAuthRoute) return '/home';
+        if (hasToken && isAuthRoute) {
+          // 로그인 직후 FCM 토큰 등록
+          ref.invalidate(registerFcmTokenProvider);
+          return '/home';
+        }
       } catch (_) {
         if (!isAuthRoute) return '/auth/login';
       }

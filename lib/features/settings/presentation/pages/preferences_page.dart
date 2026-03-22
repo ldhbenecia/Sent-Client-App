@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/notification/fcm_token_provider.dart';
+import '../../../../core/notification/notification_service.dart';
 import '../../../../core/storage/token_storage.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
@@ -236,6 +238,12 @@ class PreferencesPage extends ConsumerWidget {
     );
 
     if (confirmed != true || !context.mounted) return;
+
+    // FCM 토큰 삭제 (서버)
+    try {
+      final fcmRepo = ref.read(fcmTokenRepositoryProvider);
+      await fcmRepo.unregisterToken();
+    } catch (_) {}
 
     final tokenStorage = ref.read(tokenStorageProvider);
     final refreshToken = await tokenStorage.getRefreshToken();
@@ -756,6 +764,15 @@ class _SwitchTileState extends State<_SwitchTile> {
     setState(() => _value = v);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(widget.prefKey, v);
+
+    // FCM 토픽 구독/해제
+    final topic = widget.prefKey; // e.g. 'notif_friend_request', 'notif_todo'
+    final service = NotificationService.instance;
+    if (v) {
+      await service.subscribeToTopic(topic);
+    } else {
+      await service.unsubscribeFromTopic(topic);
+    }
   }
 
   @override
