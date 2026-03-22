@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../shared/theme/app_color_theme.dart';
+import '../../../../../shared/widgets/pressable_highlight.dart';
 import '../../../../../shared/utils/haptics.dart';
 import '../../domain/models/todo_item.dart';
 
@@ -24,11 +25,10 @@ class TodoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return InkWell(
+    return PressableHighlight(
       onTap: () { Haptics.light(); onEdit(); },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
@@ -87,7 +87,6 @@ class TodoTile extends StatelessWidget {
             _MoreButton(onEdit: onEdit, onDelete: onDelete),
           ],
         ),
-      ),
     );
   }
 
@@ -184,20 +183,18 @@ class _OptionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final c = color ?? colors.textPrimary;
-    return InkWell(
+    return PressableHighlight(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: c),
-            const SizedBox(width: 12),
-            Text(label,
-                style: TextStyle(
-                    color: c, fontSize: 15, fontWeight: FontWeight.w500)),
-          ],
-        ),
+      borderRadius: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: c),
+          const SizedBox(width: 12),
+          Text(label,
+              style: TextStyle(
+                  color: c, fontSize: 15, fontWeight: FontWeight.w500)),
+        ],
       ),
     );
   }

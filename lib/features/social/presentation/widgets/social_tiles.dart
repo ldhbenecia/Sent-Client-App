@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../shared/theme/app_color_theme.dart';
+import '../../../../../shared/widgets/pressable_highlight.dart';
 import '../../domain/models/friend.dart';
 
 // ── 섹션 컨테이너 ──────────────────────────────────────────────────
@@ -58,16 +59,11 @@ class FriendTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
+    return PressableHighlight(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        splashColor: Colors.white.withValues(alpha: 0.04),
-        highlightColor: Colors.white.withValues(alpha: 0.02),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
+        borderRadius: 8,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
             children: [
               SocialAvatar(
                 imageUrl: friend.friendProfileImageUrl,
@@ -106,8 +102,6 @@ class FriendTile extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 }

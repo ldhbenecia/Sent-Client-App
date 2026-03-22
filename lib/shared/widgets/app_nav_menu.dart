@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../utils/haptics.dart';
+import 'pressable_highlight.dart';
 
 
 // ══════════════════════════════════════════════════════════════════
@@ -262,23 +263,20 @@ class _NavRow extends StatelessWidget {
     final textColor = secondary
         ? Colors.white.withValues(alpha: 0.50)
         : Colors.white.withValues(alpha: 0.92);
-    return InkWell(
+    return PressableHighlight(
       onTap: () { Haptics.light(); onTap(); },
-      splashFactory: NoSplash.splashFactory,
-      highlightColor: Colors.white.withValues(alpha: 0.07),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 22,
-          vertical: secondary ? 11.0 : 15.0,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: textColor,
-            fontSize: secondary ? 19.0 : 30.0,
-            fontWeight: FontWeight.w300,
-            letterSpacing: -0.3,
-          ),
+      highlightAlpha: 0.07,
+      padding: EdgeInsets.symmetric(
+        horizontal: 22,
+        vertical: secondary ? 11.0 : 15.0,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: textColor,
+          fontSize: secondary ? 19.0 : 30.0,
+          fontWeight: FontWeight.w300,
+          letterSpacing: -0.3,
         ),
       ),
     );

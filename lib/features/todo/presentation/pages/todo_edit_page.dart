@@ -299,19 +299,34 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                 ),
 
                 // 인라인 시간 드럼 피커
-                if (_showTimePicker)
-                  TapRegion(
-                    groupId: 'timePicker',
-                    onTapOutside: (_) =>
-                        setState(() => _showTimePicker = false),
-                    child: _InlineTimePicker(
-                      initialTime: _time ?? const TimeOfDay(hour: 9, minute: 0),
-                      onConfirm: (t) =>
-                          setState(() { _time = t; _showTimePicker = false; }),
-                      onReset: () =>
-                          setState(() { _time = null; _showTimePicker = false; }),
-                    ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutCubic,
+                  clipBehavior: Clip.none,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) =>
+                        FadeTransition(opacity: animation, child: child),
+                    child: _showTimePicker
+                        ? TapRegion(
+                            key: const ValueKey('timePicker-visible'),
+                            groupId: 'timePicker',
+                            onTapOutside: (_) =>
+                                setState(() => _showTimePicker = false),
+                            child: _InlineTimePicker(
+                              initialTime: _time ?? const TimeOfDay(hour: 9, minute: 0),
+                              onConfirm: (t) =>
+                                  setState(() { _time = t; _showTimePicker = false; }),
+                              onReset: () =>
+                                  setState(() { _time = null; _showTimePicker = false; }),
+                            ),
+                          )
+                        : const SizedBox.shrink(
+                            key: ValueKey('timePicker-hidden')),
                   ),
+                ),
 
                 // 알림 (토글)
                 TapRegion(
@@ -333,17 +348,32 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
                 ),
 
                 // 인라인 알림 옵션 피커
-                if (_showAlarmPicker)
-                  TapRegion(
-                    groupId: 'alarmPicker',
-                    onTapOutside: (_) =>
-                        setState(() => _showAlarmPicker = false),
-                    child: _InlineAlarmOptions(
-                      selected: _alarmMinutes,
-                      onSelect: (v) =>
-                          setState(() { _alarmMinutes = v; _showAlarmPicker = false; }),
-                    ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutCubic,
+                  clipBehavior: Clip.none,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) =>
+                        FadeTransition(opacity: animation, child: child),
+                    child: _showAlarmPicker
+                        ? TapRegion(
+                            key: const ValueKey('alarmPicker-visible'),
+                            groupId: 'alarmPicker',
+                            onTapOutside: (_) =>
+                                setState(() => _showAlarmPicker = false),
+                            child: _InlineAlarmOptions(
+                              selected: _alarmMinutes,
+                              onSelect: (v) =>
+                                  setState(() { _alarmMinutes = v; _showAlarmPicker = false; }),
+                            ),
+                          )
+                        : const SizedBox.shrink(
+                            key: ValueKey('alarmPicker-hidden')),
                   ),
+                ),
               ],
             ),
           ),
@@ -429,7 +459,7 @@ class _TodoEditPageState extends ConsumerState<TodoEditPage> {
 // ══════════════════════════════════════════════════════════════════
 // 폼 행 위젯
 // ══════════════════════════════════════════════════════════════════
-class _FormRow extends StatelessWidget {
+class _FormRow extends StatefulWidget {
   const _FormRow({
     required this.label,
     this.trailing,
@@ -443,16 +473,51 @@ class _FormRow extends StatelessWidget {
   final bool isExpanded;
 
   @override
+  State<_FormRow> createState() => _FormRowState();
+}
+
+class _FormRowState extends State<_FormRow> {
+  bool _pressed = false;
+  bool _holding = false;
+
+  void _onDown() {
+    setState(() { _pressed = true; _holding = true; });
+  }
+
+  void _onUp() {
+    _holding = false;
+    // 최소 120ms 유지 후 해제
+    Future.delayed(const Duration(milliseconds: 120), () {
+      if (mounted && !_holding) setState(() => _pressed = false);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: widget.onTap != null ? (_) => _onDown() : null,
+      onTapUp: widget.onTap != null ? (_) => _onUp() : null,
+      onTapCancel: widget.onTap != null
+          ? () { _holding = false; setState(() => _pressed = false); }
+          : null,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: _pressed ? 30 : 200),
+        curve: Curves.easeOut,
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          color: _pressed
+              ? colors.textPrimary.withValues(alpha: 0.06)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Row(
           children: [
             Text(
-              label,
+              widget.label,
               style: TextStyle(
                 color: colors.textPrimary,
                 fontSize: 15,
@@ -460,11 +525,11 @@ class _FormRow extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            ?trailing,
-            if (onTap != null) ...[
+            ?widget.trailing,
+            if (widget.onTap != null) ...[
               const SizedBox(width: 4),
               AnimatedRotation(
-                turns: isExpanded ? 0.25 : 0,
+                turns: widget.isExpanded ? 0.25 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: Icon(Icons.chevron_right_rounded,
                     size: 18, color: colors.textDisabled),
@@ -683,15 +748,37 @@ class _InlineTimePickerState extends State<_InlineTimePicker> {
 // ══════════════════════════════════════════════════════════════════
 // 인라인 알림 옵션 피커
 // ══════════════════════════════════════════════════════════════════
-class _InlineAlarmOptions extends StatelessWidget {
+class _InlineAlarmOptions extends StatefulWidget {
   const _InlineAlarmOptions({required this.selected, required this.onSelect});
 
   final int? selected;
   final void Function(int?) onSelect;
 
   @override
+  State<_InlineAlarmOptions> createState() => _InlineAlarmOptionsState();
+}
+
+class _InlineAlarmOptionsState extends State<_InlineAlarmOptions> {
+  late int? _localSelected;
+  bool _closing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _localSelected = widget.selected;
+  }
+
+  void _onTap(int? value) {
+    if (_closing) return;
+    _closing = true;
+    setState(() => _localSelected = value);
+    Future.delayed(const Duration(milliseconds: 180), () {
+      if (mounted) widget.onSelect(value);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
 
     final options = <(int?, String)>[
@@ -737,36 +824,11 @@ class _InlineAlarmOptions extends StatelessWidget {
         child: Column(
           children: options.map((opt) {
             final (value, label) = opt;
-            final isSelected = selected == value;
-            return InkWell(
-              onTap: () => onSelect(value),
-              splashFactory: NoSplash.splashFactory,
-              highlightColor: Colors.white.withValues(alpha: 0.06),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 13),
-                child: Row(
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        color: isSelected
-                            ? colors.textPrimary
-                            : colors.textSecondary,
-                        fontSize: 15,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.w400,
-                      ),
-                    ),
-                    const Spacer(),
-                    ?(isSelected
-                        ? Icon(Icons.check_rounded,
-                            size: 16, color: colors.textPrimary)
-                        : null),
-                  ],
-                ),
-              ),
+            final isSelected = _localSelected == value;
+            return _AlarmOptionRow(
+              label: label,
+              isSelected: isSelected,
+              onTap: () => _onTap(value),
             );
           }).toList(),
         ),
@@ -776,3 +838,92 @@ class _InlineAlarmOptions extends StatelessWidget {
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════════
+// 알림 옵션 행 (터치 피드백)
+// ══════════════════════════════════════════════════════════════════
+class _AlarmOptionRow extends StatefulWidget {
+  const _AlarmOptionRow({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  State<_AlarmOptionRow> createState() => _AlarmOptionRowState();
+}
+
+class _AlarmOptionRowState extends State<_AlarmOptionRow> {
+  bool _pressed = false;
+  bool _holding = false;
+
+  void _onDown() {
+    setState(() { _pressed = true; _holding = true; });
+  }
+
+  void _onUp() {
+    _holding = false;
+    Future.delayed(const Duration(milliseconds: 120), () {
+      if (mounted && !_holding) setState(() => _pressed = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final showHighlight = _pressed || widget.isSelected;
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: (_) => _onDown(),
+      onTapUp: (_) => _onUp(),
+      onTapCancel: () { _holding = false; setState(() => _pressed = false); },
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: _pressed ? 30 : 160),
+        curve: Curves.easeOut,
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+        decoration: BoxDecoration(
+          color: showHighlight
+              ? colors.textPrimary.withValues(alpha: 0.06)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Text(
+              widget.label,
+              style: TextStyle(
+                color: widget.isSelected
+                    ? colors.textPrimary
+                    : colors.textSecondary,
+                fontSize: 15,
+                fontWeight:
+                    widget.isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+            const Spacer(),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 160),
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: animation,
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: widget.isSelected
+                  ? Icon(Icons.check_rounded,
+                      key: const ValueKey('check'),
+                      size: 16,
+                      color: colors.textPrimary)
+                  : const SizedBox.shrink(key: ValueKey('empty')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

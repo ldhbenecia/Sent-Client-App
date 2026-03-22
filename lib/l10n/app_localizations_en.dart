@@ -57,6 +57,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
+  String get friendRequestNotification => 'Friend Request Notifications';
+
+  @override
+  String get todoReminderNotification => 'Todo Reminders';
+
+  @override
+  String get categoryManagement => 'Category Management';
+
+  @override
   String get info => 'About';
 
   @override

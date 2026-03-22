@@ -53,7 +53,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         children: [
           const SizedBox(height: 16),
           _ToggleTile(
-            label: '친구 요청 알림',
+            label: AppLocalizations.of(context)!.friendRequestNotification,
             value: _notifFriendRequest,
             onChanged: (v) {
               setState(() => _notifFriendRequest = v);
@@ -61,7 +61,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             },
           ),
           _ToggleTile(
-            label: '할 일 알림',
+            label: AppLocalizations.of(context)!.todoReminderNotification,
             value: _notifTodo,
             onChanged: (v) {
               setState(() => _notifTodo = v);

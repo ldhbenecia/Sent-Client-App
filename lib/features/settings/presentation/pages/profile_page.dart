@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/widgets/pressable_highlight.dart';
 import '../../../../shared/widgets/top_toast.dart';
 import '../../../social/presentation/providers/friend_provider.dart';
 
@@ -243,31 +244,28 @@ class _NavTile extends StatelessWidget {
     final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      child: Material(
-        color: colors.card,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.card,
           borderRadius: BorderRadius.circular(14),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: colors.border, width: 0.5),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(label,
-                      style: TextStyle(
-                          color: colors.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400)),
-                ),
-                Icon(Icons.chevron_right_rounded,
-                    color: colors.textDisabled, size: 20),
-              ],
-            ),
+          border: Border.all(color: colors.border, width: 0.5),
+        ),
+        child: PressableHighlight(
+          onTap: onTap,
+          borderRadius: 14,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(label,
+                    style: TextStyle(
+                        color: colors.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400)),
+              ),
+              Icon(Icons.chevron_right_rounded,
+                  color: colors.textDisabled, size: 20),
+            ],
           ),
         ),
       ),

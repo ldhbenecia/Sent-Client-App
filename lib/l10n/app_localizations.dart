@@ -196,6 +196,24 @@ abstract class AppLocalizations {
   /// **'알림'**
   String get notifications;
 
+  /// No description provided for @friendRequestNotification.
+  ///
+  /// In ko, this message translates to:
+  /// **'친구 요청 알림'**
+  String get friendRequestNotification;
+
+  /// No description provided for @todoReminderNotification.
+  ///
+  /// In ko, this message translates to:
+  /// **'할 일 알림'**
+  String get todoReminderNotification;
+
+  /// No description provided for @categoryManagement.
+  ///
+  /// In ko, this message translates to:
+  /// **'카테고리 관리'**
+  String get categoryManagement;
+
   /// No description provided for @info.
   ///
   /// In ko, this message translates to:

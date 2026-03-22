@@ -57,6 +57,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notifications => '通知';
 
   @override
+  String get friendRequestNotification => '友達リクエスト通知';
+
+  @override
+  String get todoReminderNotification => 'To-Do通知';
+
+  @override
+  String get categoryManagement => 'カテゴリー管理';
+
+  @override
   String get info => '情報';
 
   @override

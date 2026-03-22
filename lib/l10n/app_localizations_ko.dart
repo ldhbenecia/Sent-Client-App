@@ -57,6 +57,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get notifications => '알림';
 
   @override
+  String get friendRequestNotification => '친구 요청 알림';
+
+  @override
+  String get todoReminderNotification => '할 일 알림';
+
+  @override
+  String get categoryManagement => '카테고리 관리';
+
+  @override
   String get info => '정보';
 
   @override

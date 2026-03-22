@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/theme/app_color_theme.dart';
+import '../../../../shared/widgets/pressable_highlight.dart';
 import '../../../social/domain/models/chat_room.dart';
 import '../../../social/presentation/providers/chat_list_provider.dart';
 import '../../../social/presentation/widgets/social_tiles.dart';
@@ -135,9 +136,7 @@ class _ChatRoomTile extends StatelessWidget {
           msgDt.day == now.day;
     }
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
+    return PressableHighlight(
         onTap: () => context.push(
           '/social/chat',
           extra: {
@@ -146,11 +145,8 @@ class _ChatRoomTile extends StatelessWidget {
             'opponentProfileImageUrl': room.opponentProfileImageUrl,
           },
         ),
-        splashColor: Colors.white.withValues(alpha: 0.04),
-        highlightColor: Colors.white.withValues(alpha: 0.02),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
             children: [
               SocialAvatar(
                 imageUrl: room.opponentProfileImageUrl,
@@ -207,8 +203,6 @@ class _ChatRoomTile extends StatelessWidget {
               ],
             ],
           ),
-        ),
-      ),
     );
   }
 }
