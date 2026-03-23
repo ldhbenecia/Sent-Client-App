@@ -241,8 +241,11 @@ class PreferencesPage extends ConsumerWidget {
 
     // FCM 토큰 삭제 (서버)
     try {
-      final fcmRepo = ref.read(fcmTokenRepositoryProvider);
-      await fcmRepo.unregisterToken();
+      final fcmToken = await NotificationService.instance.getToken();
+      if (fcmToken != null) {
+        final fcmRepo = ref.read(fcmTokenRepositoryProvider);
+        await fcmRepo.unregisterToken(fcmToken);
+      }
     } catch (_) {}
 
     final tokenStorage = ref.read(tokenStorageProvider);

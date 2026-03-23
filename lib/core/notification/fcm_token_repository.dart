@@ -13,7 +13,7 @@ class FcmTokenRepository {
   }
 
   /// 로그아웃 시 서버에서 토큰 삭제
-  Future<void> unregisterToken() async {
-    await _dio.delete('/api/v1/fcm/token');
+  Future<void> unregisterToken(String token) async {
+    await _dio.delete('/api/v1/fcm/token', data: {'token': token});
   }
 }
