@@ -15,21 +15,19 @@ class SentLogo extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: colors.card,
+        color: const Color(0xFF0F0F0F),
         borderRadius: BorderRadius.circular(size * 0.24),
         border: Border.all(color: colors.border, width: 0.5),
       ),
       child: CustomPaint(
-        painter: _SentIconPainter(cardColor: colors.card),
+        painter: const _SentIconPainter(),
       ),
     );
   }
 }
 
 class _SentIconPainter extends CustomPainter {
-  const _SentIconPainter({required this.cardColor});
-
-  final Color cardColor;
+  const _SentIconPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -43,7 +41,7 @@ class _SentIconPainter extends CustomPainter {
         radius: 0.9,
         colors: [
           const Color(0xFF242424),
-          cardColor,
+          const Color(0xFF0F0F0F),
         ],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
     final rrect = RRect.fromRectAndRadius(
@@ -154,6 +152,5 @@ class _SentIconPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _SentIconPainter oldDelegate) =>
-      oldDelegate.cardColor != cardColor;
+  bool shouldRepaint(covariant _SentIconPainter oldDelegate) => false;
 }
