@@ -398,10 +398,13 @@ class _ProfileCardState extends ConsumerState<_ProfileCard> {
                             profile.userCode,
                             style: TextStyle(
                               color: colors.textPrimary,
-                              fontSize: 13,
+                              fontSize: 11.5,
                               fontWeight: FontWeight.w600,
-                              letterSpacing: 1.0,
+                              letterSpacing: 0.3,
+                              fontFeatures: const [FontFeature.tabularFigures()],
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         AnimatedSwitcher(
