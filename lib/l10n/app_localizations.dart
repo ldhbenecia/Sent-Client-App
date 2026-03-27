@@ -595,7 +595,7 @@ abstract class AppLocalizations {
   /// No description provided for @codeHint.
   ///
   /// In ko, this message translates to:
-  /// **'유저코드 (예: ABCD1234)'**
+  /// **'유저코드를 붙여넣으세요'**
   String get codeHint;
 
   /// No description provided for @search.

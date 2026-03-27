@@ -259,7 +259,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addFriendSubtitle => 'ユーザーコードで友達を検索してください。';
 
   @override
-  String get codeHint => 'ユーザーコード（例: ABCD1234）';
+  String get codeHint => 'ユーザーコードを貼り付け';
 
   @override
   String get search => '検索';

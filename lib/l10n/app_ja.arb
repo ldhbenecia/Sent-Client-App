@@ -100,7 +100,7 @@
   "copy": "コピー",
   "addFriend": "友達を追加",
   "addFriendSubtitle": "ユーザーコードで友達を検索してください。",
-  "codeHint": "ユーザーコード（例: ABCD1234）",
+  "codeHint": "ユーザーコードを貼り付け",
   "search": "検索",
   "userNotFound": "一致するユーザーが見つかりません。",
   "friendRequestSent": "{name}さんにフレンドリクエストを送りました。",

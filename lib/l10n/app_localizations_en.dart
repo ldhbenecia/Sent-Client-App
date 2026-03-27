@@ -263,7 +263,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addFriendSubtitle => 'Search by user code.';
 
   @override
-  String get codeHint => 'User code (e.g. ABCD1234)';
+  String get codeHint => 'Paste user code';
 
   @override
   String get search => 'Search';

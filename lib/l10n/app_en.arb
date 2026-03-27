@@ -100,7 +100,7 @@
   "copy": "Copy",
   "addFriend": "Add Friend",
   "addFriendSubtitle": "Search by user code.",
-  "codeHint": "User code (e.g. ABCD1234)",
+  "codeHint": "Paste user code",
   "search": "Search",
   "userNotFound": "No matching user found.",
   "friendRequestSent": "Friend request sent to {name}.",

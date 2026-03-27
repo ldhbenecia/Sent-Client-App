@@ -259,7 +259,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get addFriendSubtitle => '유저코드로 친구를 검색하세요.';
 
   @override
-  String get codeHint => '유저코드 (예: ABCD1234)';
+  String get codeHint => '유저코드를 붙여넣으세요';
 
   @override
   String get search => '검색';
