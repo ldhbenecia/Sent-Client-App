@@ -14,7 +14,7 @@ import 'l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await NotificationService.instance.init();
+  NotificationService.instance.init();
   final prefs = await SharedPreferences.getInstance();
   runApp(
     ProviderScope(

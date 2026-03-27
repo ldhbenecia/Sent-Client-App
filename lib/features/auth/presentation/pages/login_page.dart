@@ -12,6 +12,7 @@ import '../../../../shared/theme/app_color_theme.dart';
 import '../../../../shared/utils/haptics.dart';
 import '../../../../shared/widgets/sent_logo.dart';
 import '../../../../shared/widgets/tap_scale.dart';
+import '../../../../core/notification/fcm_token_provider.dart';
 import '../../data/services/oauth_service.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -43,6 +44,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ref.invalidate(todoCategoriesProvider);
       ref.invalidate(friendsProvider);
       ref.invalidate(pendingRequestsProvider);
+      // FCM 토큰 등록
+      ref.invalidate(registerFcmTokenProvider);
+      ref.read(registerFcmTokenProvider);
       if (mounted) context.go('/todo');
     } on Exception catch (e) {
       final msg = e.toString();
@@ -202,7 +206,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       textAlign: TextAlign.center,
       text: TextSpan(
         style: TextStyle(
-          color: colors.textDisabled,
+          color: colors.textMuted,
           fontSize: 12,
           height: 1.7,
           letterSpacing: -0.1,
@@ -249,7 +253,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Text(
       '© 2025 Sent. All rights reserved.',
       style: TextStyle(
-        color: colors.textPlaceholder,
+        color: colors.textDisabled,
         fontSize: 11,
         letterSpacing: -0.1,
       ),

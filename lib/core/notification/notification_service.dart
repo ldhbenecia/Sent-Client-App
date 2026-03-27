@@ -23,14 +23,7 @@ class NotificationService {
     // 1. 백그라운드 핸들러 등록
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    // 2. iOS 권한 요청
-    await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    // 3. 포그라운드에서도 알림 배너 표시 (iOS)
+    // 2. 포그라운드에서도 알림 배너 표시 (iOS)
     await _messaging.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
@@ -54,6 +47,16 @@ class NotificationService {
     // 7. 앱 종료 상태에서 알림으로 열린 경우
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) _handleMessageOpen(initialMessage);
+  }
+
+  /// iOS 알림 권한 요청 (로그인 후 호출)
+  Future<bool> requestPermission() async {
+    final settings = await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    return settings.authorizationStatus == AuthorizationStatus.authorized;
   }
 
   /// FCM 토큰 반환 (서버 등록용)

@@ -25,13 +25,13 @@ final fcmTokenRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FcmTokenRepositoryRef = AutoDisposeProviderRef<FcmTokenRepository>;
-String _$registerFcmTokenHash() => r'b5f27ec965a187764a27a442200dbb9e19a7f1c5';
+String _$registerFcmTokenHash() => r'85669cb3d5ef8c04322bb254e8beccf2b0e98009';
 
-/// 로그인 후 호출 — FCM 토큰을 서버에 등록하고, 갱신 리스너도 설정
+/// 로그인 후 호출 — 알림 권한 요청 → FCM 토큰 서버 등록 → 갱신 리스너 설정
 ///
 /// Copied from [registerFcmToken].
 @ProviderFor(registerFcmToken)
-final registerFcmTokenProvider = AutoDisposeFutureProvider<void>.internal(
+final registerFcmTokenProvider = FutureProvider<void>.internal(
   registerFcmToken,
   name: r'registerFcmTokenProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -43,6 +43,6 @@ final registerFcmTokenProvider = AutoDisposeFutureProvider<void>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef RegisterFcmTokenRef = AutoDisposeFutureProviderRef<void>;
+typedef RegisterFcmTokenRef = FutureProviderRef<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

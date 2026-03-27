@@ -28,6 +28,7 @@ GoRouter appRouter(Ref ref) {
   authNotifier.setCleanupCallback(() {
     ref.invalidate(selectedDateProvider);
     ref.invalidate(focusedMonthProvider);
+    ref.invalidate(registerFcmTokenProvider);
   });
 
   return GoRouter(
@@ -40,8 +41,8 @@ GoRouter appRouter(Ref ref) {
         final hasToken = await tokenStorage.hasToken();
         if (!hasToken && !isAuthRoute) return '/auth/login';
         if (hasToken && isAuthRoute) {
-          // 로그인 직후 FCM 토큰 등록
-          ref.invalidate(registerFcmTokenProvider);
+          // 로그인 직후 FCM 토큰 등록 (hot restart 시)
+          ref.read(registerFcmTokenProvider);
           return '/home';
         }
       } catch (_) {

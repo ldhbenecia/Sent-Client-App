@@ -11,11 +11,15 @@ FcmTokenRepository fcmTokenRepository(Ref ref) {
   return FcmTokenRepository(ref.watch(dioProvider));
 }
 
-/// 로그인 후 호출 — FCM 토큰을 서버에 등록하고, 갱신 리스너도 설정
-@riverpod
+/// 로그인 후 호출 — 알림 권한 요청 → FCM 토큰 서버 등록 → 갱신 리스너 설정
+@Riverpod(keepAlive: true)
 Future<void> registerFcmToken(Ref ref) async {
-  final repo = ref.watch(fcmTokenRepositoryProvider);
+  final repo = ref.read(fcmTokenRepositoryProvider);
   final service = NotificationService.instance;
+
+  // 권한 요청 (로그인 후 첫 호출 시 iOS 다이얼로그 표시)
+  final granted = await service.requestPermission();
+  if (!granted) return;
 
   final token = await service.getToken();
   if (token != null) {
