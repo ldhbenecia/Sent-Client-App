@@ -29,6 +29,19 @@ Dio dio(Ref ref) {
         final token = await tokenStorage.getAccessToken();
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
+        } else {
+          // 토큰 없으면 인증 불필요 경로 외 요청 차단
+          final path = options.path;
+          final isPublic = path.startsWith('/api/auth/');
+          if (!isPublic) {
+            return handler.reject(
+              DioException(
+                requestOptions: options,
+                type: DioExceptionType.cancel,
+                message: 'No access token available',
+              ),
+            );
+          }
         }
         handler.next(options);
       },
