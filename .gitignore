@@ -39,6 +39,10 @@ ios/Flutter/Generated.xcconfig
 ios/Flutter/flutter_export_environment.sh
 ios/.symlinks/
 
+# Firebase (contains API keys)
+lib/firebase_options.dart
+ios/Runner/GoogleService-Info.plist
+
 # Environment files
 .env
 .env.*
