@@ -171,7 +171,7 @@ class _AddFriendSheetState extends State<AddFriendSheet> {
                         horizontal: 14, vertical: 12),
                   ),
                   onSubmitted: (_) => _search(),
-                  maxLength: 8,
+                  maxLength: 36,
                   buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
                 ),
               ),

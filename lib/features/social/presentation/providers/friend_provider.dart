@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/network/api_client.dart';
@@ -65,8 +66,14 @@ class Friends extends _$Friends {
 @riverpod
 class SentRequests extends _$SentRequests {
   @override
-  Future<List<SentFriendRequest>> build() =>
-      ref.read(friendRepositoryProvider).fetchSentRequests();
+  Future<List<SentFriendRequest>> build() async {
+    try {
+      return await ref.read(friendRepositoryProvider).fetchSentRequests();
+    } catch (e) {
+      debugPrint('[SentRequests] error: $e');
+      return [];
+    }
+  }
 
   Future<void> cancel(int requestId) async {
     await ref.read(friendRepositoryProvider).cancelRequest(requestId);
@@ -76,10 +83,7 @@ class SentRequests extends _$SentRequests {
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(friendRepositoryProvider).fetchSentRequests(),
-    );
+    state = AsyncData(await build());
   }
 }
 
@@ -87,8 +91,14 @@ class SentRequests extends _$SentRequests {
 @riverpod
 class PendingRequests extends _$PendingRequests {
   @override
-  Future<List<FriendRequest>> build() =>
-      ref.read(friendRepositoryProvider).fetchPendingRequests();
+  Future<List<FriendRequest>> build() async {
+    try {
+      return await ref.read(friendRepositoryProvider).fetchPendingRequests();
+    } catch (e) {
+      debugPrint('[PendingRequests] error: $e');
+      return [];
+    }
+  }
 
   Future<void> accept(int requestId) async {
     await ref.read(friendRepositoryProvider).acceptRequest(requestId);
@@ -106,9 +116,6 @@ class PendingRequests extends _$PendingRequests {
   }
 
   Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(friendRepositoryProvider).fetchPendingRequests(),
-    );
+    state = AsyncData(await build());
   }
 }

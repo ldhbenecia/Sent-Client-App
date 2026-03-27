@@ -39,7 +39,7 @@ final friendsProvider =
     );
 
 typedef _$Friends = AutoDisposeAsyncNotifier<List<Friend>>;
-String _$sentRequestsHash() => r'496a59aefacf8f6a6c2404a43b5ff6df1d40d194';
+String _$sentRequestsHash() => r'9e9e62253deca22f54766e1a0d77508a9ca98f74';
 
 /// See also [SentRequests].
 @ProviderFor(SentRequests)
@@ -58,7 +58,7 @@ final sentRequestsProvider =
     );
 
 typedef _$SentRequests = AutoDisposeAsyncNotifier<List<SentFriendRequest>>;
-String _$pendingRequestsHash() => r'c6d8063a74f3131716335fe3b4a27ec927d0789d';
+String _$pendingRequestsHash() => r'57e42b65b2c5ee85136ab705a3ab022da25bc36b';
 
 /// See also [PendingRequests].
 @ProviderFor(PendingRequests)
